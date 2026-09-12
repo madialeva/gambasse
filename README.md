@@ -54,9 +54,9 @@
 ## Linux development
 
 ```sh
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/Gambasse
+cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build-linux
+./build-linux/Gambasse
 ```
 
 When Qt is not discoverable, add
@@ -68,7 +68,8 @@ and `database.db` beside itself by default; `--base <directory>` overrides it.
 Use a shell where Qt MinGW, Ninja, CMake, and the Qt `bin` directory are on
 `PATH`, then configure as above with `-DCMAKE_PREFIX_PATH="<Qt-prefix>"`.
 
-`deploy.bat` and `deploy.sh` create this self-contained Windows layout:
+`deploy-windows.bat` and `deploy-windows.sh` create this self-contained Windows
+layout:
 
 ```text
 <destination>/
