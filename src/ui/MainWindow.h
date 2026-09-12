@@ -1,0 +1,145 @@
+#pragma once
+
+#include <QMainWindow>
+#include <QVector>
+#include <QTranslator>
+
+#include "data/Patient.h"
+
+class QTableView;
+class QLineEdit;
+class QLabel;
+class QPushButton;
+class QGroupBox;
+class QAction;
+class QMenu;
+class QEvent;
+class QToolButton;
+class QComboBox;
+class QDateEdit;
+class QSpinBox;
+
+namespace gambasse {
+
+class PatientsModel;
+class ColumnFilterProxy;
+
+// Main screen (equivalent to FrmInicial), redesigned as a master-detail view
+// with in-panel patient CRUD.
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+public:
+    explicit MainWindow(QWidget* parent = nullptr);
+
+protected:
+    void changeEvent(QEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+private slots:
+    void onSelectionChanged();
+    void onActionNotImplemented();
+    void onAdd();
+    void onEdit();
+    void onDelete();
+    void onSave();
+    void onCancel();
+
+private:
+    void buildUi();
+    QWidget* buildListPanel();
+    void buildToolbar();
+
+    void positionFilters();
+    void loadIntoFields(const Patient* p);
+    void gatherFromFields(Patient& p) const;
+    void setEditMode(bool editing);
+    int  selectedSourceRow() const;
+    const Patient* selectedPatient() const;
+    void updateContextButtons(const Patient* p);
+    void loadPhoto(const Patient* p);
+    void clearDetail();
+
+    void changeLanguage(const QString& code);
+    void updateLanguageButton();
+    void changeTheme(const QString& mode);
+    void applyTheme(const QString& mode);
+    void styleToolbarButtons();
+    void updateThemeButton();
+    void retranslate();
+
+    // Data
+    PatientsModel*     m_model = nullptr;
+    ColumnFilterProxy* m_proxy = nullptr;
+
+    // List and filter
+    QTableView*           m_table = nullptr;
+    QWidget*              m_filterRow = nullptr;
+    QVector<QLineEdit*>   m_filters;
+
+    // Detail: title labels and editable fields.
+    QGroupBox* m_dataGroup = nullptr;
+    QGroupBox* m_addressGroup = nullptr;
+    QVector<QLabel*> m_valueLabels;   // title labels in the detail panel
+    QLabel*   m_photo = nullptr;
+
+    // Identifier field (read-only; never editable).
+    QLabel* m_codeCaption = nullptr;
+    QLabel* m_codeValue = nullptr;
+
+    // Editable detail fields.
+    QLineEdit* m_nameEdit = nullptr;
+    QComboBox* m_sexCombo = nullptr;
+    QDateEdit* m_dateEdit = nullptr;
+    QSpinBox*  m_ageSpinBox = nullptr;
+    QLineEdit* m_addressEdit = nullptr;
+    QLineEdit* m_cohabitantsEdit = nullptr;
+    QLineEdit* m_contactEdit = nullptr;
+    QSpinBox*  m_siblingsSpinBox = nullptr;
+
+    // Patient CRUD bar above "Basic data".
+    QPushButton* m_addButton = nullptr;
+    QPushButton* m_editButton = nullptr;
+    QPushButton* m_deleteButton = nullptr;
+    QPushButton* m_saveButton = nullptr;
+    QPushButton* m_cancelButton = nullptr;
+
+    // Editing state.
+    bool m_isEditing = false;
+    int  m_editingRow = -1;     // source row being edited; -1 = new patient
+    Patient m_previousPatient;   // previous values, for photo renaming
+
+    // History/consultation entry buttons in the left side of the toolbar.
+    // Keep the QAction returned by QToolBar::addWidget(): it, not the widget,
+    // controls effective visibility in a toolbar.
+    QToolButton* m_pediatricHistoryButton = nullptr;
+    QToolButton* m_pediatricConsultationButton = nullptr;
+    QToolButton* m_adultHistoryButton = nullptr;
+    QToolButton* m_adultConsultationButton = nullptr;
+    QToolButton* m_pregnancyHistoryButton = nullptr;
+    QToolButton* m_pregnancyConsultationButton = nullptr;
+    QAction* m_pediatricHistoryAction = nullptr;
+    QAction* m_pediatricConsultationAction = nullptr;
+    QAction* m_adultHistoryAction = nullptr;
+    QAction* m_adultConsultationAction = nullptr;
+    QAction* m_pregnancyHistoryAction = nullptr;
+    QAction* m_pregnancyConsultationAction = nullptr;
+    // History creation buttons below the detail sections.
+    QPushButton* m_createPediatricButton = nullptr;
+    QPushButton* m_createAdultButton = nullptr;
+    QPushButton* m_createPregnancyButton = nullptr;
+
+    // Toolbar language and theme controls.
+    QToolButton* m_languageButton = nullptr;
+    QToolButton* m_themeButton = nullptr;
+    QAction* m_actEs = nullptr;
+    QAction* m_actPt = nullptr;
+    QAction* m_lightAction = nullptr;
+    QAction* m_darkAction = nullptr;
+
+    // i18n and theme.
+    QTranslator m_translator;
+    QString m_languageCode = QStringLiteral("pt");
+    QString m_theme = QStringLiteral("claro");
+};
+
+} // namespace gambasse

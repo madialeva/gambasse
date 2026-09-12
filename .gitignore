@@ -1,0 +1,50 @@
+# Build (CMake / Ninja)
+build/
+build-linux/
+out/
+cmake-build-*/
+
+# Deploy / empaquetado
+deploy/
+
+# Qt / MOC / UIC / RCC generados
+*_autogen/
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+
+# Qt Creator
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+*.autosave
+
+# Compiladores / IDEs
+*.obj
+*.o
+*.exe
+*.dll
+*.pdb
+*.ilk
+.vs/
+.vscode/
+*.vcxproj*
+*.sln
+
+# ---- AI's folders and files ----
+.claude/
+.github/
+.opencode/
+openspec/
+AGENTS.md
+
+# Configuración local
+config.ini
+database.db
+tmp/
+
+# Windows
+Thumbs.db
+desktop.ini

@@ -1,0 +1,12 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/img">
+    <file alias="logo-historias.jpg">img/logo-historias.jpg</file>
+    <file alias="foto0.png">img/foto0.png</file>
+    <file alias="flag-es.png">img/flag-es.png</file>
+    <file alias="flag-pt.png">img/flag-pt.png</file>
+    <file alias="sun.svg">img/sun.svg</file>
+    <file alias="moon.svg">img/moon.svg</file>
+    <file alias="github.svg">img/github.svg</file>
+  </qresource>
+</RCC>

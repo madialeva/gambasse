@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/i18n">
+    <file alias="gambasse_pt.qm">gambasse_pt.qm</file>
+    <file alias="gambasse_es.qm">gambasse_es.qm</file>
+  </qresource>
+</RCC>
