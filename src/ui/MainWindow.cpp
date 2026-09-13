@@ -4,6 +4,7 @@
 #include "data/Database.h"
 #include "data/PatientsModel.h"
 #include "filter/ColumnFilterProxy.h"
+#include "ui/TitleBar.h"
 
 #include <QApplication>
 #include <QAbstractButton>
@@ -18,6 +19,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFont>
+#include <QMouseEvent>
 #include <QSpinBox>
 #include <QFormLayout>
 #include <QGridLayout>
@@ -49,6 +51,13 @@
 namespace gambasse {
 
 namespace {
+
+// Resize border width (pixels) for the frameless window.
+constexpr int kResizeMargin = 6;
+
+// Resize edge flags.
+enum ResizeEdge { NoEdge = 0, EdgeLeft = 1, EdgeTop = 2, EdgeRight = 4, EdgeBottom = 8 };
+
 // Detail panel field indexes.
 enum Field { FieldName = 0, FieldSex, FieldDate, FieldAge, FieldAddress, FieldCohabitants, FieldContact, FieldSiblings, FieldCount };
 
@@ -85,15 +94,31 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 void MainWindow::buildUi() {
+    // Frameless window: the OS title bar is replaced by the custom TitleBar.
+    // Keep the Qt::Window type so the taskbar entry is preserved.
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setMinimumSize(960, 540);
     resize(1008, 561); // base size for the oldest supported laptops
+
+    // Custom title bar first: logo, name, language, theme, window controls.
+    // It must exist before buildToolbar(), which moves the language and
+    // theme buttons into it.
+    m_titleBar = new TitleBar();
 
     // Create the top toolbar, including history/consultation entry buttons.
     buildToolbar();
 
     auto* central = new QWidget(this);
     auto* v = new QVBoxLayout(central);
-    v->setContentsMargins(6, 6, 6, 6);
+    v->setContentsMargins(6, 0, 6, 6);
+
+    v->addWidget(m_titleBar);
+    v->addWidget(m_toolbar);
+
+    // Manual edge resizing (lost with the native frame) is handled through
+    // an event filter on the title bar and the central widget.
+    m_titleBar->installEventFilter(this);
+    central->installEventFilter(this);
 
     // History-creation buttons, located below the photo in the right column.
     m_createPediatricButton = new QPushButton(central);
@@ -209,7 +234,10 @@ void MainWindow::buildUi() {
 }
 
 void MainWindow::buildToolbar() {
-    auto* toolbar = addToolBar(QStringLiteral("toolbar"));
+    // Plain widget in the central layout (below the title bar), not a docked
+    // toolbar: docked toolbars always render above the central area.
+    m_toolbar = new QToolBar(this);
+    QToolBar* toolbar = m_toolbar;
     toolbar->setMovable(false);
     toolbar->setIconSize(QSize(28, 18));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -230,13 +258,10 @@ void MainWindow::buildToolbar() {
     m_pregnancyHistoryButton = createActionButton(m_pregnancyHistoryAction);
     m_pregnancyConsultationButton = createActionButton(m_pregnancyConsultationAction);
 
-    // Spacer that pushes language and theme controls to the right.
-    auto* esp = new QWidget(toolbar);
-    esp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    toolbar->addWidget(esp);
-
+    // Language and theme live in the custom title bar now (same buttons,
+    // menus and persistence as before).
     // Language button: flag and name, with a language menu.
-    m_languageButton = new QToolButton(toolbar);
+    m_languageButton = new QToolButton(m_titleBar);
     m_languageButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_languageButton->setPopupMode(QToolButton::InstantPopup);
     auto* menuIdioma = new QMenu(m_languageButton);
@@ -251,10 +276,10 @@ void MainWindow::buildToolbar() {
     connect(m_actEs, &QAction::triggered, this, [this]() { changeLanguage(QStringLiteral("es")); });
     connect(m_actPt, &QAction::triggered, this, [this]() { changeLanguage(QStringLiteral("pt")); });
     m_languageButton->setMenu(menuIdioma);
-    toolbar->addWidget(m_languageButton);
+    m_titleBar->insertControl(m_languageButton);
 
     // Theme button: sun/moon and name, with a light/dark menu.
-    m_themeButton = new QToolButton(toolbar);
+    m_themeButton = new QToolButton(m_titleBar);
     m_themeButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_themeButton->setPopupMode(QToolButton::InstantPopup);
     auto* menuTema = new QMenu(m_themeButton);
@@ -269,7 +294,7 @@ void MainWindow::buildToolbar() {
     connect(m_lightAction, &QAction::triggered, this, [this]() { changeTheme(QStringLiteral("claro")); });
     connect(m_darkAction, &QAction::triggered, this, [this]() { changeTheme(QStringLiteral("oscuro")); });
     m_themeButton->setMenu(menuTema);
-    toolbar->addWidget(m_themeButton);
+    m_titleBar->insertControl(m_themeButton);
 }
 
 QWidget* MainWindow::buildListPanel() {
@@ -703,6 +728,26 @@ void MainWindow::styleToolbarButtons() {
     for (QPushButton* b : {m_createPediatricButton, m_createAdultButton, m_createPregnancyButton,
                            m_addButton, m_editButton, m_deleteButton, m_saveButton, m_cancelButton})
         if (b) b->setStyleSheet(pushButtonStyle);
+
+    // Custom title-bar window controls: flat buttons with a subtle hover and
+    // a red close on hover, following the active theme.
+    if (m_titleBar) {
+        const QString windowBase =
+            QStringLiteral("QToolButton { background:transparent; border:none;"
+                           " padding:4px 8px; font-weight:bold; }"
+                           " QToolButton:hover:enabled { background:%1; }"
+                           " QToolButton:pressed:enabled { background:%2; }")
+                .arg(hover, press);
+        const QString closeStyle =
+            QStringLiteral("QToolButton { background:transparent; border:none;"
+                           " padding:4px 8px; font-weight:bold; }"
+                           " QToolButton:hover:enabled { background:#E81123; color:white; }"
+                           " QToolButton:pressed:enabled { background:#A00A18; color:white; }");
+        for (QToolButton* b : m_titleBar->windowButtons()) {
+            if (b)
+                b->setStyleSheet(b == m_titleBar->closeButton() ? closeStyle : windowBase);
+        }
+    }
 }
 
 void MainWindow::applyTheme(const QString& mode) {
@@ -764,6 +809,8 @@ void MainWindow::updateThemeButton() {
 void MainWindow::changeEvent(QEvent* event) {
     if (event && event->type() == QEvent::LanguageChange)
         retranslate();
+    if (event && event->type() == QEvent::WindowStateChange && m_titleBar)
+        m_titleBar->refreshMaximizeGlyph();
     QMainWindow::changeEvent(event);
 }
 
@@ -826,7 +873,89 @@ void MainWindow::retranslate() {
 bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
     if (m_table && obj == m_table->viewport() && event->type() == QEvent::Resize)
         positionFilters();
+
+    // Manual edge resizing for the frameless window. The filter runs before
+    // the title bar's own drag handling, so border presses resize while the
+    // rest of the bar still moves the window.
+    if (m_titleBar && (obj == m_titleBar || obj == centralWidget())) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto* press = static_cast<QMouseEvent*>(event);
+            if (press->button() == Qt::LeftButton) {
+                const int edges = resizeEdgesAt(press->globalPosition().toPoint());
+                if (edges != NoEdge) {
+                    m_resizeEdges = edges;
+                    m_resizeStartPos = press->globalPosition().toPoint();
+                    m_resizeStartGeometry = frameGeometry();
+                    return true;
+                }
+            }
+        } else if (event->type() == QEvent::MouseMove) {
+            auto* move = static_cast<QMouseEvent*>(event);
+            const QPoint globalPos = move->globalPosition().toPoint();
+            if (m_resizeEdges != NoEdge) {
+                QRect geometry = m_resizeStartGeometry;
+                const QPoint delta = globalPos - m_resizeStartPos;
+                if (m_resizeEdges & EdgeLeft)
+                    geometry.setLeft(geometry.left() + delta.x());
+                if (m_resizeEdges & EdgeRight)
+                    geometry.setRight(geometry.right() + delta.x());
+                if (m_resizeEdges & EdgeTop)
+                    geometry.setTop(geometry.top() + delta.y());
+                if (m_resizeEdges & EdgeBottom)
+                    geometry.setBottom(geometry.bottom() + delta.y());
+                if (geometry.width() < minimumWidth())
+                    geometry.setWidth(minimumWidth());
+                if (geometry.height() < minimumHeight())
+                    geometry.setHeight(minimumHeight());
+                setGeometry(geometry.normalized());
+                return true;
+            }
+            if (QWidget* watched = qobject_cast<QWidget*>(obj))
+                watched->setCursor(cursorForEdges(resizeEdgesAt(globalPos)));
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+            auto* release = static_cast<QMouseEvent*>(event);
+            if (release->button() == Qt::LeftButton && m_resizeEdges != NoEdge) {
+                m_resizeEdges = NoEdge;
+                return true;
+            }
+        }
+    }
     return QMainWindow::eventFilter(obj, event);
+}
+
+int MainWindow::resizeEdgesAt(const QPoint& globalPos) const {
+    if (isMaximized())
+        return NoEdge;
+    const QRect frame = frameGeometry();
+    int edges = NoEdge;
+    if (globalPos.x() <= frame.left() + kResizeMargin)
+        edges |= EdgeLeft;
+    if (globalPos.x() >= frame.right() - kResizeMargin)
+        edges |= EdgeRight;
+    if (globalPos.y() <= frame.top() + kResizeMargin)
+        edges |= EdgeTop;
+    if (globalPos.y() >= frame.bottom() - kResizeMargin)
+        edges |= EdgeBottom;
+    return edges;
+}
+
+Qt::CursorShape MainWindow::cursorForEdges(int edges) {
+    switch (edges) {
+    case EdgeLeft:
+    case EdgeRight:
+        return Qt::SizeHorCursor;
+    case EdgeTop:
+    case EdgeBottom:
+        return Qt::SizeVerCursor;
+    case EdgeLeft | EdgeTop:
+    case EdgeRight | EdgeBottom:
+        return Qt::SizeFDiagCursor;
+    case EdgeRight | EdgeTop:
+    case EdgeLeft | EdgeBottom:
+        return Qt::SizeBDiagCursor;
+    default:
+        return Qt::ArrowCursor;
+    }
 }
 
 } // namespace gambasse
