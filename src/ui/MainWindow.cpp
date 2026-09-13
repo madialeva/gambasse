@@ -110,9 +110,10 @@ void MainWindow::buildUi() {
 
     auto* central = new QWidget(this);
     auto* v = new QVBoxLayout(central);
-    v->setContentsMargins(6, 6, 6, 6);
+    v->setContentsMargins(6, 0, 6, 6);
 
     v->addWidget(m_titleBar);
+    v->addWidget(m_toolbar);
 
     // Manual edge resizing (lost with the native frame) is handled through
     // an event filter on the title bar and the central widget.
@@ -233,7 +234,10 @@ void MainWindow::buildUi() {
 }
 
 void MainWindow::buildToolbar() {
-    auto* toolbar = addToolBar(QStringLiteral("toolbar"));
+    // Plain widget in the central layout (below the title bar), not a docked
+    // toolbar: docked toolbars always render above the central area.
+    m_toolbar = new QToolBar(this);
+    QToolBar* toolbar = m_toolbar;
     toolbar->setMovable(false);
     toolbar->setIconSize(QSize(28, 18));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);

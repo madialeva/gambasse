@@ -14,6 +14,7 @@ class QGroupBox;
 class QAction;
 class QMenu;
 class QEvent;
+class QToolBar;
 class QToolButton;
 class QComboBox;
 class QDateEdit;
@@ -137,6 +138,9 @@ private:
     // Custom title bar (frameless window) hosting logo, name, language,
     // theme and window controls.
     TitleBar* m_titleBar = nullptr;
+    // Entry-button toolbar below the title bar (a plain layout widget, so it
+    // stays under the custom bar instead of docking above the central area).
+    QToolBar* m_toolbar = nullptr;
 
     // Active manual resize state (NoEdge = not resizing).
     int m_resizeEdges = 0;
