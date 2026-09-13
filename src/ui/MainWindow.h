@@ -23,6 +23,7 @@ namespace gambasse {
 
 class PatientsModel;
 class ColumnFilterProxy;
+class TitleBar;
 
 // Main screen (equivalent to FrmInicial), redesigned as a master-detail view
 // with in-panel patient CRUD.
@@ -66,6 +67,11 @@ private:
     void styleToolbarButtons();
     void updateThemeButton();
     void retranslate();
+
+    // Manual edge resizing for the frameless window (the event filter on the
+    // title bar and the central widget feeds these).
+    int resizeEdgesAt(const QPoint& globalPos) const;
+    static Qt::CursorShape cursorForEdges(int edges);
 
     // Data
     PatientsModel*     m_model = nullptr;
@@ -128,7 +134,16 @@ private:
     QPushButton* m_createAdultButton = nullptr;
     QPushButton* m_createPregnancyButton = nullptr;
 
-    // Toolbar language and theme controls.
+    // Custom title bar (frameless window) hosting logo, name, language,
+    // theme and window controls.
+    TitleBar* m_titleBar = nullptr;
+
+    // Active manual resize state (NoEdge = not resizing).
+    int m_resizeEdges = 0;
+    QPoint m_resizeStartPos;
+    QRect m_resizeStartGeometry;
+
+    // Toolbar language and theme controls (hosted by the title bar).
     QToolButton* m_languageButton = nullptr;
     QToolButton* m_themeButton = nullptr;
     QAction* m_actEs = nullptr;

@@ -22,6 +22,7 @@ set(SOURCES
     src/main.cpp
     src/ui/SplashWindow.cpp
     src/ui/MainWindow.cpp
+    src/ui/TitleBar.cpp
     src/data/Database.cpp
     src/data/PatientsModel.cpp
     src/filter/ColumnFilterProxy.cpp
@@ -31,6 +32,7 @@ set(HEADERS
     src/Paths.h
     src/ui/SplashWindow.h
     src/ui/MainWindow.h
+    src/ui/TitleBar.h
     src/data/Database.h
     src/data/Patient.h
     src/data/PatientsModel.h
