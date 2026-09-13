@@ -35,10 +35,8 @@ CMakeLists.txt.user.*
 
 # ---- AI's folders and files ----
 .claude/
-.github/
 .opencode/
 openspec/
-AGENTS.md
 
 # Configuración local
 config.ini
