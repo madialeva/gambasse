@@ -10,6 +10,8 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
+include(CTest)
+
 # --- UxWidgets control library ----------------------------------------------
 # UxWidgets lives in its OWN Git repository, outside this project.
 # To adopt its controls in the Qt screens, point to the location where that
@@ -80,4 +82,8 @@ if(WIN32)
     set_target_properties(Lanzador PROPERTIES OUTPUT_NAME "gambasse")
     target_link_libraries(Lanzador PRIVATE shell32)
     target_link_options(Lanzador PRIVATE -static -static-libgcc -static-libstdc++)
+endif()
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
 endif()
