@@ -7,6 +7,15 @@ nursing-consultation application for an NGO in Guinea-Bissau. The production
 .NET application is the functional reference. Both use the same SQLite database,
 so persistent contracts take precedence over naming consistency.
 
+The reference is a VB.NET WinForms application on .NET Framework 4.5, fully
+operational on real PCs. A local copy lives in `tmp/dispensario/` (git-ignored,
+so it may be absent after a fresh clone) — consult it for every piece of Qt
+business logic and every screen still to be developed: `src/Dispensario/Forms/`
+(including the six `FrmHistoria*`/`FrmConsulta*` child forms),
+`src/Dispensario/ORM/` (data access per area), and
+`src/Dispensario/Utilidades/` (shared framework, NOT to be ported: Qt covers
+those services natively).
+
 Use Qt Widgets, CMake, Ninja, and a MinGW/GCC Qt kit for Windows deployment. Do
 not introduce QML, MSVC, PostgreSQL, or new production dependencies without an
 approved OpenSpec change.
