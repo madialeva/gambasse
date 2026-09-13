@@ -85,11 +85,16 @@ Each OpenSpec change is tracked on GitHub with this cycle:
 1. OpenSpec proposal approved by the user.
 2. GitHub issue for the change, linking its `openspec/changes/<name>/`
    folder (plus its milestone once milestones exist; the Projects board stays
-   light: Todo / In progress / Done).
+   light: Todo / In progress / Done). While active, the change folder is named
+   `is<n>-<slug>` after its issue; the date prefix is added only when the
+   change is archived.
 3. Branch created from the issue (Development panel → "Create a branch";
    name like `change/is<n>-<slug>`) starting from `main`.
 4. Implementation on the branch + push (pushes are done by the user; the
-   agent has no SSH access to `origin` from its shell).
+   agent has no SSH access to `origin` from its shell). The agent never
+   commits on its own: work stays uncommitted on the branch until the user
+   validates it (including visual verification); commit only after the user
+   explicitly confirms.
 5. PR toward `main` with `Closes #<n>` in the description → the Linux CI
    (`ci-linux.yml`) validates the PR → user reviews the diff.
 6. Squash merge as the norm (one change = one clean commit on `main`).
