@@ -5,6 +5,7 @@
 <h1 align="center">Gambasse</h1>
 
 <p align="center">
+  <a href="https://github.com/madialeva/gambasse/actions/workflows/ci-linux.yml"><img src="https://github.com/madialeva/gambasse/actions/workflows/ci-linux.yml/badge.svg" alt="ci-linux" /></a>
   <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" /></a>
   <a href="#"><img src="https://img.shields.io/badge/c%2B%2B-17-00599C?logo=cplusplus&logoColor=white" alt="C++17" /></a>
   <a href="#"><img src="https://img.shields.io/badge/Qt-6-41CD52?logo=qt&logoColor=white" alt="Qt 6" /></a>
