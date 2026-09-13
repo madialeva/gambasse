@@ -12,15 +12,11 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
 include(CTest)
 
-# --- UxWidgets control library ----------------------------------------------
-# UxWidgets lives in its OWN Git repository, outside this project.
-# To adopt its controls in the Qt screens, point to the location where that
-# repository is cloned, then uncomment and link it. The actual adoption in the
-# six windows belongs to later changes; this only records the integration path.
-#
-# set(UXWIDGETS_BUILD_DEMO OFF)
-# add_subdirectory(<path-to-UxWidgets-repository> ${CMAKE_BINARY_DIR}/UxWidgets)
-# target_link_libraries(Gambasse ... UxWidgets::UxWidgets)
+# --- UxWidgets control library (vendored) ------------------------------------
+# Self-contained copy under src/uxwidgets, so the project does not depend on
+# the external Qt.UxWidgets repository. Adoption in the screens belongs to
+# later issues; here the library only needs to compile and link.
+add_subdirectory(src/uxwidgets)
 
 set(SOURCES
     src/main.cpp
@@ -55,6 +51,7 @@ target_link_libraries(Gambasse PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::Sql
+    UxWidgets::UxWidgets
 )
 
 # After building, copy Qt DLLs and plugins next to the executable on Windows so
