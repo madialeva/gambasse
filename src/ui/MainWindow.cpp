@@ -1,6 +1,15 @@
 #include "MainWindow.h"
 
 #include "../Paths.h"
+#include "UxWidgets/UxComboInput.h"
+#include "UxWidgets/UxDateField.h"
+#include "UxWidgets/UxDateInput.h"
+#include "UxWidgets/UxField.h"
+#include "UxWidgets/UxLabel.h"
+#include "UxWidgets/UxNumberField.h"
+#include "UxWidgets/UxNumberInput.h"
+#include "UxWidgets/UxTextField.h"
+#include "UxWidgets/UxTextInput.h"
 #include "data/Database.h"
 #include "data/PatientsModel.h"
 #include "filter/ColumnFilterProxy.h"
@@ -13,14 +22,12 @@
 #include <QColor>
 #include <QComboBox>
 #include <QCoreApplication>
-#include <QDateEdit>
 #include <QDir>
 #include <QEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QFont>
 #include <QMouseEvent>
-#include <QSpinBox>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -45,7 +52,6 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
-#include <QValidator>
 #include <QVBoxLayout>
 
 namespace gambasse {
@@ -57,19 +63,6 @@ constexpr int kResizeMargin = 6;
 
 // Resize edge flags.
 enum ResizeEdge { NoEdge = 0, EdgeLeft = 1, EdgeTop = 2, EdgeRight = 4, EdgeBottom = 8 };
-
-// Detail panel field indexes.
-enum Field { FieldName = 0, FieldSex, FieldDate, FieldAge, FieldAddress, FieldCohabitants, FieldContact, FieldSiblings, FieldCount };
-
-// Converts input to upper case to prevent duplicates differing only in case.
-class UppercaseValidator : public QValidator {
-public:
-    using QValidator::QValidator;
-    State validate(QString& s, int& /*pos*/) const override {
-        s = s.toUpper();
-        return Acceptable;
-    }
-};
 }
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -147,13 +140,9 @@ void MainWindow::buildUi() {
     v->addLayout(topRow, 1);
 
     // --- Campos editables del detalle ---
-    m_valueLabels.resize(FieldCount);
-    for (int i = 0; i < FieldCount; ++i)
-        m_valueLabels[i] = new QLabel(central);
-
-    // Identifier: always read-only (a QLabel, excluded from edit toggling).
-    m_codeCaption = new QLabel(central);
-    m_codeValue = new QLabel(central);
+    // Identifier: always read-only, shown with the custom non-editable label.
+    m_codeCaption = new UxLabel(central);
+    m_codeValue = new UxLabel(central);
     m_codeValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     // Field limits mirror b01_paciente columns.
@@ -162,27 +151,26 @@ void MainWindow::buildUi() {
     constexpr int kMaxCohabitants = 100;  // b01_e_coabitantes
     constexpr int kMaxContact     = 100;  // b01_e_pessoacontacto
 
-    m_nameEdit = new QLineEdit(central);
-    m_nameEdit->setValidator(new UppercaseValidator(m_nameEdit));  // enforce upper case
-    m_nameEdit->setMaxLength(kMaxName);
-    m_sexCombo = new QComboBox(central);
+    // Custom UxWidgets composite controls (label + field in one widget).
+    m_nameInput = new UxTextInput(QString(), central);
+    m_nameInput->textField()->setUppercase(true);  // prevent case-only duplicates
+    m_nameInput->setRequired(true);                // visual feedback when empty
+    m_nameInput->setMaxLength(kMaxName);
+    m_sexInput = new UxComboInput(QString(), central);
     // Persisted domain terms (Galician/Portuguese), matching the Sex column.
-    m_sexCombo->addItem(QStringLiteral("Home"), static_cast<int>(Patient::Sex::Home));
-    m_sexCombo->addItem(QStringLiteral("Muller"), static_cast<int>(Patient::Sex::Muller));
-    m_dateEdit = new QDateEdit(central);
-    m_dateEdit->setDisplayFormat(QStringLiteral("dd/MM/yyyy"));
-    m_dateEdit->setCalendarPopup(true);
-    m_dateEdit->setDateRange(QDate(1900, 1, 1), QDate(2100, 12, 31));
-    m_ageSpinBox = new QSpinBox(central);
-    m_ageSpinBox->setRange(0, 130);
-    m_addressEdit = new QLineEdit(central);
-    m_addressEdit->setMaxLength(kMaxAddress);
-    m_cohabitantsEdit = new QLineEdit(central);
-    m_cohabitantsEdit->setMaxLength(kMaxCohabitants);
-    m_contactEdit = new QLineEdit(central);
-    m_contactEdit->setMaxLength(kMaxContact);
-    m_siblingsSpinBox = new QSpinBox(central);
-    m_siblingsSpinBox->setRange(0, 99);
+    m_sexInput->comboBox()->addItem(QStringLiteral("Home"), static_cast<int>(Patient::Sex::Home));
+    m_sexInput->comboBox()->addItem(QStringLiteral("Muller"), static_cast<int>(Patient::Sex::Muller));
+    m_dateInput = new UxDateInput(QString(), central);
+    m_ageInput = new UxNumberInput(QString(), central);
+    m_ageInput->numberField()->setIntegerDigits(3);
+    m_addressInput = new UxTextInput(QString(), central);
+    m_addressInput->setMaxLength(kMaxAddress);
+    m_cohabitantsInput = new UxTextInput(QString(), central);
+    m_cohabitantsInput->setMaxLength(kMaxCohabitants);
+    m_contactInput = new UxTextInput(QString(), central);
+    m_contactInput->setMaxLength(kMaxContact);
+    m_siblingsInput = new UxNumberInput(QString(), central);
+    m_siblingsInput->numberField()->setIntegerDigits(2);
 
     // --- Patient CRUD bar above "Basic data". ---
     m_addButton    = new QPushButton(central);
@@ -203,25 +191,31 @@ void MainWindow::buildUi() {
 
     // --- Detail row: "Basic data" (left) and "Address" (right). ---
     m_dataGroup = new QGroupBox(central);
-    auto* dataForm = new QFormLayout(m_dataGroup);
-    // First row: read-only identifier (left) and name (remaining space).
+    auto* dataFields = new QVBoxLayout(m_dataGroup);
+    // First row: read-only identifier (left) and name (remaining space). The
+    // name control carries its own integrated label.
     m_codeValue->setMinimumWidth(45);
     auto* codeAndNameRow = new QHBoxLayout();
+    codeAndNameRow->addWidget(m_codeCaption);
     codeAndNameRow->addWidget(m_codeValue);
     codeAndNameRow->addSpacing(12);
-    codeAndNameRow->addWidget(m_valueLabels[FieldName]);
-    codeAndNameRow->addWidget(m_nameEdit, 1);
-    dataForm->addRow(m_codeCaption, codeAndNameRow);
-    dataForm->addRow(m_valueLabels[FieldSex],   m_sexCombo);
-    dataForm->addRow(m_valueLabels[FieldDate],  m_dateEdit);
-    dataForm->addRow(m_valueLabels[FieldAge],   m_ageSpinBox);
+    codeAndNameRow->addWidget(m_nameInput, 1);
+    dataFields->addLayout(codeAndNameRow);
+
+    // Sex uses the custom label + combo composite like the rest of the fields.
+    dataFields->addWidget(m_sexInput);
+
+    dataFields->addWidget(m_dateInput);
+    dataFields->addWidget(m_ageInput);
+    dataFields->addStretch(1);
 
     m_addressGroup = new QGroupBox(central);
-    auto* addressForm = new QFormLayout(m_addressGroup);
-    addressForm->addRow(m_valueLabels[FieldAddress], m_addressEdit);
-    addressForm->addRow(m_valueLabels[FieldCohabitants], m_cohabitantsEdit);
-    addressForm->addRow(m_valueLabels[FieldContact], m_contactEdit);
-    addressForm->addRow(m_valueLabels[FieldSiblings], m_siblingsSpinBox);
+    auto* addressLayout = new QVBoxLayout(m_addressGroup);
+    addressLayout->addWidget(m_addressInput);
+    addressLayout->addWidget(m_cohabitantsInput);
+    addressLayout->addWidget(m_contactInput);
+    addressLayout->addWidget(m_siblingsInput);
+    addressLayout->addStretch(1);
 
     auto* dataLayout = new QHBoxLayout();
     dataLayout->addWidget(m_dataGroup, 1);
@@ -403,45 +397,54 @@ void MainWindow::onSelectionChanged() {
 void MainWindow::loadIntoFields(const Patient* p) {
     if (!p) {
         m_codeValue->clear();
-        m_nameEdit->clear();
-        m_sexCombo->setCurrentIndex(m_sexCombo->findData(static_cast<int>(Patient::Sex::Muller)));
-        m_dateEdit->setDate(QDate(1900, 1, 1));
-        m_ageSpinBox->setValue(0);
-        m_addressEdit->clear();
-        m_cohabitantsEdit->clear();
-        m_contactEdit->clear();
-        m_siblingsSpinBox->setValue(0);
+        m_nameInput->setText(QString());
+        m_sexInput->comboBox()->setCurrentIndex(
+            m_sexInput->comboBox()->findData(static_cast<int>(Patient::Sex::Muller)));
+        m_dateInput->setText(QDate(1900, 1, 1).toString(QString::fromLatin1(UxDateField::kDateFormat)));
+        m_ageInput->setText(QStringLiteral("0"));
+        m_addressInput->setText(QString());
+        m_cohabitantsInput->setText(QString());
+        m_contactInput->setText(QString());
+        m_siblingsInput->setText(QStringLiteral("0"));
         return;
     }
     m_codeValue->setText(QString::number(p->id));
-    m_nameEdit->setText(p->name);
-    m_sexCombo->setCurrentIndex(m_sexCombo->findData(static_cast<int>(p->sex)));
-    m_dateEdit->setDate(p->birthDate.isValid() ? p->birthDate : QDate(1900, 1, 1));
-    m_ageSpinBox->setValue(p->ageRange);
-    m_addressEdit->setText(p->address);
-    m_cohabitantsEdit->setText(p->cohabitants);
-    m_contactEdit->setText(p->contactPerson);
-    m_siblingsSpinBox->setValue(p->siblingCount);
+    m_nameInput->setText(p->name);
+    m_sexInput->comboBox()->setCurrentIndex(
+        m_sexInput->comboBox()->findData(static_cast<int>(p->sex)));
+    const QDate birth = p->birthDate.isValid() ? p->birthDate : QDate(1900, 1, 1);
+    m_dateInput->setText(birth.toString(QString::fromLatin1(UxDateField::kDateFormat)));
+    m_ageInput->setText(QString::number(p->ageRange));
+    m_addressInput->setText(p->address);
+    m_cohabitantsInput->setText(p->cohabitants);
+    m_contactInput->setText(p->contactPerson);
+    m_siblingsInput->setText(QString::number(p->siblingCount));
 }
 
 void MainWindow::gatherFromFields(Patient& p) const {
-    p.name = m_nameEdit->text().trimmed();
-    p.sex = static_cast<Patient::Sex>(m_sexCombo->currentData().toInt());
-    p.birthDate = m_dateEdit->date();
-    p.ageRange = m_ageSpinBox->value();
-    p.address = m_addressEdit->text().trimmed();
-    p.cohabitants = m_cohabitantsEdit->text().trimmed();
-    p.contactPerson = m_contactEdit->text().trimmed();
-    p.siblingCount = m_siblingsSpinBox->value();
+    p.name = m_nameInput->text().trimmed();
+    p.sex = static_cast<Patient::Sex>(m_sexInput->comboBox()->currentData().toInt());
+    QDate birth = QDate::fromString(m_dateInput->text().trimmed(),
+                                    QString::fromLatin1(UxDateField::kDateFormat));
+    if (!birth.isValid() || birth.year() < 1900 || birth.year() > 2100)
+        birth = QDate(1900, 1, 1);
+    p.birthDate = birth;
+    p.ageRange = qBound(0, m_ageInput->text().toInt(), 130);
+    p.address = m_addressInput->text().trimmed();
+    p.cohabitants = m_cohabitantsInput->text().trimmed();
+    p.contactPerson = m_contactInput->text().trimmed();
+    p.siblingCount = qBound(0, m_siblingsInput->text().toInt(), 99);
 }
 
 void MainWindow::setEditMode(bool editing) {
     m_isEditing = editing;
-    for (QWidget* w : {static_cast<QWidget*>(m_nameEdit), static_cast<QWidget*>(m_sexCombo),
-                       static_cast<QWidget*>(m_dateEdit), static_cast<QWidget*>(m_ageSpinBox),
-                       static_cast<QWidget*>(m_addressEdit), static_cast<QWidget*>(m_cohabitantsEdit),
-                       static_cast<QWidget*>(m_contactEdit), static_cast<QWidget*>(m_siblingsSpinBox)})
-        if (w) w->setEnabled(editing);
+    // Disable the inner fields, not the composites, so their labels keep the
+    // normal (non-disabled) colour in view mode.
+    const QVector<UxInput*> inputs = {m_nameInput, m_dateInput, m_ageInput, m_addressInput,
+                                      m_cohabitantsInput, m_contactInput, m_siblingsInput};
+    for (UxInput* input : inputs)
+        if (input) input->field()->setEnabled(editing);
+    if (m_sexInput) m_sexInput->comboBox()->setEnabled(editing);
 
     if (m_addButton)    m_addButton->setEnabled(!editing);
     if (m_editButton) m_editButton->setEnabled(!editing);
@@ -472,7 +475,7 @@ void MainWindow::onAdd() {
     updateContextButtons(nullptr);
     loadPhoto(nullptr);
     setEditMode(true);
-    m_nameEdit->setFocus();
+    m_nameInput->textField()->setFocus();
 }
 
 void MainWindow::onEdit() {
@@ -484,7 +487,7 @@ void MainWindow::onEdit() {
     m_previousPatient = *p;       // used to rename the photo if its name changes
     loadIntoFields(p);
     setEditMode(true);
-    m_nameEdit->setFocus();
+    m_nameInput->textField()->setFocus();
 }
 
 void MainWindow::onCancel() {
@@ -501,7 +504,7 @@ void MainWindow::onSave() {
     gatherFromFields(p);
     if (p.name.isEmpty()) {
         QMessageBox::warning(this, tr("Incomplete data"), tr("Name is required."));
-        m_nameEdit->setFocus();
+        m_nameInput->textField()->setFocus();
         return;
     }
 
@@ -830,16 +833,15 @@ void MainWindow::retranslate() {
     if (m_addressGroup) m_addressGroup->setTitle(tr("Address"));
 
     if (m_codeCaption) m_codeCaption->setText(tr("Code:"));
-    if (!m_valueLabels.isEmpty()) {
-        m_valueLabels[FieldName]->setText(tr("Name:"));
-        m_valueLabels[FieldSex]->setText(tr("Sex:"));
-        m_valueLabels[FieldDate]->setText(tr("Birth date:"));
-        m_valueLabels[FieldAge]->setText(tr("Age:"));
-        m_valueLabels[FieldAddress]->setText(tr("Address:"));
-        m_valueLabels[FieldCohabitants]->setText(tr("Cohabitants:"));
-        m_valueLabels[FieldContact]->setText(tr("Contact:"));
-        m_valueLabels[FieldSiblings]->setText(tr("Siblings:"));
-    }
+    if (m_sexInput) m_sexInput->setLabelText(tr("Sex:"));
+    if (m_nameInput) m_nameInput->setLabelText(tr("Name:"));
+    if (m_dateInput) m_dateInput->setLabelText(tr("Birth date:"));
+    if (m_ageInput) m_ageInput->setLabelText(tr("Age:"));
+    if (m_addressInput) m_addressInput->setLabelText(tr("Address:"));
+    if (m_cohabitantsInput) m_cohabitantsInput->setLabelText(tr("Cohabitants:"));
+    if (m_contactInput) m_contactInput->setLabelText(tr("Contact:"));
+    if (m_siblingsInput) m_siblingsInput->setLabelText(tr("Siblings:"));
+    alignDetailLabels();
 
     if (m_pediatricHistoryButton) {
         m_createPediatricButton->setText(tr("Create pediatric history"));
@@ -868,6 +870,29 @@ void MainWindow::retranslate() {
         const QString cab = m_model->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString();
         m_filters[c]->setPlaceholderText(cab);
     }
+}
+
+void MainWindow::alignDetailLabels() {
+    // Integrated labels take their natural width, so the fields of a detail
+    // group would not line up in a column. Give the labels of each group a
+    // common width (recomputed after every retranslation).
+    auto labelOf = [](QWidget* widget) -> QLabel* {
+        if (auto* caption = qobject_cast<QLabel*>(widget))
+            return caption;
+        return widget->findChild<QLabel*>();
+    };
+    auto align = [&labelOf](const QVector<QWidget*>& widgets) {
+        int width = 0;
+        for (QWidget* w : widgets)
+            if (QLabel* label = labelOf(w))
+                width = qMax(width, label->sizeHint().width());
+        for (QWidget* w : widgets)
+            if (QLabel* label = labelOf(w))
+                label->setFixedWidth(width);
+    };
+
+    align({m_sexInput, m_dateInput, m_ageInput});
+    align({m_addressInput, m_cohabitantsInput, m_contactInput, m_siblingsInput});
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event) {

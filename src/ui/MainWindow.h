@@ -16,9 +16,11 @@ class QMenu;
 class QEvent;
 class QToolBar;
 class QToolButton;
-class QComboBox;
-class QDateEdit;
-class QSpinBox;
+class UxTextInput;
+class UxNumberInput;
+class UxDateInput;
+class UxComboInput;
+class UxLabel;
 
 namespace gambasse {
 
@@ -55,6 +57,7 @@ private:
     void loadIntoFields(const Patient* p);
     void gatherFromFields(Patient& p) const;
     void setEditMode(bool editing);
+    void alignDetailLabels();
     int  selectedSourceRow() const;
     const Patient* selectedPatient() const;
     void updateContextButtons(const Patient* p);
@@ -86,22 +89,22 @@ private:
     // Detail: title labels and editable fields.
     QGroupBox* m_dataGroup = nullptr;
     QGroupBox* m_addressGroup = nullptr;
-    QVector<QLabel*> m_valueLabels;   // title labels in the detail panel
     QLabel*   m_photo = nullptr;
 
     // Identifier field (read-only; never editable).
-    QLabel* m_codeCaption = nullptr;
-    QLabel* m_codeValue = nullptr;
+    UxLabel* m_codeCaption = nullptr;
+    UxLabel* m_codeValue = nullptr;
 
-    // Editable detail fields.
-    QLineEdit* m_nameEdit = nullptr;
-    QComboBox* m_sexCombo = nullptr;
-    QDateEdit* m_dateEdit = nullptr;
-    QSpinBox*  m_ageSpinBox = nullptr;
-    QLineEdit* m_addressEdit = nullptr;
-    QLineEdit* m_cohabitantsEdit = nullptr;
-    QLineEdit* m_contactEdit = nullptr;
-    QSpinBox*  m_siblingsSpinBox = nullptr;
+    // Editable detail fields (custom UxWidgets composite controls with an
+    // integrated label).
+    UxTextInput*   m_nameInput = nullptr;
+    UxComboInput*  m_sexInput = nullptr;
+    UxDateInput*   m_dateInput = nullptr;
+    UxNumberInput* m_ageInput = nullptr;
+    UxTextInput*   m_addressInput = nullptr;
+    UxTextInput*   m_cohabitantsInput = nullptr;
+    UxTextInput*   m_contactInput = nullptr;
+    UxNumberInput* m_siblingsInput = nullptr;
 
     // Patient CRUD bar above "Basic data".
     QPushButton* m_addButton = nullptr;
