@@ -12,7 +12,7 @@ namespace {
 
 // Same height as the toolbar below, so the custom bar replaces it visually.
 constexpr int kBarHeight = 32;
-constexpr int kLogoHeight = 20;
+constexpr int kLogoHeight = 24;
 constexpr int kWindowButtonWidth = 44;
 
 } // namespace
@@ -25,7 +25,7 @@ TitleBar::TitleBar(QWidget* parent) : QWidget(parent) {
     m_layout->setContentsMargins(8, 0, 2, 0);
     m_layout->setSpacing(6);
 
-    const QPixmap logo(QStringLiteral(":/img/logo-historias.jpg"));
+    const QPixmap logo(QStringLiteral(":/img/logo.svg"));
     m_logo = new QLabel(this);
     if (!logo.isNull())
         m_logo->setPixmap(logo.scaledToHeight(kLogoHeight, Qt::SmoothTransformation));
