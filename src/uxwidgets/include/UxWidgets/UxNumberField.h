@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UxWidgets/UxField.h"
+#include <UxWidgets/UxField.h>
 
 /**
  * Numeric field with configurable precision: permitted integer and decimal

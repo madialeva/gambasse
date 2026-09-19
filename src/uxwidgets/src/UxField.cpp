@@ -1,4 +1,4 @@
-#include "UxWidgets/UxField.h"
+#include <UxWidgets/UxField.h>
 
 #include <QAction>
 #include <QApplication>

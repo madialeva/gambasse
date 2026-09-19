@@ -1,5 +1,5 @@
-#include "UxWidgets/UxNumberInput.h"
-#include "UxWidgets/UxNumberField.h"
+#include <UxWidgets/UxNumberInput.h>
+#include <UxWidgets/UxNumberField.h>
 
 UxNumberInput::UxNumberInput(const QString &label, QWidget *parent)
     : UxInput(new UxNumberField, parent)

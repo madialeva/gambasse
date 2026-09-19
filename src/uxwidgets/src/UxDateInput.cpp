@@ -1,5 +1,5 @@
-#include "UxWidgets/UxDateInput.h"
-#include "UxWidgets/UxDateField.h"
+#include <UxWidgets/UxDateInput.h>
+#include <UxWidgets/UxDateField.h>
 
 UxDateInput::UxDateInput(const QString &label, QWidget *parent)
     : UxInput(new UxDateField, parent)

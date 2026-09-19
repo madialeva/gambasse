@@ -4,7 +4,7 @@
 #include <QVector>
 #include <QTranslator>
 
-#include "data/Patient.h"
+#include <data/Patient.h>
 
 class QTableView;
 class QLineEdit;

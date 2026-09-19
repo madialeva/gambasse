@@ -1,5 +1,5 @@
-#include "UxWidgets/UxInput.h"
-#include "UxWidgets/UxField.h"
+#include <UxWidgets/UxInput.h>
+#include <UxWidgets/UxField.h>
 
 #include <QBoxLayout>
 #include <QHBoxLayout>

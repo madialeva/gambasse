@@ -1,4 +1,4 @@
-#include "UxWidgets/UxLabel.h"
+#include <UxWidgets/UxLabel.h>
 
 #include <QEnterEvent>
 #include <QFontMetrics>

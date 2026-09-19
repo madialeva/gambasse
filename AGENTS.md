@@ -60,6 +60,18 @@ Spanish. UI text must use `tr()`; English is the source language and the Spanish
 and Portuguese catalogs must preserve their current displayed text. Text uses LF;
 never line-ending-normalize binaries such as `.qm`, images, or databases.
 
+## C++ includes
+
+Every `#include` uses angle brackets, never double quotes: Qt and system headers
+(`<QtTest>`, `<QSqlDatabase>`) and project headers resolved from the `src`
+include root (`<Paths.h>`, `<data/Database.h>`, `<ui/MainWindow.h>`,
+`<filter/ColumnFilterProxy.h>`, `<UxWidgets/UxField.h>`). Never use relative
+include paths such as `"../Paths.h"`. The only exception is the Qt AUTOMOC
+generated file for a `Q_OBJECT` defined in a `.cpp`, which stays double-quoted
+(`#include "test_schemamigrator.moc"`). CMake must expose the include roots so
+angle includes resolve: `src` for the application and the tests, and
+`src/uxwidgets/include` (PUBLIC on the `UxWidgets` target) for the controls.
+
 ## Deployment notes
 
 Keep a 1008×561 base UI with elastic layouts. The Windows launcher starts the Qt
