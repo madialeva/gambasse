@@ -45,6 +45,15 @@
 | ⬜ | Interactive photo management |
 | ⬜ | USB backup |
 
+## Branching and versioning
+
+The default branch is `develop/vX.Y.Z` (currently `develop/v1.0.0`), the version
+under development; there is no `main`/`master`. Releasing cuts `release/vX.Y.Z`
+and tags `vX.Y.Z`, and hotfixes bump the patch digit. The program version is
+declared once in `CMakeLists.txt` and checked against the branch name by the CI.
+Feature work happens on short-lived `change/is<n>-<slug>` branches that PR into
+`develop/vX.Y.Z`.
+
 ## Requirements
 
 - GCC 11+ (C++17).
