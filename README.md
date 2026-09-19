@@ -121,7 +121,8 @@ beside the application while data remains at the distribution root.
 
 ## Internationalization
 
-English is the source language. Spanish and Portuguese catalogs are embedded from
+English is the source language; the interface can be switched between Spanish,
+Portuguese and English. Spanish and Portuguese catalogs are embedded from
 `translations/gambasse_es.qm` and `translations/gambasse_pt.qm`. Regenerate
 them after editing TS files:
 

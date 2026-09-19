@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QVector>
+#include <QHash>
 #include <QTranslator>
 
 #include <data/model/Patient.h>
@@ -158,8 +159,7 @@ private:
     // Toolbar language and theme controls (hosted by the title bar).
     QToolButton* m_languageButton = nullptr;
     QToolButton* m_themeButton = nullptr;
-    QAction* m_actEs = nullptr;
-    QAction* m_actPt = nullptr;
+    QHash<QString, QAction*> m_languageActions;   // language code -> menu action
     QAction* m_lightAction = nullptr;
     QAction* m_darkAction = nullptr;
 

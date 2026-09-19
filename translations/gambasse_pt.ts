@@ -96,6 +96,10 @@
         <translation>Português</translation>
     </message>
     <message>
+        <source>English</source>
+        <translation>Inglês</translation>
+    </message>
+    <message>
         <location filename="../src/ui/MainWindow.cpp" line="761"/>
         <location filename="../src/ui/MainWindow.cpp" line="776"/>
         <source>Dark</source>
