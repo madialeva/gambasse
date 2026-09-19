@@ -113,3 +113,22 @@ target_link_libraries(test_clinicalcontext PRIVATE
 add_test(NAME clinicalcontext COMMAND test_clinicalcontext)
 
 set_tests_properties(clinicalcontext PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_sexlabel
+    test_sexlabel.cpp
+    ../src/logic/SexLabel.cpp
+    ${CMAKE_SOURCE_DIR}/translations/i18n.qrc
+)
+
+set_target_properties(test_sexlabel PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_sexlabel PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(test_sexlabel PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+add_test(NAME sexlabel COMMAND test_sexlabel)
+
+set_tests_properties(sexlabel PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

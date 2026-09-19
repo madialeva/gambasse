@@ -11,6 +11,7 @@
 #include <UxWidgets/UxTextField.h>
 #include <UxWidgets/UxTextInput.h>
 #include <data/model/PatientsModel.h>
+#include <logic/SexLabel.h>
 #include <ui/filter/ColumnFilterProxy.h>
 #include <ui/window/TitleBar.h>
 
@@ -150,9 +151,9 @@ void MainWindow::buildUi() {
     m_nameInput->setRequired(true);                // visual feedback when empty
     m_nameInput->setMaxLength(kMaxName);
     m_sexInput = new UxComboInput(QString(), central);
-    // Persisted domain terms (Galician/Portuguese), matching the Sex column.
-    m_sexInput->comboBox()->addItem(QStringLiteral("Home"), static_cast<int>(Patient::Sex::Home));
-    m_sexInput->comboBox()->addItem(QStringLiteral("Muller"), static_cast<int>(Patient::Sex::Muller));
+    // The combo stores the persisted enum value; its labels follow the language.
+    m_sexInput->comboBox()->addItem(sexLabel(Patient::Sex::Home), static_cast<int>(Patient::Sex::Home));
+    m_sexInput->comboBox()->addItem(sexLabel(Patient::Sex::Muller), static_cast<int>(Patient::Sex::Muller));
     m_dateInput = new UxDateInput(QString(), central);
     m_ageInput = new UxNumberInput(QString(), central);
     m_ageInput->numberField()->setIntegerDigits(3);
@@ -832,7 +833,17 @@ void MainWindow::retranslate() {
         m_cancelButton->setText(tr("Cancel"));
     }
 
-    if (m_model) m_model->refreshHeaders();
+    if (m_model) m_model->refreshLanguage();
+
+    // The sex combo labels follow the language; the selected value is preserved
+    // because only the item text changes.
+    if (m_sexInput) {
+        QComboBox* sexCombo = m_sexInput->comboBox();
+        const int homeIndex = sexCombo->findData(static_cast<int>(Patient::Sex::Home));
+        const int mullerIndex = sexCombo->findData(static_cast<int>(Patient::Sex::Muller));
+        if (homeIndex >= 0) sexCombo->setItemText(homeIndex, sexLabel(Patient::Sex::Home));
+        if (mullerIndex >= 0) sexCombo->setItemText(mullerIndex, sexLabel(Patient::Sex::Muller));
+    }
 
     // Each filter placeholder is its column name.
     for (int c = 0; c < m_filters.size(); ++c) {

@@ -299,4 +299,15 @@
         <translation>Projeto realizado por Juan Franco, disponível no &lt;a href=&quot;%1&quot; style=&quot;color:#58A6FF; text-decoration:none;&quot;&gt;GitHub&lt;/a&gt;.</translation>
     </message>
 </context>
+<context>
+    <name>Sex</name>
+    <message>
+        <source>Male</source>
+        <translation>Homem</translation>
+    </message>
+    <message>
+        <source>Female</source>
+        <translation>Mulher</translation>
+    </message>
+</context>
 </TS>

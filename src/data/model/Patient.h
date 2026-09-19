@@ -39,10 +39,6 @@ struct Patient {
         return age;
     }
 
-    QString sexToString() const {
-        return sex == Sex::Muller ? QStringLiteral("Muller") : QStringLiteral("Home");
-    }
-
     // Patient photo filename in the persisted fotos/ directory.
     // The directory and filename format are a compatibility contract.
     QString photoFilename() const {

@@ -30,6 +30,7 @@ set(SOURCES
     src/logic/ClinicalContext.cpp
     src/logic/PatientService.cpp
     src/logic/PhotoManager.cpp
+    src/logic/SexLabel.cpp
     src/ui/filter/ColumnFilterProxy.cpp
 )
 
@@ -46,6 +47,7 @@ set(HEADERS
     src/logic/ClinicalContext.h
     src/logic/PatientService.h
     src/logic/PhotoManager.h
+    src/logic/SexLabel.h
     src/ui/filter/ColumnFilterProxy.h
 )
 

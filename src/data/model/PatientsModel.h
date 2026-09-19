@@ -37,8 +37,8 @@ public:
 
     const Patient* patientAt(int row) const;
 
-    // Refreshes header text after a language change.
-    void refreshHeaders();
+    // Refreshes header text and the language-dependent cells after a language change.
+    void refreshLanguage();
 
 private:
     QVector<Patient> m_patients;
