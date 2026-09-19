@@ -73,8 +73,21 @@ void TitleBar::insertControl(QWidget* control) {
     m_layout->insertWidget(m_layout->indexOf(m_minimizeButton), control);
 }
 
+void TitleBar::setTitle(const QString& title) {
+    if (m_name)
+        m_name->setText(title);
+}
+
 QList<QToolButton*> TitleBar::windowButtons() const {
     return {m_minimizeButton, m_maximizeButton, m_closeButton};
+}
+
+void TitleBar::setCloseOnly(bool closeOnly) {
+    m_closeOnly = closeOnly;
+    if (m_minimizeButton)
+        m_minimizeButton->setVisible(!closeOnly);
+    if (m_maximizeButton)
+        m_maximizeButton->setVisible(!closeOnly);
 }
 
 void TitleBar::refreshMaximizeGlyph() {
@@ -127,7 +140,7 @@ void TitleBar::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void TitleBar::mouseDoubleClickEvent(QMouseEvent* event) {
-    if (event && event->button() == Qt::LeftButton)
+    if (event && event->button() == Qt::LeftButton && !m_closeOnly)
         toggleMaximize();
     QWidget::mouseDoubleClickEvent(event);
 }

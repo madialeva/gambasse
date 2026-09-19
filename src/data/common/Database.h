@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 
 #include <data/model/Patient.h>
+#include <data/model/PediatricHistory.h>
 
 namespace gambasse {
 
@@ -23,6 +24,14 @@ public:
     bool hasPediatricHistory(qlonglong patientId) const;
     bool hasAdultHistory(qlonglong patientId) const;
     bool hasPregnancyHistory(qlonglong patientId) const;
+
+    // Pediatric history (b05_pediatric_history): only the columns managed by
+    // the pediatric history window. Unmanaged columns keep their schema
+    // defaults on insert and are left untouched on update.
+    bool loadPediatricHistory(qlonglong patientId, PediatricHistory& history) const;
+    bool insertPediatricHistory(const PediatricHistory& history);
+    bool updatePediatricHistory(const PediatricHistory& history);
+    bool removePediatricHistory(qlonglong patientId);
 
     // Write operations on b01_patient.
     qlonglong nextId() const;

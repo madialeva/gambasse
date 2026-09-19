@@ -28,8 +28,15 @@ public:
     // buttons, keeping them rightmost.
     void insertControl(QWidget* control);
 
+    // Title shown next to the logo (the application name by default).
+    void setTitle(const QString& title);
+
     QList<QToolButton*> windowButtons() const;
     QToolButton* closeButton() const { return m_closeButton; }
+    // Close-only mode for child windows: hides minimize/maximize and disables
+    // the double-click maximize/restore gesture.
+    void setCloseOnly(bool closeOnly);
+    bool isCloseOnly() const { return m_closeOnly; }
     void refreshMaximizeGlyph();
     void retranslateUi();
 
@@ -49,6 +56,7 @@ private:
     QToolButton* m_minimizeButton = nullptr;
     QToolButton* m_maximizeButton = nullptr;
     QToolButton* m_closeButton = nullptr;
+    bool m_closeOnly = false;
 
     bool m_dragging = false;
     QPoint m_dragOffset;

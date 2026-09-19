@@ -52,6 +52,7 @@ private slots:
     void onDelete();
     void onSave();
     void onCancel();
+    void openPediatricHistory();
 
 private:
     void buildUi();

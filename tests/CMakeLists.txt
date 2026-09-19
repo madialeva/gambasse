@@ -132,3 +132,72 @@ target_link_libraries(test_sexlabel PRIVATE
 add_test(NAME sexlabel COMMAND test_sexlabel)
 
 set_tests_properties(sexlabel PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_pediatricehistoryservice
+    test_pediatricehistoryservice.cpp
+    ../src/logic/PediatricHistoryService.cpp
+    ../src/data/common/Database.cpp
+    ../src/data/common/SchemaMigrator.cpp
+    ${CMAKE_SOURCE_DIR}/resources/bd/bd.qrc
+)
+
+set_target_properties(test_pediatricehistoryservice PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_pediatricehistoryservice PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(test_pediatricehistoryservice PRIVATE
+    Qt6::Core
+    Qt6::Sql
+    Qt6::Test
+)
+
+add_test(NAME pediatricehistoryservice COMMAND test_pediatricehistoryservice)
+
+set_tests_properties(pediatricehistoryservice PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_uxcheck test_uxcheck.cpp)
+
+set_target_properties(test_uxcheck PROPERTIES AUTOMOC ON)
+
+target_include_directories(test_uxcheck PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(test_uxcheck PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Test
+    UxWidgets::UxWidgets
+)
+
+add_test(NAME uxcheck COMMAND test_uxcheck)
+
+set_tests_properties(uxcheck PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_pediatricehistorywindow
+    test_pediatricehistorywindow.cpp
+    ../src/ui/window/PediatricHistoryWindow.cpp
+    ../src/ui/window/TitleBar.cpp
+    ../src/logic/PediatricHistoryService.cpp
+    ../src/logic/PediatricHistoryLabels.cpp
+    ../src/data/common/Database.cpp
+    ../src/data/common/SchemaMigrator.cpp
+    ${CMAKE_SOURCE_DIR}/resources/bd/bd.qrc
+    ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+)
+
+set_target_properties(test_pediatricehistorywindow PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_pediatricehistorywindow PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(test_pediatricehistorywindow PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Sql
+    Qt6::Test
+    UxWidgets::UxWidgets
+)
+
+add_test(NAME pediatricehistorywindow COMMAND test_pediatricehistorywindow)
+
+set_tests_properties(pediatricehistorywindow PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
