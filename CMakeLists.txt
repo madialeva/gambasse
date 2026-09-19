@@ -24,6 +24,7 @@ set(SOURCES
     src/ui/MainWindow.cpp
     src/ui/TitleBar.cpp
     src/data/Database.cpp
+    src/data/SchemaMigrator.cpp
     src/data/PatientsModel.cpp
     src/filter/ColumnFilterProxy.cpp
 )
@@ -34,6 +35,7 @@ set(HEADERS
     src/ui/MainWindow.h
     src/ui/TitleBar.h
     src/data/Database.h
+    src/data/SchemaMigrator.h
     src/data/Patient.h
     src/data/PatientsModel.h
     src/filter/ColumnFilterProxy.h
@@ -41,6 +43,7 @@ set(HEADERS
 
 set(RESOURCES
     resources/resources.qrc
+    resources/bd/bd.qrc
     translations/i18n.qrc
 )
 
