@@ -3,7 +3,9 @@ name: ci-linux
 on:
   pull_request:
   push:
-    branches: [main]
+    branches:
+      - 'develop/**'
+      - 'release/**'
 
 jobs:
   build-and-test:
@@ -13,6 +15,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check branch name matches project version
+        if: github.event_name == 'push'
+        run: sh scripts/check-branch-version.sh "${GITHUB_REF_NAME}"
 
       - name: Install Qt 6 and build tools
         run: |

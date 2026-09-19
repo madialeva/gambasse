@@ -80,6 +80,16 @@ redirected because the process has no standard console.
 
 ## GitHub workflow (issues, branches, PRs)
 
+There is no `main`/`master`. The long-lived, default branch is
+`develop/vX.Y.Z` (for example `develop/v1.0.0`), which holds the version
+currently under development. Releasing cuts `release/vX.Y.Z` from it and tags
+`vX.Y.Z`; hotfixes bump the patch digit. When a new cycle starts,
+`develop/vX.Y.Z` is created from the released tag and becomes the default
+branch. The program version lives as the single source of truth in
+`CMakeLists.txt` (`project(... VERSION ...)`) and must match the branch suffix;
+the Linux CI (`ci-linux.yml`) enforces it on `develop/**` and `release/**`
+pushes.
+
 Each OpenSpec change is tracked on GitHub with this cycle:
 
 1. OpenSpec proposal approved by the user.
@@ -89,17 +99,17 @@ Each OpenSpec change is tracked on GitHub with this cycle:
    `is<n>-<slug>` after its issue; the date prefix is added only when the
    change is archived.
 3. Branch created from the issue (Development panel → "Create a branch";
-   name like `change/is<n>-<slug>`) starting from `main`.
+   name like `change/is<n>-<slug>`) starting from `develop/vX.Y.Z`.
 4. Implementation on the branch + push (pushes are done by the user; the
    agent has no SSH access to `origin` from its shell). The agent never
    commits on its own: work stays uncommitted on the branch until the user
    validates it (including visual verification); commit only after the user
    explicitly confirms.
-5. PR toward `main` with `Closes #<n>` in the description → the Linux CI
-   (`ci-linux.yml`) validates the PR → user reviews the diff.
-6. Squash merge as the norm (one change = one clean commit on `main`).
-   Exception: PRs whose intermediate commits have standalone value (e.g.
-   massive deletions separated from new code) → normal merge.
+5. PR toward `develop/vX.Y.Z` with `Closes #<n>` in the description → the Linux
+   CI (`ci-linux.yml`) validates the PR → user reviews the diff.
+6. Squash merge as the norm (one change = one clean commit on the development
+   branch). Exception: PRs whose intermediate commits have standalone value
+   (e.g. massive deletions separated from new code) → normal merge.
 7. The last commit on the branch may be the archiving of the change (only
    after user confirmation), so merged PR = closed issue (automatic via
    `Closes`) = archived change.

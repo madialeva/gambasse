@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QApplication::setApplicationName(QStringLiteral("Gambasse"));
     QApplication::setOrganizationName(QStringLiteral("Gambasse"));
+    QApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
     // Fusion is necessary for the custom dark palette to apply consistently;
     // the native Windows style ignores the palette.
     QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));

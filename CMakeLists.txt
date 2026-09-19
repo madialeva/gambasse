@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(Gambasse LANGUAGES CXX)
+project(Gambasse VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -47,6 +47,11 @@ set(RESOURCES
 qt_add_executable(Gambasse WIN32 ${SOURCES} ${HEADERS} ${RESOURCES})
 
 target_include_directories(Gambasse PRIVATE src)
+
+# Single source of truth for the program version, published at runtime with
+# QCoreApplication::setApplicationVersion() and checked against the branch name
+# in CI.
+target_compile_definitions(Gambasse PRIVATE GAMBASSE_VERSION="${PROJECT_VERSION}")
 
 target_link_libraries(Gambasse PRIVATE
     Qt6::Core
