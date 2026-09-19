@@ -1,6 +1,7 @@
 #include <data/model/PatientsModel.h>
 
 #include <data/common/Database.h>
+#include <logic/SexLabel.h>
 
 #include <QSqlQuery>
 #include <QSqlError>
@@ -68,7 +69,7 @@ QVariant PatientsModel::data(const QModelIndex& index, int role) const {
                                      ? p.birthDate.toString(QStringLiteral("dd/MM/yyyy"))
                                      : QString();
     case ColumnAgeRange:   return p.ageRange;
-    case ColumnSex:        return p.sexToString();
+    case ColumnSex:        return sexLabel(p.sex);
     case ColumnAddress:    return p.address;
     case ColumnCohabitants:return p.cohabitants;
     case ColumnContactPerson: return p.contactPerson;
@@ -101,8 +102,11 @@ const Patient* PatientsModel::patientAt(int row) const {
     return &m_patients.at(row);
 }
 
-void PatientsModel::refreshHeaders() {
+// Refreshes header text and the language-dependent cells after a language change.
+void PatientsModel::refreshLanguage() {
     emit headerDataChanged(Qt::Horizontal, 0, ColumnCount - 1);
+    if (!m_patients.isEmpty())
+        emit dataChanged(index(0, 0), index(m_patients.size() - 1, ColumnCount - 1));
 }
 
 } // namespace gambasse
