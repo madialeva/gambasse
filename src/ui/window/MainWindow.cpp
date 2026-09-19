@@ -255,14 +255,20 @@ void MainWindow::buildToolbar() {
     auto* menuIdioma = new QMenu(m_languageButton);
     auto* grpIdioma = new QActionGroup(this);
     grpIdioma->setExclusive(true);
-    m_actEs = menuIdioma->addAction(QIcon(QStringLiteral(":/img/flag-es.png")), QString());
-    m_actPt = menuIdioma->addAction(QIcon(QStringLiteral(":/img/flag-pt.png")), QString());
-    for (QAction* a : {m_actEs, m_actPt}) {
-        a->setCheckable(true);
-        grpIdioma->addAction(a);
+    struct LanguageEntry { const char* code; const char* flag; };
+    const LanguageEntry languages[] = {
+        {"es", ":/img/flag-es.png"},
+        {"pt", ":/img/flag-pt.png"},
+        {"en", ":/img/flag-en.png"},
+    };
+    for (const LanguageEntry& language : languages) {
+        const QString code = QString::fromLatin1(language.code);
+        QAction* action = menuIdioma->addAction(QIcon(QString::fromLatin1(language.flag)), QString());
+        action->setCheckable(true);
+        grpIdioma->addAction(action);
+        m_languageActions.insert(code, action);
+        connect(action, &QAction::triggered, this, [this, code]() { changeLanguage(code); });
     }
-    connect(m_actEs, &QAction::triggered, this, [this]() { changeLanguage(QStringLiteral("es")); });
-    connect(m_actPt, &QAction::triggered, this, [this]() { changeLanguage(QStringLiteral("pt")); });
     m_languageButton->setMenu(menuIdioma);
     m_titleBar->insertControl(m_languageButton);
 
@@ -644,7 +650,8 @@ void MainWindow::changeLanguage(const QString& code) {
 
     m_appSettings.setLanguage(code);
 
-    if (m_actEs) m_actEs->setChecked(code == QLatin1String("es"));    if (m_actPt) m_actPt->setChecked(code == QLatin1String("pt"));
+    for (auto it = m_languageActions.constBegin(); it != m_languageActions.constEnd(); ++it)
+        it.value()->setChecked(it.key() == code);
 
     retranslate(); // refuerzo por si installTranslator no dispara LanguageChange
 }
@@ -652,10 +659,13 @@ void MainWindow::changeLanguage(const QString& code) {
 void MainWindow::updateLanguageButton() {
     if (!m_languageButton)
         return;
-    const bool es = (m_languageCode == QLatin1String("es"));
-    m_languageButton->setIcon(QIcon(es ? QStringLiteral(":/img/flag-es.png")
-                                  : QStringLiteral(":/img/flag-pt.png")));
-    m_languageButton->setText(es ? tr("Spanish") : tr("Portuguese"));
+    QAction* active = m_languageActions.value(m_languageCode);
+    if (!active)
+        active = m_languageActions.value(QStringLiteral("pt"));
+    if (active) {
+        m_languageButton->setIcon(active->icon());
+        m_languageButton->setText(active->text());
+    }
 }
 
 void MainWindow::changeTheme(const QString& mode) {
@@ -790,8 +800,9 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::retranslate() {
     setWindowTitle(tr("Gambasse"));
 
-    if (m_actEs) m_actEs->setText(tr("Spanish"));
-    if (m_actPt) m_actPt->setText(tr("Portuguese"));
+    if (QAction* es = m_languageActions.value(QStringLiteral("es"))) es->setText(tr("Spanish"));
+    if (QAction* pt = m_languageActions.value(QStringLiteral("pt"))) pt->setText(tr("Portuguese"));
+    if (QAction* en = m_languageActions.value(QStringLiteral("en"))) en->setText(tr("English"));
     if (m_lightAction) m_lightAction->setText(tr("Light"));
     if (m_darkAction) m_darkAction->setText(tr("Dark"));
     if (m_languageButton) m_languageButton->setToolTip(tr("Language"));
