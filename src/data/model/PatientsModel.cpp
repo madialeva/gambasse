@@ -1,6 +1,6 @@
-#include <data/PatientsModel.h>
+#include <data/model/PatientsModel.h>
 
-#include <data/Database.h>
+#include <data/common/Database.h>
 
 #include <QSqlQuery>
 #include <QSqlError>
@@ -99,37 +99,6 @@ const Patient* PatientsModel::patientAt(int row) const {
     if (row < 0 || row >= m_patients.size())
         return nullptr;
     return &m_patients.at(row);
-}
-
-int PatientsModel::add(Patient p) {
-    if (!Database::instance().insert(p))
-        return -1;
-    const int row = m_patients.size();
-    beginInsertRows(QModelIndex(), row, row);
-    m_patients.append(p);
-    endInsertRows();
-    return row;
-}
-
-bool PatientsModel::modify(int row, const Patient& p) {
-    if (row < 0 || row >= m_patients.size())
-        return false;
-    if (!Database::instance().update(p))
-        return false;
-    m_patients[row] = p;
-    emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
-    return true;
-}
-
-bool PatientsModel::remove(int row) {
-    if (row < 0 || row >= m_patients.size())
-        return false;
-    if (!Database::instance().remove(m_patients.at(row).id))
-        return false;
-    beginRemoveRows(QModelIndex(), row, row);
-    m_patients.remove(row);
-    endRemoveRows();
-    return true;
 }
 
 void PatientsModel::refreshHeaders() {

@@ -7,7 +7,7 @@
 #include <QTemporaryDir>
 #include <QtTest>
 
-#include <data/SchemaMigrator.h>
+#include <data/common/SchemaMigrator.h>
 
 namespace gambasse {
 

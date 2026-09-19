@@ -4,7 +4,11 @@
 #include <QVector>
 #include <QTranslator>
 
-#include <data/Patient.h>
+#include <data/model/Patient.h>
+#include <logic/AppSettings.h>
+#include <logic/ClinicalContext.h>
+#include <logic/PatientService.h>
+#include <logic/PhotoManager.h>
 
 class QTableView;
 class QLineEdit;
@@ -63,6 +67,7 @@ private:
     void updateContextButtons(const Patient* p);
     void loadPhoto(const Patient* p);
     void clearDetail();
+    void selectPatientById(qlonglong patientId);
 
     void changeLanguage(const QString& code);
     void updateLanguageButton();
@@ -162,6 +167,12 @@ private:
     QTranslator m_translator;
     QString m_languageCode = QStringLiteral("pt");
     QString m_theme = QStringLiteral("claro");
+
+    // Business logic, decoupled from the window.
+    PatientService  m_patientService;
+    PhotoManager    m_photoManager;
+    ClinicalContext m_clinicalContext;
+    AppSettings     m_appSettings;
 };
 
 } // namespace gambasse

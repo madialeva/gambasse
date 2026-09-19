@@ -2,7 +2,7 @@
 #include <QStandardItemModel>
 #include <QtTest>
 
-#include <filter/ColumnFilterProxy.h>
+#include <ui/filter/ColumnFilterProxy.h>
 
 namespace gambasse {
 

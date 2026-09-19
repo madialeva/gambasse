@@ -1,4 +1,4 @@
-#include <data/SchemaMigrator.h>
+#include <data/common/SchemaMigrator.h>
 
 #include <QCryptographicHash>
 #include <QDateTime>

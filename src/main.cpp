@@ -11,9 +11,9 @@
 #include <cstdio>
 
 #include <Paths.h>
-#include <data/Database.h>
-#include <ui/MainWindow.h>
-#include <ui/SplashWindow.h>
+#include <data/common/Database.h>
+#include <ui/window/MainWindow.h>
+#include <ui/window/SplashWindow.h>
 
 #ifdef Q_OS_WIN
 #  include <windows.h>

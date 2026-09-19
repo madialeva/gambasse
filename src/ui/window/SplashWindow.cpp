@@ -1,4 +1,4 @@
-#include <ui/SplashWindow.h>
+#include <ui/window/SplashWindow.h>
 
 #include <QHBoxLayout>
 #include <QIcon>
