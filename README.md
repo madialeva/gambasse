@@ -40,6 +40,7 @@
 | ✅ | Patient CRUD |
 | ✅ | Language/theme selection |
 | ✅ | Windows launcher |
+| ✅ | Automatic database creation and schema migration |
 | ⬜ | Histories |
 | ⬜ | Consultations |
 | ⬜ | Interactive photo management |
@@ -53,6 +54,21 @@ and tags `vX.Y.Z`, and hotfixes bump the patch digit. The program version is
 declared once in `CMakeLists.txt` and checked against the branch name by the CI.
 Feature work happens on short-lived `change/is<n>-<slug>` branches that PR into
 `develop/vX.Y.Z`.
+
+## Database
+
+The SQLite file is created on first run if it does not exist, and its schema is
+kept up to date automatically. The file path comes from `config.ini`
+(`database/path`, `database.db` by default). `database/user` and
+`database/password` are fixed connection credentials for now; the stock SQLite
+driver ignores them, but the connection is ready for a future first-run setup.
+
+Schema changes ship as embedded SQL patches in `resources/bd/`, named
+`<x.y.z.n>_<slug>.sql` (program version plus a sequence that restarts for every
+version). Pending patches are applied in order on startup, each inside a
+transaction, and recorded in the `b00_bd_migrations` table. A legacy database
+that already contains the clinical tables but no history is baselined without
+re-running the initial schema, so its data is preserved.
 
 ## Requirements
 
@@ -72,6 +88,7 @@ cmake --build build-linux
 When Qt is not discoverable, add
 `-DCMAKE_PREFIX_PATH=/path/to/Qt/6.x/gcc_64`. The executable uses `config.ini`
 and `database.db` beside itself by default; `--base <directory>` overrides it.
+The database file is created and migrated on first run.
 
 ## Windows development and deployment
 

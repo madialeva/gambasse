@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UxWidgets/UxField.h"
+#include <UxWidgets/UxField.h>
 
 /**
  * Free-text field. Maximum length is controlled through the QLineEdit

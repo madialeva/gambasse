@@ -3,7 +3,7 @@
 #include <QAbstractTableModel>
 #include <QVector>
 
-#include "Patient.h"
+#include <data/Patient.h>
 
 namespace gambasse {
 

@@ -1,4 +1,4 @@
-#include "UxWidgets/UxComboInput.h"
+#include <UxWidgets/UxComboInput.h>
 
 #include <QBoxLayout>
 #include <QComboBox>

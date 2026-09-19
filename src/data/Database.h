@@ -3,7 +3,7 @@
 #include <QString>
 #include <QSqlDatabase>
 
-#include "Patient.h"
+#include <data/Patient.h>
 
 namespace gambasse {
 

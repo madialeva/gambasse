@@ -1,4 +1,4 @@
-#include "UxWidgets/UxNumberField.h"
+#include <UxWidgets/UxNumberField.h>
 
 #include <QFocusEvent>
 #include <QRegularExpression>

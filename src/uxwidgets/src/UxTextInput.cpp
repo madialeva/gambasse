@@ -1,5 +1,5 @@
-#include "UxWidgets/UxTextInput.h"
-#include "UxWidgets/UxTextField.h"
+#include <UxWidgets/UxTextInput.h>
+#include <UxWidgets/UxTextField.h>
 
 UxTextInput::UxTextInput(const QString &label, QWidget *parent)
     : UxInput(new UxTextField, parent)

@@ -1,4 +1,4 @@
-#include "TitleBar.h"
+#include <ui/TitleBar.h>
 
 #include <QHBoxLayout>
 #include <QLabel>

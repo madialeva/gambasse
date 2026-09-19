@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UxWidgets/UxField.h"
+#include <UxWidgets/UxField.h>
 
 /**
  * Date field built on QLineEdit (not QDateEdit), with dd/MM/yyyy format. It

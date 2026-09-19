@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UxWidgets/UxInput.h"
+#include <UxWidgets/UxInput.h>
 
 class UxDateField;
 

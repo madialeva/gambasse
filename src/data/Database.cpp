@@ -1,6 +1,7 @@
-#include "Database.h"
+#include <data/Database.h>
 
-#include "../Paths.h"
+#include <Paths.h>
+#include <data/SchemaMigrator.h>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -30,14 +31,23 @@ bool Database::open(QString* errorMessage) {
     if (QFileInfo(databasePath).isRelative())
         databasePath = QDir(baseDirectory).filePath(databasePath);
 
-    if (!QFileInfo::exists(databasePath)) {
+    // The database file is created on first run; make sure its directory exists.
+    const QString databaseDirectory = QFileInfo(databasePath).absolutePath();
+    if (!QDir().mkpath(databaseDirectory)) {
         if (errorMessage)
-            *errorMessage = QObject::tr("Database was not found at:\n%1").arg(databasePath);
+            *errorMessage = QObject::tr("Could not create the database directory:\n%1")
+                            .arg(databaseDirectory);
         return false;
     }
 
     m_db = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"));
     m_db.setDatabaseName(databasePath);
+    // Fixed connection credentials for now. The stock SQLite driver ignores
+    // them, but the connection is ready for the future first-run mechanism.
+    m_db.setUserName(cfg.value(QStringLiteral("database/user"),
+                               QStringLiteral("gambasse")).toString());
+    m_db.setPassword(cfg.value(QStringLiteral("database/password"),
+                               QStringLiteral("gambasse")).toString());
     if (!m_db.open()) {
         if (errorMessage)
             *errorMessage = QObject::tr("Could not open the database:\n%1")
@@ -48,6 +58,12 @@ bool Database::open(QString* errorMessage) {
     // SQLite requires foreign keys to be enabled per connection for cascade
     // deletion (FK ON DELETE CASCADE) to work.
     QSqlQuery(m_db).exec(QStringLiteral("PRAGMA foreign_keys = ON"));
+
+    // Create the database or bring its schema up to date before it is used.
+    if (!SchemaMigrator::migrate(m_db, errorMessage)) {
+        m_db.close();
+        return false;
+    }
     return true;
 }
 

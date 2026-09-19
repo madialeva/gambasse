@@ -1,19 +1,19 @@
-#include "MainWindow.h"
+#include <ui/MainWindow.h>
 
-#include "../Paths.h"
-#include "UxWidgets/UxComboInput.h"
-#include "UxWidgets/UxDateField.h"
-#include "UxWidgets/UxDateInput.h"
-#include "UxWidgets/UxField.h"
-#include "UxWidgets/UxLabel.h"
-#include "UxWidgets/UxNumberField.h"
-#include "UxWidgets/UxNumberInput.h"
-#include "UxWidgets/UxTextField.h"
-#include "UxWidgets/UxTextInput.h"
-#include "data/Database.h"
-#include "data/PatientsModel.h"
-#include "filter/ColumnFilterProxy.h"
-#include "ui/TitleBar.h"
+#include <Paths.h>
+#include <UxWidgets/UxComboInput.h>
+#include <UxWidgets/UxDateField.h>
+#include <UxWidgets/UxDateInput.h>
+#include <UxWidgets/UxField.h>
+#include <UxWidgets/UxLabel.h>
+#include <UxWidgets/UxNumberField.h>
+#include <UxWidgets/UxNumberInput.h>
+#include <UxWidgets/UxTextField.h>
+#include <UxWidgets/UxTextInput.h>
+#include <data/Database.h>
+#include <data/PatientsModel.h>
+#include <filter/ColumnFilterProxy.h>
+#include <ui/TitleBar.h>
 
 #include <QApplication>
 #include <QAbstractButton>

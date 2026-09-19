@@ -10,10 +10,10 @@
 #include <QStyleFactory>
 #include <cstdio>
 
-#include "Paths.h"
-#include "data/Database.h"
-#include "ui/MainWindow.h"
-#include "ui/SplashWindow.h"
+#include <Paths.h>
+#include <data/Database.h>
+#include <ui/MainWindow.h>
+#include <ui/SplashWindow.h>
 
 #ifdef Q_OS_WIN
 #  include <windows.h>

@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/bd">
+    <file>1.0.0.1_initial_schema.sql</file>
+  </qresource>
+</RCC>
