@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     // Diagnostic mode: count patients and exit (database/deployment verification).
     if (app.arguments().contains(QStringLiteral("--check-db"))) {
         attachConsoleIfNeeded();
-        QSqlQuery q(QStringLiteral("SELECT COUNT(*) FROM b01_paciente"),
+        QSqlQuery q(QStringLiteral("SELECT COUNT(*) FROM b01_patient"),
                     gambasse::Database::instance().connection());
         long long n = -1;
         if (q.next())

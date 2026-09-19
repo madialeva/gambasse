@@ -19,9 +19,13 @@ add_test(NAME columnfilterproxy COMMAND test_columnfilterproxy)
 # Run GUI-less tests headless on CI (no X server needed).
 set_tests_properties(columnfilterproxy PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
-add_executable(test_schemamigrator test_schemamigrator.cpp ../src/data/common/SchemaMigrator.cpp)
+add_executable(test_schemamigrator
+    test_schemamigrator.cpp
+    ../src/data/common/SchemaMigrator.cpp
+    ${CMAKE_SOURCE_DIR}/resources/bd/bd.qrc
+)
 
-set_target_properties(test_schemamigrator PROPERTIES AUTOMOC ON)
+set_target_properties(test_schemamigrator PROPERTIES AUTOMOC ON AUTORCC ON)
 
 target_include_directories(test_schemamigrator PRIVATE ${CMAKE_SOURCE_DIR}/src)
 

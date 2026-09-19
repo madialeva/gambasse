@@ -67,8 +67,8 @@ Schema changes ship as embedded SQL patches in `resources/bd/`, named
 `<x.y.z.n>_<slug>.sql` (program version plus a sequence that restarts for every
 version). Pending patches are applied in order on startup, each inside a
 transaction, and recorded in the `b00_bd_migrations` table. A legacy database
-that already contains the clinical tables but no history is baselined without
-re-running the initial schema, so its data is preserved.
+whose tables still use the Spanish names and has no migration history is
+baselined without re-running the initial schema, so its data is preserved.
 
 ## Requirements
 

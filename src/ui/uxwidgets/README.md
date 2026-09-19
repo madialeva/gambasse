@@ -9,8 +9,7 @@ composites.
 - Origin: external `Qt.UxWidgets` repository, snapshot 2026-09-13
   (library sources only: `include/`, `src/`; the demo application was not
   vendored).
-- Local additions after the snapshot: `UxLabel` and `UxComboInput`, ported
-  from the original VB.NET controls (`UxLabel.vb`, `UxComboBox.vb`/`UxCombo.vb`)
-  as screens needed them. They are not part of the upstream snapshot.
+- Local additions after the snapshot: `UxLabel` and `UxComboInput`, added as
+  screens needed them; they are not part of the upstream snapshot.
 - License: same MIT license as the rest of the repository (`LICENSE.md` at the
   root); no separate license file (same author).

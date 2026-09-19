@@ -138,11 +138,11 @@ void MainWindow::buildUi() {
     m_codeValue = new UxLabel(central);
     m_codeValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    // Field limits mirror b01_paciente columns.
-    constexpr int kMaxName        = 200;  // b01_nome
-    constexpr int kMaxAddress     = 100;  // b01_e_enderezo
-    constexpr int kMaxCohabitants = 100;  // b01_e_coabitantes
-    constexpr int kMaxContact     = 100;  // b01_e_pessoacontacto
+    // Field limits mirror b01_patient columns.
+    constexpr int kMaxName        = 200;  // name
+    constexpr int kMaxAddress     = 100;  // address
+    constexpr int kMaxCohabitants = 100;  // cohabitants
+    constexpr int kMaxContact     = 100;  // contact_person
 
     // Custom UxWidgets composite controls (label + field in one widget).
     m_nameInput = new UxTextInput(QString(), central);

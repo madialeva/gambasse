@@ -24,7 +24,7 @@ public:
     bool hasAdultHistory(qlonglong patientId) const;
     bool hasPregnancyHistory(qlonglong patientId) const;
 
-    // Write operations on b01_paciente.
+    // Write operations on b01_patient.
     qlonglong nextId() const;
     bool hasDuplicate(const Patient& p, qlonglong exceptId) const;
     bool insert(Patient& p);                 // assigns the new identifier to p.id

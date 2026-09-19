@@ -81,9 +81,9 @@ void TestClinicalContext::existingHistoryDisablesCreation() {
     const qlonglong id = 9001;
     QSqlQuery create(Database::instance().connection());
     QVERIFY(create.exec(QStringLiteral(
-        "INSERT INTO b01_paciente (b01_id, b01_nome) VALUES (9001, 'HIST')")));
+        "INSERT INTO b01_patient (id, name) VALUES (9001, 'HIST')")));
     QVERIFY(create.exec(QStringLiteral(
-        "INSERT INTO b05_historias_pediatrica (b05_b01_id) VALUES (9001)")));
+        "INSERT INTO b05_pediatric_history (patient_id) VALUES (9001)")));
 
     Patient p;
     p.id = id;
