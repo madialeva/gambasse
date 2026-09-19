@@ -26,7 +26,7 @@ public:
 
     explicit PatientsModel(QObject* parent = nullptr);
 
-    // Loads every patient from b01_paciente. Returns false on failure.
+    // Loads every patient from b01_patient. Returns false on failure.
     bool load();
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;

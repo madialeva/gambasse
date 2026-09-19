@@ -7,7 +7,7 @@
 
 namespace gambasse {
 
-// Patient domain model (table b01_paciente).
+// Patient domain model (table b01_patient).
 // Mirrors the fields used by the main window.
 struct Patient {
 
@@ -17,7 +17,7 @@ struct Patient {
     QString   name;
     QDate     birthDate;
     Sex      sex = Sex::Home;
-    int       ageRange = 0;        // b01_anosaproximados
+    int       ageRange = 0;        // approximate_age
     QString   address;
     QString   cohabitants;
     QString   contactPerson;

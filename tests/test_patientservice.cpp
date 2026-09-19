@@ -22,14 +22,14 @@ Patient makePatient(const QString& name) {
 
 int patientCount() {
     QSqlQuery query(Database::instance().connection());
-    if (!query.exec(QStringLiteral("SELECT COUNT(*) FROM b01_paciente")) || !query.next())
+    if (!query.exec(QStringLiteral("SELECT COUNT(*) FROM b01_patient")) || !query.next())
         return -1;
     return query.value(0).toInt();
 }
 
 QString addressOf(qlonglong id) {
     QSqlQuery query(Database::instance().connection());
-    query.prepare(QStringLiteral("SELECT b01_e_enderezo FROM b01_paciente WHERE b01_id=?"));
+    query.prepare(QStringLiteral("SELECT address FROM b01_patient WHERE id=?"));
     query.addBindValue(id);
     if (!query.exec() || !query.next())
         return QString();

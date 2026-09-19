@@ -23,6 +23,7 @@ private slots:
     void outOfOrderPatchAborts();
     void modifiedAppliedPatchIsRejected();
     void failingPatchIsRolledBack();
+    void realPatchesProduceEnglishSchema();
 };
 
 namespace {
@@ -206,6 +207,31 @@ void TestSchemaMigrator::failingPatchIsRolledBack() {
         QCOMPARE(historyCount(db), 1);
         QVERIFY(hasTable(db, QStringLiteral("t_a")));
         QVERIFY(!hasTable(db, QStringLiteral("rolled_back")));
+        db.close();
+    }
+    QSqlDatabase::removeDatabase(connection);
+}
+
+// The patches shipped in the executable must converge to the English schema.
+void TestSchemaMigrator::realPatchesProduceEnglishSchema() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString connection = QStringLiteral("realpatches");
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), connection);
+        db.setDatabaseName(dir.filePath(QStringLiteral("database.db")));
+        QVERIFY(db.open());
+
+        QString error;
+        QVERIFY2(SchemaMigrator::migrate(db, QStringLiteral(":/bd"), &error), qPrintable(error));
+        QVERIFY(hasTable(db, QStringLiteral("b01_patient")));
+        QVERIFY(hasTable(db, QStringLiteral("b08_pediatric_consultation")));
+        QVERIFY(!hasTable(db, QStringLiteral("b01_paciente")));
+        QCOMPARE(historyCount(db), 2);
+
+        QSqlQuery foreignKeys(db);
+        QVERIFY(foreignKeys.exec(QStringLiteral("PRAGMA foreign_key_check")));
+        QVERIFY(!foreignKeys.next());
         db.close();
     }
     QSqlDatabase::removeDatabase(connection);

@@ -18,9 +18,9 @@ bool PatientsModel::load() {
 
     QSqlQuery q(Database::instance().connection());
     const QString sql = QStringLiteral(
-        "SELECT b01_id, b01_nome, b01_datanascimento, b01_sexo, b01_anosaproximados, "
-        "       b01_e_enderezo, b01_e_coabitantes, b01_e_pessoacontacto, b01_e_numero_irmaos "
-        "FROM b01_paciente ORDER BY b01_nome");
+        "SELECT id, name, birth_date, sex, approximate_age, "
+        "       address, cohabitants, contact_person, sibling_count "
+        "FROM b01_patient ORDER BY name");
 
     if (!q.exec(sql)) {
         endResetModel();

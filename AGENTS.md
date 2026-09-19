@@ -2,19 +2,19 @@
 
 ## Project
 
-DispensarioQt is the Qt Widgets/C++17 rewrite of a clinical-record and
-nursing-consultation application for an NGO in Guinea-Bissau. The production
-.NET application is the functional reference. Both use the same SQLite database,
-so persistent contracts take precedence over naming consistency.
+DispensarioQt is a clinical-record and nursing-consultation application for an
+NGO in Guinea-Bissau. It continues an earlier desktop application that is no
+longer maintained; the SQLite schema is owned by this project, and a legacy
+database with Spanish table and column names is still supported through the
+embedded migration patches (see Persistent compatibility below).
 
-The reference is a VB.NET WinForms application on .NET Framework 4.5, fully
-operational on real PCs. A local copy lives in `tmp/dispensario/` (git-ignored,
-so it may be absent after a fresh clone) — consult it for every piece of Qt
-business logic and every screen still to be developed: `src/Dispensario/Forms/`
-(including the six `FrmHistoria*`/`FrmConsulta*` child forms),
-`src/Dispensario/ORM/` (data access per area), and
-`src/Dispensario/Utilidades/` (shared framework, NOT to be ported: Qt covers
-those services natively).
+A local copy of the original application lives in `tmp/dispensario/`
+(git-ignored, so it may be absent after a fresh clone) — consult it as a
+functional and UX reference for every screen and business rule still to be
+developed: `src/Dispensario/Forms/` (including the six
+`FrmHistoria*`/`FrmConsulta*` child forms), `src/Dispensario/ORM/` (data access
+per area), and `src/Dispensario/Utilidades/` (shared framework, NOT to be
+ported: Qt covers those services natively).
 
 Use Qt Widgets, CMake, Ninja, and a MinGW/GCC Qt kit for Windows deployment. Do
 not introduce QML, MSVC, PostgreSQL, or new production dependencies without an
@@ -68,11 +68,13 @@ language (always English, see below).
 
 ## Persistent compatibility
 
-Never change SQLite tables or columns (`b01_*`, `b03_*` through `b08_*`), SQL
-literals, `config.ini` keys/values, date formats, existing photo filename formats,
-or domain values `Home` and `Muller`. Enable `PRAGMA foreign_keys = ON` per
-connection. Bind optional QString values to `TEXT NOT NULL` fields with
-`nonNull()`.
+The SQLite schema is owned and versioned by this project through embedded
+migration patches (`resources/bd/`). Table names keep the `b0N_` ordering prefix
+and are English; column names are English `snake_case` without the `b0N_` prefix.
+Keep `config.ini` keys/values, date formats, existing photo filename formats, and
+the domain values `Home` and `Muller` stable. Never edit an applied patch; add a
+new one. Enable `PRAGMA foreign_keys = ON` per connection. Bind optional QString
+values to `TEXT NOT NULL` fields with `nonNull()`.
 
 ## Language and files
 

@@ -81,25 +81,25 @@ bool Database::exists(const QString& table, const QString& foreignKeyColumn, qlo
 }
 
 bool Database::hasPediatricHistory(qlonglong patientId) const {
-    return exists(QStringLiteral("b05_historias_pediatrica"),
-                  QStringLiteral("b05_b01_id"), patientId);
+    return exists(QStringLiteral("b05_pediatric_history"),
+                  QStringLiteral("patient_id"), patientId);
 }
 
 bool Database::hasAdultHistory(qlonglong patientId) const {
-    return exists(QStringLiteral("b03_historias_adulto"),
-                  QStringLiteral("b03_b01_id"), patientId);
+    return exists(QStringLiteral("b03_adult_history"),
+                  QStringLiteral("patient_id"), patientId);
 }
 
 bool Database::hasPregnancyHistory(qlonglong patientId) const {
-    return exists(QStringLiteral("b04_historias_embarazada"),
-                  QStringLiteral("b04_b01_id"), patientId);
+    return exists(QStringLiteral("b04_pregnancy_history"),
+                  QStringLiteral("patient_id"), patientId);
 }
 
 // --- Write operations ---
 
 qlonglong Database::nextId() const {
     QSqlQuery q(m_db);
-    if (q.exec(QStringLiteral("SELECT COALESCE(MAX(b01_id),0)+1 FROM b01_paciente")) && q.next())
+    if (q.exec(QStringLiteral("SELECT COALESCE(MAX(id),0)+1 FROM b01_patient")) && q.next())
         return q.value(0).toLongLong();
     return 1;
 }
@@ -107,8 +107,8 @@ qlonglong Database::nextId() const {
 bool Database::hasDuplicate(const Patient& p, qlonglong exceptId) const {
     QSqlQuery q(m_db);
     q.prepare(QStringLiteral(
-        "SELECT 1 FROM b01_paciente WHERE b01_nome=? AND b01_datanascimento=? "
-        "AND b01_sexo=? AND b01_anosaproximados=? AND b01_id<>? LIMIT 1"));
+        "SELECT 1 FROM b01_patient WHERE name=? AND birth_date=? "
+        "AND sex=? AND approximate_age=? AND id<>? LIMIT 1"));
     q.addBindValue(p.name);
     q.addBindValue(p.birthDate.toString(QStringLiteral("yyyy-MM-dd")));
     q.addBindValue(static_cast<int>(p.sex));
@@ -127,9 +127,9 @@ bool Database::insert(Patient& p) {
     p.id = nextId();
     QSqlQuery q(m_db);
     q.prepare(QStringLiteral(
-        "INSERT INTO b01_paciente "
-        "(b01_id, b01_nome, b01_datanascimento, b01_sexo, b01_anosaproximados, "
-        " b01_e_enderezo, b01_e_coabitantes, b01_e_pessoacontacto, b01_e_numero_irmaos) "
+        "INSERT INTO b01_patient "
+        "(id, name, birth_date, sex, approximate_age, "
+        " address, cohabitants, contact_person, sibling_count) "
         "VALUES (?,?,?,?,?,?,?,?,?)"));
     q.addBindValue(p.id);
     q.addBindValue(nonNull(p.name));
@@ -146,9 +146,9 @@ bool Database::insert(Patient& p) {
 bool Database::update(const Patient& p) {
     QSqlQuery q(m_db);
     q.prepare(QStringLiteral(
-        "UPDATE b01_paciente SET b01_nome=?, b01_datanascimento=?, b01_sexo=?, "
-        "b01_anosaproximados=?, b01_e_enderezo=?, b01_e_coabitantes=?, "
-        "b01_e_pessoacontacto=?, b01_e_numero_irmaos=? WHERE b01_id=?"));
+        "UPDATE b01_patient SET name=?, birth_date=?, sex=?, "
+        "approximate_age=?, address=?, cohabitants=?, "
+        "contact_person=?, sibling_count=? WHERE id=?"));
     q.addBindValue(nonNull(p.name));
     q.addBindValue(p.birthDate.toString(QStringLiteral("yyyy-MM-dd")));
     q.addBindValue(static_cast<int>(p.sex));
@@ -163,7 +163,7 @@ bool Database::update(const Patient& p) {
 
 bool Database::remove(qlonglong patientId) {
     QSqlQuery q(m_db);
-    q.prepare(QStringLiteral("DELETE FROM b01_paciente WHERE b01_id=?"));
+    q.prepare(QStringLiteral("DELETE FROM b01_patient WHERE id=?"));
     q.addBindValue(patientId);
     return q.exec();
 }
