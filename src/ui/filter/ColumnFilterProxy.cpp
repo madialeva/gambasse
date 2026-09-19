@@ -1,4 +1,4 @@
-#include <filter/ColumnFilterProxy.h>
+#include <ui/filter/ColumnFilterProxy.h>
 
 #include <QModelIndex>
 #include <QRegularExpression>

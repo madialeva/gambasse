@@ -3,7 +3,7 @@
 #include <QAbstractTableModel>
 #include <QVector>
 
-#include <data/Patient.h>
+#include <data/model/Patient.h>
 
 namespace gambasse {
 
@@ -36,11 +36,6 @@ public:
                         int role = Qt::DisplayRole) const override;
 
     const Patient* patientAt(int row) const;
-
-    // CRUD operations synchronize the database and in-memory list.
-    int  add(Patient p);                 // -1 on failure; otherwise, the new source row
-    bool modify(int row, const Patient& p);
-    bool remove(int row);
 
     // Refreshes header text after a language change.
     void refreshHeaders();

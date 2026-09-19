@@ -20,6 +20,29 @@ Use Qt Widgets, CMake, Ninja, and a MinGW/GCC Qt kit for Windows deployment. Do
 not introduce QML, MSVC, PostgreSQL, or new production dependencies without an
 approved OpenSpec change.
 
+## Source layout
+
+The Qt sources under `src/` are organized by layer:
+
+```text
+src/
+├── main.cpp
+├── Paths.h                  shared base-path helper
+├── data/
+│   ├── common/              database and migration infrastructure
+│   └── model/               data model (Patient, PatientsModel)
+├── logic/                   business logic, UI-independent
+└── ui/
+    ├── window/              windows
+    ├── filter/              view helpers (proxy models)
+    └── uxwidgets/           vendored custom controls
+```
+
+Dependencies flow `ui -> logic -> data`; `logic/` uses only QtCore and `data/`,
+never QtWidgets or `ui/`, so it can be tested without a GUI. Business rules
+(patient writes, photo files, clinical availability, language/theme persistence)
+live in `logic/`, not in the windows.
+
 ## OpenSpec
 
 OpenSpec is the default workflow for changes. For each change: create
@@ -64,13 +87,13 @@ never line-ending-normalize binaries such as `.qm`, images, or databases.
 
 Every `#include` uses angle brackets, never double quotes: Qt and system headers
 (`<QtTest>`, `<QSqlDatabase>`) and project headers resolved from the `src`
-include root (`<Paths.h>`, `<data/Database.h>`, `<ui/MainWindow.h>`,
-`<filter/ColumnFilterProxy.h>`, `<UxWidgets/UxField.h>`). Never use relative
+include root (`<Paths.h>`, `<data/common/Database.h>`, `<ui/window/MainWindow.h>`,
+`<ui/filter/ColumnFilterProxy.h>`, `<UxWidgets/UxField.h>`). Never use relative
 include paths such as `"../Paths.h"`. The only exception is the Qt AUTOMOC
 generated file for a `Q_OBJECT` defined in a `.cpp`, which stays double-quoted
 (`#include "test_schemamigrator.moc"`). CMake must expose the include roots so
 angle includes resolve: `src` for the application and the tests, and
-`src/uxwidgets/include` (PUBLIC on the `UxWidgets` target) for the controls.
+`src/ui/uxwidgets/include` (PUBLIC on the `UxWidgets` target) for the controls.
 
 ## Deployment notes
 

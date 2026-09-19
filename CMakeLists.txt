@@ -13,32 +13,40 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 include(CTest)
 
 # --- UxWidgets control library (vendored) ------------------------------------
-# Self-contained copy under src/uxwidgets, so the project does not depend on
+# Self-contained copy under src/ui/uxwidgets, so the project does not depend on
 # the external Qt.UxWidgets repository. Adoption in the screens belongs to
 # later issues; here the library only needs to compile and link.
-add_subdirectory(src/uxwidgets)
+add_subdirectory(src/ui/uxwidgets)
 
 set(SOURCES
     src/main.cpp
-    src/ui/SplashWindow.cpp
-    src/ui/MainWindow.cpp
-    src/ui/TitleBar.cpp
-    src/data/Database.cpp
-    src/data/SchemaMigrator.cpp
-    src/data/PatientsModel.cpp
-    src/filter/ColumnFilterProxy.cpp
+    src/ui/window/SplashWindow.cpp
+    src/ui/window/MainWindow.cpp
+    src/ui/window/TitleBar.cpp
+    src/data/common/Database.cpp
+    src/data/common/SchemaMigrator.cpp
+    src/data/model/PatientsModel.cpp
+    src/logic/AppSettings.cpp
+    src/logic/ClinicalContext.cpp
+    src/logic/PatientService.cpp
+    src/logic/PhotoManager.cpp
+    src/ui/filter/ColumnFilterProxy.cpp
 )
 
 set(HEADERS
     src/Paths.h
-    src/ui/SplashWindow.h
-    src/ui/MainWindow.h
-    src/ui/TitleBar.h
-    src/data/Database.h
-    src/data/SchemaMigrator.h
-    src/data/Patient.h
-    src/data/PatientsModel.h
-    src/filter/ColumnFilterProxy.h
+    src/ui/window/SplashWindow.h
+    src/ui/window/MainWindow.h
+    src/ui/window/TitleBar.h
+    src/data/common/Database.h
+    src/data/common/SchemaMigrator.h
+    src/data/model/Patient.h
+    src/data/model/PatientsModel.h
+    src/logic/AppSettings.h
+    src/logic/ClinicalContext.h
+    src/logic/PatientService.h
+    src/logic/PhotoManager.h
+    src/ui/filter/ColumnFilterProxy.h
 )
 
 set(RESOURCES

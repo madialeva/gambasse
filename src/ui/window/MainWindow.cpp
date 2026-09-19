@@ -1,4 +1,4 @@
-#include <ui/MainWindow.h>
+#include <ui/window/MainWindow.h>
 
 #include <Paths.h>
 #include <UxWidgets/UxComboInput.h>
@@ -10,10 +10,9 @@
 #include <UxWidgets/UxNumberInput.h>
 #include <UxWidgets/UxTextField.h>
 #include <UxWidgets/UxTextInput.h>
-#include <data/Database.h>
-#include <data/PatientsModel.h>
-#include <filter/ColumnFilterProxy.h>
-#include <ui/TitleBar.h>
+#include <data/model/PatientsModel.h>
+#include <ui/filter/ColumnFilterProxy.h>
+#include <ui/window/TitleBar.h>
 
 #include <QApplication>
 #include <QAbstractButton>
@@ -24,7 +23,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QEvent>
-#include <QFile>
 #include <QFileInfo>
 #include <QFont>
 #include <QMouseEvent>
@@ -43,7 +41,6 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QScrollBar>
-#include <QSettings>
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QStyle>
@@ -69,12 +66,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildUi();
 
     // Initial language and theme (config.ini; Portuguese and light by default).
-    QSettings cfg(QDir(basePath()).filePath(QStringLiteral("config.ini")),
-                  QSettings::IniFormat);
-    const QString code = cfg.value(QStringLiteral("idioma/codigo"), QStringLiteral("pt")).toString();
-    const QString theme = cfg.value(QStringLiteral("tema/modo"), QStringLiteral("claro")).toString();
-    changeTheme(theme);
-    changeLanguage(code);
+    changeTheme(m_appSettings.theme());
+    changeLanguage(m_appSettings.language());
 
     // Once visible, position the filter row and select the first patient so the
     // detail and contextual buttons are populated.
@@ -460,9 +453,33 @@ void MainWindow::setEditMode(bool editing) {
 void MainWindow::clearDetail() {
     loadIntoFields(nullptr);
     if (m_photo)
-        m_photo->setPixmap(QPixmap(QStringLiteral(":/img/foto0.png"))
+        m_photo->setPixmap(QPixmap(m_photoManager.defaultPhotoResource())
                               .scaled(m_photo->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     updateContextButtons(nullptr);
+}
+
+// Selects the row of the patient with the given identifier after a model reload.
+void MainWindow::selectPatientById(qlonglong patientId) {
+    int sourceRow = -1;
+    for (int row = 0; row < m_model->rowCount(); ++row) {
+        const Patient* p = m_model->patientAt(row);
+        if (p && p->id == patientId) {
+            sourceRow = row;
+            break;
+        }
+    }
+    if (sourceRow < 0) {
+        if (m_proxy->rowCount() > 0)
+            m_table->selectRow(0);
+        else
+            clearDetail();
+        return;
+    }
+    const QModelIndex proxyIdx = m_proxy->mapFromSource(m_model->index(sourceRow, 0));
+    if (proxyIdx.isValid()) {
+        m_table->selectRow(proxyIdx.row());
+        m_table->scrollTo(proxyIdx);
+    }
 }
 
 // --- CRUD ---
@@ -471,7 +488,7 @@ void MainWindow::onAdd() {
     m_editingRow = -1;            // new patient
     loadIntoFields(nullptr);      // empty fields, 1900 date, Muller sex
     // Display the calculated identifier (read-only).
-    m_codeValue->setText(QString::number(Database::instance().nextId()));
+    m_codeValue->setText(QString::number(m_patientService.nextId()));
     updateContextButtons(nullptr);
     loadPhoto(nullptr);
     setEditMode(true);
@@ -502,55 +519,35 @@ void MainWindow::onCancel() {
 void MainWindow::onSave() {
     Patient p;
     gatherFromFields(p);
-    if (p.name.isEmpty()) {
+
+    const bool isNew = (m_editingRow < 0);
+    const PatientService::SaveResult result =
+        isNew ? m_patientService.create(p)
+              : m_patientService.update(m_previousPatient, p);
+
+    switch (result) {
+    case PatientService::SaveResult::NameRequired:
         QMessageBox::warning(this, tr("Incomplete data"), tr("Name is required."));
         m_nameInput->textField()->setFocus();
         return;
-    }
-
-    Database& db = Database::instance();
-    const bool isNew = (m_editingRow < 0);
-    const qlonglong exceptId = isNew ? -1 : m_previousPatient.id;
-    if (db.hasDuplicate(p, exceptId)) {
+    case PatientService::SaveResult::Duplicate:
         QMessageBox::warning(this, tr("Duplicate patient"),
             tr("A patient with the same name, birth date, sex, and age already exists."));
         return;
+    case PatientService::SaveResult::Error:
+        QMessageBox::critical(this, tr("Error"), tr("Could not save the patient."));
+        return;
+    case PatientService::SaveResult::Saved:
+        break;
     }
 
-    int sourceRow = -1;
-    if (isNew) {
-        sourceRow = m_model->add(p);   // assigns p.id internally
-        if (sourceRow < 0) {
-            QMessageBox::critical(this, tr("Error"), tr("Could not save the patient."));
-            return;
-        }
-    } else {
-        p.id = m_previousPatient.id;
-        if (!m_model->modify(m_editingRow, p)) {
-            QMessageBox::critical(this, tr("Error"), tr("Could not save the patient."));
-            return;
-        }
-        sourceRow = m_editingRow;
-        // Rename the photo if any filename component has changed.
-        const QString oldFilename = m_previousPatient.photoFilename();
-        const QString newFilename = p.photoFilename();
-        if (oldFilename != newFilename) {
-            const QString oldPath = QDir(basePath()).filePath(oldFilename);
-            const QString newPath = QDir(basePath()).filePath(newFilename);
-            if (QFileInfo::exists(oldPath))
-                QFile::rename(oldPath, newPath);
-        }
-    }
-
+    const qlonglong savedId = p.id;
     m_editingRow = -1;
     setEditMode(false);
 
-    // Select the affected row after mapping source to proxy following reordering.
-    const QModelIndex proxyIdx = m_proxy->mapFromSource(m_model->index(sourceRow, 0));
-    if (proxyIdx.isValid()) {
-        m_table->selectRow(proxyIdx.row());
-        m_table->scrollTo(proxyIdx);
-    }
+    // Reload so ordering/filtering reflect the change, then re-select the patient.
+    m_model->load();
+    selectPatientById(savedId);
     const Patient* sel = selectedPatient();
     loadIntoFields(sel);
     loadPhoto(sel);
@@ -563,85 +560,62 @@ void MainWindow::onDelete() {
     if (!p)
         return;
 
-        if (QMessageBox::question(this, tr("Delete patient"),
-            tr("Delete patient \"%1\" and all their histories and consultations?").arg(p->name))
+    if (QMessageBox::question(this, tr("Delete patient"),
+        tr("Delete patient \"%1\" and all their histories and consultations?").arg(p->name))
         != QMessageBox::Yes)
         return;
 
-    const QString photoPath = QDir(basePath()).filePath(p->photoFilename());
     const int previousProxyRow = m_table->selectionModel()->currentIndex().row();
+    const Patient toDelete = *p;   // copy before the model is reloaded
 
-    if (!m_model->remove(f)) {
+    if (!m_patientService.remove(toDelete)) {
         QMessageBox::critical(this, tr("Error"), tr("Could not delete the patient."));
         return;
     }
-    if (QFileInfo::exists(photoPath))
-        QFile::remove(photoPath);
 
-    if (m_proxy->rowCount() > 0) {
+    m_model->load();
+    if (m_proxy->rowCount() > 0)
         m_table->selectRow(qBound(0, previousProxyRow, m_proxy->rowCount() - 1));
-    } else {
+    else
         clearDetail();
-    }
 }
 
 void MainWindow::updateContextButtons(const Patient* p) {
     // The three Create buttons are always visible; only their enabled state
     // changes. Entry buttons in the toolbar use their QAction for visibility.
-    if (!p) {
-        for (QAction* a : {m_pediatricHistoryAction, m_pediatricConsultationAction, m_adultHistoryAction, m_adultConsultationAction,
-                           m_pregnancyHistoryAction, m_pregnancyConsultationAction})
-            if (a) a->setVisible(false);
-        for (QPushButton* b : {m_createPediatricButton, m_createAdultButton, m_createPregnancyButton}) {
-            b->setVisible(true);
-            b->setEnabled(false);
-        }
-        return;
-    }
+    const Availability availability = m_clinicalContext.availability(p);
 
-    Database& db = Database::instance();
-    const bool hasPediatric = db.hasPediatricHistory(p->id);
-    const bool hasAdult = db.hasAdultHistory(p->id);
-    const bool hasPregnancy = db.hasPregnancyHistory(p->id);
-
-    const bool isChild = (p->ageRange <= 16) || (p->isValidDate() && p->ageInYears() <= 16);
-    const bool isAdult = (p->ageRange > 16)  || (p->isValidDate() && p->ageInYears() > 16);
-    const bool isPregnant = (p->sex == Patient::Sex::Muller)
-                           && ((p->ageRange >= 9) || (p->isValidDate() && p->ageInYears() >= 9));
-
-    // Toolbar entry controls are visible only when the history already exists.
-    m_pediatricHistoryAction->setVisible(hasPediatric);  m_pediatricConsultationAction->setVisible(hasPediatric);
-    m_adultHistoryAction->setVisible(hasAdult);      m_adultConsultationAction->setVisible(hasAdult);
-    m_pregnancyHistoryAction->setVisible(hasPregnancy);  m_pregnancyConsultationAction->setVisible(hasPregnancy);
+    m_pediatricHistoryAction->setVisible(availability.showPediatric);
+    m_pediatricConsultationAction->setVisible(availability.showPediatric);
+    m_adultHistoryAction->setVisible(availability.showAdult);
+    m_adultConsultationAction->setVisible(availability.showAdult);
+    m_pregnancyHistoryAction->setVisible(availability.showPregnancy);
+    m_pregnancyConsultationAction->setVisible(availability.showPregnancy);
 
     // History creation below the photo is always visible, but only enabled when
     // the history does not exist and the patient meets the age/sex criteria.
-    m_createPediatricButton->setVisible(true); m_createPediatricButton->setEnabled(!hasPediatric && isChild);
-    m_createAdultButton->setVisible(true); m_createAdultButton->setEnabled(!hasAdult && isAdult);
-    m_createPregnancyButton->setVisible(true); m_createPregnancyButton->setEnabled(!hasPregnancy && isPregnant);
+    m_createPediatricButton->setVisible(true);
+    m_createPediatricButton->setEnabled(availability.canCreatePediatric);
+    m_createAdultButton->setVisible(true);
+    m_createAdultButton->setEnabled(availability.canCreateAdult);
+    m_createPregnancyButton->setVisible(true);
+    m_createPregnancyButton->setEnabled(availability.canCreatePregnancy);
 }
 
 void MainWindow::loadPhoto(const Patient* p) {
     if (!m_photo)
         return;
-    if (!p) {
-        m_photo->setPixmap(QPixmap(QStringLiteral(":/img/foto0.png"))
-                              .scaled(m_photo->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        return;
-    }
-    const QString applicationDirectory = basePath();
     QPixmap pm;
-
-    const QString photoFilenamePath = QDir(applicationDirectory).filePath(p->photoFilename());
-    const QString legacyPhotoPath = QDir(applicationDirectory).filePath(QStringLiteral("fotos/%1.jpg").arg(p->id));
-
-    if (QFileInfo::exists(photoFilenamePath))
-        pm.load(photoFilenamePath);
-    else if (QFileInfo::exists(legacyPhotoPath))
-        pm.load(legacyPhotoPath);
-
+    if (p) {
+        const QString photoPath = m_photoManager.photoPath(*p);
+        const QString legacyPath = m_photoManager.legacyPhotoPath(*p);
+        if (QFileInfo::exists(photoPath))
+            pm.load(photoPath);
+        else if (QFileInfo::exists(legacyPath))
+            pm.load(legacyPath);
+    }
     if (pm.isNull())
-        pm = QPixmap(QStringLiteral(":/img/foto0.png"));
+        pm = QPixmap(m_photoManager.defaultPhotoResource());
 
     m_photo->setPixmap(pm.scaled(m_photo->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
@@ -667,12 +641,9 @@ void MainWindow::changeLanguage(const QString& code) {
             qApp->installTranslator(&m_translator);
     }
 
-    QSettings cfg(QDir(basePath()).filePath(QStringLiteral("config.ini")),
-                  QSettings::IniFormat);
-    cfg.setValue(QStringLiteral("idioma/codigo"), code);
+    m_appSettings.setLanguage(code);
 
-    if (m_actEs) m_actEs->setChecked(code == QLatin1String("es"));
-    if (m_actPt) m_actPt->setChecked(code == QLatin1String("pt"));
+    if (m_actEs) m_actEs->setChecked(code == QLatin1String("es"));    if (m_actPt) m_actPt->setChecked(code == QLatin1String("pt"));
 
     retranslate(); // refuerzo por si installTranslator no dispara LanguageChange
 }
@@ -690,9 +661,7 @@ void MainWindow::changeTheme(const QString& mode) {
     m_theme = (mode == QLatin1String("oscuro")) ? QStringLiteral("oscuro") : QStringLiteral("claro");
     applyTheme(m_theme);
 
-    QSettings cfg(QDir(basePath()).filePath(QStringLiteral("config.ini")),
-                  QSettings::IniFormat);
-    cfg.setValue(QStringLiteral("tema/modo"), m_theme);
+    m_appSettings.setTheme(m_theme);
 
     if (m_lightAction) m_lightAction->setChecked(m_theme == QLatin1String("claro"));
     if (m_darkAction) m_darkAction->setChecked(m_theme == QLatin1String("oscuro"));

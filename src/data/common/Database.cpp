@@ -1,7 +1,7 @@
-#include <data/Database.h>
+#include <data/common/Database.h>
 
 #include <Paths.h>
-#include <data/SchemaMigrator.h>
+#include <data/common/SchemaMigrator.h>
 
 #include <QCoreApplication>
 #include <QDir>
