@@ -22,6 +22,7 @@ set(SOURCES
     src/main.cpp
     src/ui/window/SplashWindow.cpp
     src/ui/window/MainWindow.cpp
+    src/ui/window/PediatricHistoryWindow.cpp
     src/ui/window/TitleBar.cpp
     src/data/common/Database.cpp
     src/data/common/SchemaMigrator.cpp
@@ -29,6 +30,8 @@ set(SOURCES
     src/logic/AppSettings.cpp
     src/logic/ClinicalContext.cpp
     src/logic/PatientService.cpp
+    src/logic/PediatricHistoryLabels.cpp
+    src/logic/PediatricHistoryService.cpp
     src/logic/PhotoManager.cpp
     src/logic/SexLabel.cpp
     src/ui/filter/ColumnFilterProxy.cpp
@@ -38,14 +41,18 @@ set(HEADERS
     src/Paths.h
     src/ui/window/SplashWindow.h
     src/ui/window/MainWindow.h
+    src/ui/window/PediatricHistoryWindow.h
     src/ui/window/TitleBar.h
     src/data/common/Database.h
     src/data/common/SchemaMigrator.h
     src/data/model/Patient.h
     src/data/model/PatientsModel.h
+    src/data/model/PediatricHistory.h
     src/logic/AppSettings.h
     src/logic/ClinicalContext.h
     src/logic/PatientService.h
+    src/logic/PediatricHistoryLabels.h
+    src/logic/PediatricHistoryService.h
     src/logic/PhotoManager.h
     src/logic/SexLabel.h
     src/ui/filter/ColumnFilterProxy.h

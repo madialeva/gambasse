@@ -13,6 +13,7 @@
 #include <data/model/PatientsModel.h>
 #include <logic/SexLabel.h>
 #include <ui/filter/ColumnFilterProxy.h>
+#include <ui/window/PediatricHistoryWindow.h>
 #include <ui/window/TitleBar.h>
 
 #include <QApplication>
@@ -108,10 +109,14 @@ void MainWindow::buildUi() {
     central->installEventFilter(this);
 
     // History-creation buttons, located below the photo in the right column.
+    // The pediatric one opens the pediatric history window; adult/pregnancy
+    // stay inert until their windows are ported.
     m_createPediatricButton = new QPushButton(central);
     m_createAdultButton = new QPushButton(central);
     m_createPregnancyButton = new QPushButton(central);
-    for (QPushButton* b : {m_createPediatricButton, m_createAdultButton, m_createPregnancyButton})
+    connect(m_createPediatricButton, &QPushButton::clicked,
+            this, &MainWindow::openPediatricHistory);
+    for (QPushButton* b : {m_createAdultButton, m_createPregnancyButton})
         connect(b, &QPushButton::clicked, this, &MainWindow::onActionNotImplemented);
 
     // --- Top row: grid (left) and photo/create-buttons column (right). ---
@@ -245,6 +250,13 @@ void MainWindow::buildToolbar() {
     m_adultConsultationButton = createActionButton(m_adultConsultationAction);
     m_pregnancyHistoryButton = createActionButton(m_pregnancyHistoryAction);
     m_pregnancyConsultationButton = createActionButton(m_pregnancyConsultationAction);
+
+    // The pediatric history entry opens its window (existing or new); the
+    // remaining entries stay inert until their forms are ported.
+    disconnect(m_pediatricHistoryButton, &QToolButton::clicked,
+               this, &MainWindow::onActionNotImplemented);
+    connect(m_pediatricHistoryButton, &QToolButton::clicked,
+            this, &MainWindow::openPediatricHistory);
 
     // Language and theme live in the custom title bar now (same buttons,
     // menus and persistence as before).
@@ -631,6 +643,18 @@ void MainWindow::onActionNotImplemented() {
     QMessageBox::information(
         this, tr("Unavailable"),
         tr("This feature is not implemented in this phase yet."));
+}
+
+void MainWindow::openPediatricHistory() {
+    const Patient* p = selectedPatient();
+    if (!p)
+        return;
+    PediatricHistoryWindow dialog(p->id, p->name, this);
+    if (!dialog.isValid())
+        return;
+    // After saving or deleting, the entry/create buttons change state.
+    if (dialog.exec() == QDialog::Accepted)
+        updateContextButtons(selectedPatient());
 }
 
 // --------- i18n ---------
