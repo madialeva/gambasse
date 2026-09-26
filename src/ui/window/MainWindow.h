@@ -53,6 +53,8 @@ private slots:
     void onSave();
     void onCancel();
     void openPediatricHistory();
+    void openAdultHistory();
+    void openPregnancyHistory();
 
 private:
     void buildUi();

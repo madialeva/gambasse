@@ -22,16 +22,20 @@ set(SOURCES
     src/main.cpp
     src/ui/window/SplashWindow.cpp
     src/ui/window/MainWindow.cpp
+    src/ui/window/AdultHistoryWindow.cpp
     src/ui/window/PediatricHistoryWindow.cpp
+    src/ui/window/PregnancyHistoryWindow.cpp
     src/ui/window/TitleBar.cpp
     src/data/common/Database.cpp
     src/data/common/SchemaMigrator.cpp
     src/data/model/PatientsModel.cpp
+    src/logic/AdultHistoryService.cpp
     src/logic/AppSettings.cpp
     src/logic/ClinicalContext.cpp
     src/logic/PatientService.cpp
     src/logic/PediatricHistoryLabels.cpp
     src/logic/PediatricHistoryService.cpp
+    src/logic/PregnancyHistoryService.cpp
     src/logic/PhotoManager.cpp
     src/logic/SexLabel.cpp
     src/ui/filter/ColumnFilterProxy.cpp
@@ -41,18 +45,24 @@ set(HEADERS
     src/Paths.h
     src/ui/window/SplashWindow.h
     src/ui/window/MainWindow.h
+    src/ui/window/AdultHistoryWindow.h
     src/ui/window/PediatricHistoryWindow.h
+    src/ui/window/PregnancyHistoryWindow.h
     src/ui/window/TitleBar.h
     src/data/common/Database.h
     src/data/common/SchemaMigrator.h
+    src/data/model/AdultHistory.h
     src/data/model/Patient.h
     src/data/model/PatientsModel.h
     src/data/model/PediatricHistory.h
+    src/data/model/PregnancyHistory.h
+    src/logic/AdultHistoryService.h
     src/logic/AppSettings.h
     src/logic/ClinicalContext.h
     src/logic/PatientService.h
     src/logic/PediatricHistoryLabels.h
     src/logic/PediatricHistoryService.h
+    src/logic/PregnancyHistoryService.h
     src/logic/PhotoManager.h
     src/logic/SexLabel.h
     src/ui/filter/ColumnFilterProxy.h

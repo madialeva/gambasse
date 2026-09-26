@@ -4,7 +4,9 @@
 #include <QSqlDatabase>
 
 #include <data/model/Patient.h>
+#include <data/model/AdultHistory.h>
 #include <data/model/PediatricHistory.h>
+#include <data/model/PregnancyHistory.h>
 
 namespace gambasse {
 
@@ -32,6 +34,23 @@ public:
     bool insertPediatricHistory(const PediatricHistory& history);
     bool updatePediatricHistory(const PediatricHistory& history);
     bool removePediatricHistory(qlonglong patientId);
+
+    // Adult history (b03_adult_history): only the columns managed by the
+    // adult history window. Decimal vital signs use the VB.NET scaling:
+    // weight and temperature x10, BMI x100.
+    bool loadAdultHistory(qlonglong patientId, AdultHistory& history) const;
+    bool insertAdultHistory(const AdultHistory& history);
+    bool updateAdultHistory(const AdultHistory& history);
+    bool removeAdultHistory(qlonglong patientId);
+
+    // Pregnancy history (b04_pregnancy_history): only the columns managed by
+    // the pregnancy history window. Nullable dates use an invalid QDate for
+    // NULL. The fixed TabPage2 rows (iron, folic acid, deworming) carry no
+    // column and are never persisted.
+    bool loadPregnancyHistory(qlonglong patientId, PregnancyHistory& history) const;
+    bool insertPregnancyHistory(const PregnancyHistory& history);
+    bool updatePregnancyHistory(const PregnancyHistory& history);
+    bool removePregnancyHistory(qlonglong patientId);
 
     // Write operations on b01_patient.
     qlonglong nextId() const;

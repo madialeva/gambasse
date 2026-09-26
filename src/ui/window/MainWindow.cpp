@@ -13,7 +13,9 @@
 #include <data/model/PatientsModel.h>
 #include <logic/SexLabel.h>
 #include <ui/filter/ColumnFilterProxy.h>
+#include <ui/window/AdultHistoryWindow.h>
 #include <ui/window/PediatricHistoryWindow.h>
+#include <ui/window/PregnancyHistoryWindow.h>
 #include <ui/window/TitleBar.h>
 
 #include <QApplication>
@@ -116,8 +118,10 @@ void MainWindow::buildUi() {
     m_createPregnancyButton = new QPushButton(central);
     connect(m_createPediatricButton, &QPushButton::clicked,
             this, &MainWindow::openPediatricHistory);
-    for (QPushButton* b : {m_createAdultButton, m_createPregnancyButton})
-        connect(b, &QPushButton::clicked, this, &MainWindow::onActionNotImplemented);
+    connect(m_createAdultButton, &QPushButton::clicked,
+            this, &MainWindow::openAdultHistory);
+    connect(m_createPregnancyButton, &QPushButton::clicked,
+            this, &MainWindow::openPregnancyHistory);
 
     // --- Top row: grid (left) and photo/create-buttons column (right). ---
     m_photo = new QLabel(central);
@@ -251,12 +255,20 @@ void MainWindow::buildToolbar() {
     m_pregnancyHistoryButton = createActionButton(m_pregnancyHistoryAction);
     m_pregnancyConsultationButton = createActionButton(m_pregnancyConsultationAction);
 
-    // The pediatric history entry opens its window (existing or new); the
-    // remaining entries stay inert until their forms are ported.
+    // The history entries open their windows (existing or new); only the
+    // consultation entries stay inert until their forms are ported.
     disconnect(m_pediatricHistoryButton, &QToolButton::clicked,
                this, &MainWindow::onActionNotImplemented);
     connect(m_pediatricHistoryButton, &QToolButton::clicked,
             this, &MainWindow::openPediatricHistory);
+    disconnect(m_adultHistoryButton, &QToolButton::clicked,
+               this, &MainWindow::onActionNotImplemented);
+    connect(m_adultHistoryButton, &QToolButton::clicked,
+            this, &MainWindow::openAdultHistory);
+    disconnect(m_pregnancyHistoryButton, &QToolButton::clicked,
+               this, &MainWindow::onActionNotImplemented);
+    connect(m_pregnancyHistoryButton, &QToolButton::clicked,
+            this, &MainWindow::openPregnancyHistory);
 
     // Language and theme live in the custom title bar now (same buttons,
     // menus and persistence as before).
@@ -650,6 +662,30 @@ void MainWindow::openPediatricHistory() {
     if (!p)
         return;
     PediatricHistoryWindow dialog(p->id, p->name, this);
+    if (!dialog.isValid())
+        return;
+    // After saving or deleting, the entry/create buttons change state.
+    if (dialog.exec() == QDialog::Accepted)
+        updateContextButtons(selectedPatient());
+}
+
+void MainWindow::openAdultHistory() {
+    const Patient* p = selectedPatient();
+    if (!p)
+        return;
+    AdultHistoryWindow dialog(p->id, p->name, this);
+    if (!dialog.isValid())
+        return;
+    // After saving or deleting, the entry/create buttons change state.
+    if (dialog.exec() == QDialog::Accepted)
+        updateContextButtons(selectedPatient());
+}
+
+void MainWindow::openPregnancyHistory() {
+    const Patient* p = selectedPatient();
+    if (!p)
+        return;
+    PregnancyHistoryWindow dialog(p->id, p->name, this);
     if (!dialog.isValid())
         return;
     // After saving or deleting, the entry/create buttons change state.

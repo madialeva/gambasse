@@ -41,7 +41,7 @@
 | ✅ | Language/theme selection |
 | ✅ | Windows launcher |
 | ✅ | Automatic database creation and schema migration |
-| ⬜ | Histories |
+| ✅ | Histories |
 | ⬜ | Consultations |
 | ⬜ | Interactive photo management |
 | ⬜ | USB backup |
