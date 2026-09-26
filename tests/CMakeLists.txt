@@ -250,6 +250,7 @@ add_executable(test_adulthistorywindow
     test_adulthistorywindow.cpp
     ../src/ui/window/AdultHistoryWindow.cpp
     ../src/ui/window/TitleBar.cpp
+    ../src/ui/window/TitleBar.cpp
     ../src/logic/AdultHistoryService.cpp
     ../src/logic/PediatricHistoryLabels.cpp
     ../src/data/common/Database.cpp
@@ -303,3 +304,142 @@ target_link_libraries(test_pregnancyhistorywindow PRIVATE
 add_test(NAME pregnancyhistorywindow COMMAND test_pregnancyhistorywindow)
 
 set_tests_properties(pregnancyhistorywindow PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_qmlfoundation
+    test_qmlfoundation.cpp
+    ../src/ui/InterfaceSettings.cpp
+    ../src/logic/AppSettings.cpp
+    ${CMAKE_SOURCE_DIR}/translations/i18n.qrc
+    ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+)
+
+set_target_properties(test_qmlfoundation PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_qmlfoundation PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_compile_definitions(test_qmlfoundation PRIVATE QML_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures")
+
+target_link_libraries(test_qmlfoundation PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::Test
+    GambasseQml
+    GambasseQmlplugin
+)
+
+add_test(NAME qmlfoundation COMMAND test_qmlfoundation)
+
+set_tests_properties(qmlfoundation PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_qmlcomponents
+    test_qmlcomponents.cpp
+    ../src/ui/InterfaceSettings.cpp
+    ../src/logic/AppSettings.cpp
+    ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+)
+
+set_target_properties(test_qmlcomponents PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_qmlcomponents PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_compile_definitions(test_qmlcomponents PRIVATE
+    QML_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures"
+    QML_COMPONENTS_DIR="${CMAKE_SOURCE_DIR}/qml/components")
+
+target_link_libraries(test_qmlcomponents PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::Test
+    GambasseQml
+    GambasseQmlplugin
+)
+
+add_test(NAME qmlcomponents COMMAND test_qmlcomponents)
+
+set_tests_properties(qmlcomponents PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+# The QML main screen bridge: the controller plus the Widgets sources it still
+# opens for the history dialogs, reused by the controller and screen tests.
+set(MAINSCREEN_SOURCES
+    ../src/ui/PatientController.cpp
+    ../src/ui/window/AdultHistoryWindow.cpp
+    ../src/ui/window/TitleBar.cpp
+    ../src/ui/window/PediatricHistoryWindow.cpp
+    ../src/ui/window/PregnancyHistoryWindow.cpp
+    ../src/data/common/Database.cpp
+    ../src/data/common/SchemaMigrator.cpp
+    ../src/data/model/PatientsModel.cpp
+    ../src/logic/AdultHistoryService.cpp
+    ../src/logic/AppSettings.cpp
+    ../src/logic/ClinicalContext.cpp
+    ../src/logic/PatientService.cpp
+    ../src/logic/PediatricHistoryLabels.cpp
+    ../src/logic/PediatricHistoryService.cpp
+    ../src/logic/PregnancyHistoryService.cpp
+    ../src/logic/PhotoManager.cpp
+    ../src/logic/SexLabel.cpp
+    ../src/ui/filter/ColumnFilterProxy.cpp
+    ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+    ${CMAKE_SOURCE_DIR}/resources/bd/bd.qrc
+)
+
+add_executable(test_patientcontroller
+    test_patientcontroller.cpp
+    ${MAINSCREEN_SOURCES}
+)
+
+set_target_properties(test_patientcontroller PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_patientcontroller PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/ui/uxwidgets/include
+)
+
+target_link_libraries(test_patientcontroller PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Sql
+    Qt6::Test
+    UxWidgets::UxWidgets
+)
+
+add_test(NAME patientcontroller COMMAND test_patientcontroller)
+
+set_tests_properties(patientcontroller PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+add_executable(test_qmlmainwindow
+    test_qmlmainwindow.cpp
+    ../src/ui/InterfaceSettings.cpp
+    ${MAINSCREEN_SOURCES}
+    ${CMAKE_SOURCE_DIR}/translations/i18n.qrc
+)
+
+set_target_properties(test_qmlmainwindow PROPERTIES AUTOMOC ON AUTORCC ON)
+
+target_include_directories(test_qmlmainwindow PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/ui/uxwidgets/include
+)
+
+target_link_libraries(test_qmlmainwindow PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Sql
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::Test
+    UxWidgets::UxWidgets
+    GambasseQml
+    GambasseQmlplugin
+)
+
+add_test(NAME qmlmainwindow COMMAND test_qmlmainwindow)
+
+set_tests_properties(qmlmainwindow PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

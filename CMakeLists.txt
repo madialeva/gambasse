@@ -8,7 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql Qml Quick QuickControls2)
 
 include(CTest)
 
@@ -20,6 +20,8 @@ add_subdirectory(src/ui/uxwidgets)
 
 set(SOURCES
     src/main.cpp
+    src/ui/InterfaceSettings.cpp
+    src/ui/PatientController.cpp
     src/ui/window/SplashWindow.cpp
     src/ui/window/MainWindow.cpp
     src/ui/window/AdultHistoryWindow.cpp
@@ -43,6 +45,8 @@ set(SOURCES
 
 set(HEADERS
     src/Paths.h
+    src/ui/InterfaceSettings.h
+    src/ui/PatientController.h
     src/ui/window/SplashWindow.h
     src/ui/window/MainWindow.h
     src/ui/window/AdultHistoryWindow.h
@@ -76,6 +80,35 @@ set(RESOURCES
 
 qt_add_executable(Gambasse WIN32 ${SOURCES} ${HEADERS} ${RESOURCES})
 
+# QML module in a static library shared by the application and the tests,
+# so both resolve `import Gambasse` (and its resources) identically.
+qt_add_library(GambasseQml STATIC)
+qt_policy(SET QTP0001 NEW)
+set_source_files_properties(qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+qt_add_qml_module(GambasseQml
+    URI Gambasse
+    VERSION 1.0
+    QML_FILES
+        qml/Root.qml
+        qml/Theme.qml
+        qml/TitleBar.qml
+        qml/ResizeHandles.qml
+        qml/windows/SplashWindow.qml
+        qml/windows/MainWindow.qml
+        qml/components/GxTextInput.qml
+        qml/components/GxNumberInput.qml
+        qml/components/GxDateInput.qml
+        qml/components/GxComboInput.qml
+        qml/components/GxLabel.qml
+        qml/components/GxCheck.qml
+        qml/components/GxDialog.qml
+)
+target_link_libraries(GambasseQml PUBLIC
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+)
+
 target_include_directories(Gambasse PRIVATE src)
 
 # Single source of truth for the program version, published at runtime with
@@ -88,6 +121,11 @@ target_link_libraries(Gambasse PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::Sql
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+    GambasseQml
+    GambasseQmlplugin
     UxWidgets::UxWidgets
 )
 

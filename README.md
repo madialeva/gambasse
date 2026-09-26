@@ -74,6 +74,8 @@ baselined without re-running the initial schema, so its data is preserved.
 
 - GCC 11+ (C++17).
 - Qt 6 Core, Gui, Widgets and Sql, with the SQLite driver.
+- Qt 6 Qml, Quick and QuickControls2 (declarative UI; `qt6-declarative-dev`
+  on Debian/Ubuntu, plus `qt6-declarative-dev-tools` for `qmllint`/`qmlformat`).
 - CMake 3.21+ and Ninja.
 - Windows deployment: a Qt MinGW kit, `windeployqt`, and MinGW runtime DLLs.
 
@@ -89,6 +91,23 @@ When Qt is not discoverable, add
 `-DCMAKE_PREFIX_PATH=/path/to/Qt/6.x/gcc_64`. The executable uses `config.ini`
 and `database.db` beside itself by default; `--base <directory>` overrides it.
 The database file is created and migrated on first run.
+
+## QML UI flow
+
+The declarative UI lives in `qml/` as the `Gambasse` module (`qt_add_qml_module`):
+shell (`Root.qml`, `Theme.qml` singleton, `TitleBar.qml`, `ResizeHandles.qml`)
+plus the `qml/components/` custom control library; screens land under `qml/`
+as they are ported. Run it with `./build-linux/Gambasse --qml` (default stays
+Widgets until the final cutover). Keep every file formatted and lint-clean:
+
+```sh
+qmlformat -i qml/<file>.qml
+qmllint -i build-linux/qmldir qml/<file>.qml   # needs a configured build
+```
+
+Windows deployment adds the QML runtime with
+`windeployqt --qmldir qml/ ...`. QML development needs no install beyond the
+requirements above; the Qt VS Code extension covers editing and previewing.
 
 ## Windows development and deployment
 
