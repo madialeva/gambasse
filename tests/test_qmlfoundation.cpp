@@ -9,6 +9,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <ui/AppIcon.h>
 #include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
@@ -72,7 +73,9 @@ private slots:
     void qmlLanguageSwitchesInHot();
     void splashSequence();
     void appOpensShellAfterSplash();
+    void applicationIconIsTheLogo();
     void titleBarChrome();
+    void titleBarStandsOut();
     void titleBarWindowButtons();
     void titleBarDrag();
     void windowEdgeResize();
@@ -212,6 +215,41 @@ void TestQmlFoundation::appOpensShellAfterSplash() {
     QVERIFY(QTest::qWaitForWindowExposed(shell));
 }
 
+void TestQmlFoundation::titleBarStandsOut() {
+    // Title bar background per theme (see qml/Theme.qml), distinct from the
+    // window grey of expectedShell().
+    const auto expectedBar = [](const QString& mode) {
+        return mode == QStringLiteral("oscuro") ? QColor(0x24, 0x3B, 0x3A)
+                                                : QColor(0xDC, 0xEE, 0xEA);
+    };
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    auto* bar = window->findChild<QQuickItem*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    // An empty spot of the bar: between the title and the window buttons.
+    const QPoint spot = bar->mapToScene(QPointF(bar->width() / 2.0, 4)).toPoint();
+
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        settingsOf(*m_engine)->setTheme(mode); // hot change
+        QTRY_COMPARE(window->grabWindow().pixelColor(spot), expectedBar(mode));
+        QVERIFY(expectedBar(mode) != expectedShell(mode));
+    }
+}
+
+void TestQmlFoundation::applicationIconIsTheLogo() {
+    // The title bar logo at every usual desktop size, not an empty icon.
+    const QIcon icon = applicationIcon();
+    QVERIFY(!icon.isNull());
+    for (int size : {16, 24, 32, 48, 64, 128, 256}) {
+        QVERIFY2(icon.availableSizes().contains(QSize(size, size)), qPrintable(QString::number(size)));
+        const QImage image = icon.pixmap(QSize(size, size)).toImage();
+        QCOMPARE(image.size(), QSize(size, size));
+        // The logo is a filled disc: its centre is opaque.
+        QCOMPARE(image.pixelColor(size / 2, size / 2).alpha(), 255);
+    }
+}
+
 void TestQmlFoundation::titleBarChrome() {
     // Same assertions in both themes (tooltips stay in English: no
     // translator is installed in tests, like a fresh English session).
@@ -222,7 +260,16 @@ void TestQmlFoundation::titleBarChrome() {
 
         QObject* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
         QVERIFY(bar != nullptr);
-        QCOMPARE(bar->property("height").toInt(), 32);
+        // 40 px of buttons plus the 1 px bottom line: every button of the bar
+        // fits exactly above that line.
+        QCOMPARE(bar->property("height").toInt(), 41);
+        for (const char* name : {"languageButton", "themeButton", "minimizeButton",
+                                 "maximizeButton", "closeButton"}) {
+            auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
+            QVERIFY2(button != nullptr, name);
+            const QPointF top = button->mapToItem(qobject_cast<QQuickItem*>(bar), QPointF(0, 0));
+            QVERIFY2(top.y() == 0 && button->height() == 40, name);
+        }
 
         auto* minimizeButton = bar->findChild<QQuickItem*>(QStringLiteral("minimizeButton"));
         auto* maximizeButton = bar->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));

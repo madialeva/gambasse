@@ -28,6 +28,22 @@ QQuickItem* child(QObject* parent, const QString& name) {
 
 // Visual descendants (Repeater instantiates them without QObject parentage),
 // so the item tree is the reliable place to look for them.
+// Items of the visual tree with the given objectName (Repeater and TableView
+// delegates hang from the visual tree only).
+QList<QQuickItem*> visualItems(QQuickItem* parent, const QString& objectName) {
+    QList<QQuickItem*> found;
+    const auto visit = [&](QQuickItem* item, auto&& self) -> void {
+        for (QQuickItem* childItem : item->childItems()) {
+            if (childItem->objectName() == objectName)
+                found.append(childItem);
+            self(childItem, self);
+        }
+    };
+    if (parent != nullptr)
+        visit(parent, visit);
+    return found;
+}
+
 int countVisualChildren(QQuickItem* parent, const QString& objectName) {
     int found = 0;
     const auto visit = [&](QQuickItem* item, auto&& self) -> void {
@@ -145,6 +161,11 @@ private slots:
     void calendarPopupIsVisible();
     void bothGroupsAreAligned();
     void gridTakesFocusAndKeyboardMoves();
+    void gridHasAFrame();
+    void photoKeepsTheOriginalSize();
+    void detailGroupsAreSections();
+    void gridHeadersFitAndNumbersAreCentred();
+    void filterRowSitsInsideTheGrid();
 };
 
 void TestQmlMainWindow::initTestCase() {
@@ -477,31 +498,25 @@ void TestQmlMainWindow::detailPanelFitsTheWindow() {
     QVERIFY(left(age) < left(date));
     QVERIFY(left(date) < left(sex));
 
-    // Nothing of the bottom panel may fall outside the window, not even at the
-    // 960x540 minimum (the code label used to push the last field out).
-    for (const QSize target : {QSize(1008, 561), QSize(960, 540)}) {
-        m_window->resize(target);
-        QTRY_COMPARE(m_window->size(), target);
-        QTRY_COMPARE(m_screen->height(), target.height() - 32); // layout settled
-        const auto bottom = [](QQuickItem* it) {
-            return it->mapToScene(QPointF(0, it->height())).toPoint().y();
-        };
-        QVERIFY2(bottom(basic) <= m_window->height(),
-                 qPrintable(QStringLiteral("%1x%2 basic=%3").arg(target.width())
-                                .arg(target.height())
-                                .arg(bottom(basic))));
-        QVERIFY2(bottom(address) <= m_window->height(),
-                 qPrintable(QStringLiteral("%1x%2 address=%3").arg(target.width())
-                                .arg(target.height())
-                                .arg(bottom(address))));
-        QVERIFY2(bottom(age) <= bottom(basic), "the age field is not cut");
-        QVERIFY2(bottom(siblings) <= bottom(address), "the siblings field is not cut");
-        // The grid keeps the remaining space instead of pushing the panel out.
-        QVERIFY(item(QStringLiteral("gridTable"))->height() > 100);
-        // The code line is visible too (it used to overflow with the age field).
-        QVERIFY(code->mapToScene(QPointF(0, 0)).toPoint().y() > 0);
-    }
-    m_window->resize(1008, 561);
+    // The window opens at its minimum size, the 1008x561 base, and nothing of
+    // the bottom panel may fall outside it.
+    QCOMPARE(m_window->minimumSize(), QSize(1008, 561));
+    QCOMPARE(m_window->size(), QSize(1008, 561));
+    const auto bottom = [](QQuickItem* it) {
+        return it->mapToScene(QPointF(0, it->height())).toPoint().y();
+    };
+    for (QQuickItem* group : {basic, address})
+        QVERIFY2(bottom(group) <= m_window->height(),
+                 qPrintable(QStringLiteral("%1 ends at %2 of %3")
+                                .arg(group->objectName())
+                                .arg(bottom(group))
+                                .arg(m_window->height())));
+    QVERIFY2(bottom(age) <= bottom(basic), "the age field is not cut");
+    QVERIFY2(bottom(siblings) <= bottom(address), "the siblings field is not cut");
+    // The grid keeps the remaining space instead of pushing the panel out.
+    QVERIFY(item(QStringLiteral("gridTable"))->height() > 100);
+    // The code line is visible too (it used to overflow with the age field).
+    QVERIFY(code->mapToScene(QPointF(0, 0)).toPoint().y() > 0);
 }
 
 void TestQmlMainWindow::detailFieldsFitTheirLine() {
@@ -593,11 +608,16 @@ void TestQmlMainWindow::bothGroupsAreAligned() {
     QCOMPARE(basic->height(), address->height());
     // The action row sits above both groups (same structure as the Widgets).
     QVERIFY(top(item(QStringLiteral("detailActions"))) < top(basic));
-    // Controls keep their 30px height inside the boxes.
-    QCOMPARE(item(QStringLiteral("nameInput"))->height(), 30);
-    QCOMPARE(item(QStringLiteral("addressInput"))->height(), 30);
-    QCOMPARE(item(QStringLiteral("ageInput"))->height(), 30);
-    QCOMPARE(item(QStringLiteral("siblingsInput"))->height(), 30);
+    // Rows packed at the field height, 4 px apart, so the groups stay short.
+    for (const char* name : {"nameInput", "addressInput", "ageInput", "siblingsInput"})
+        QCOMPARE(item(QLatin1String(name))->height(), 22.0);
+    const auto gap = [&](const char* upper, const char* lower) {
+        QQuickItem* a = item(QLatin1String(upper));
+        QQuickItem* b = item(QLatin1String(lower));
+        return b->mapToScene(QPointF(0, 0)).y() - a->mapToScene(QPointF(0, a->height())).y();
+    };
+    QCOMPARE(gap("nameInput", "ageInput"), 4.0);
+    QCOMPARE(gap("addressInput", "cohabitantsInput"), 4.0);
     // The sex combo has room for its longest option.
     auto* combo = item(QStringLiteral("sexInput"))->findChild<QQuickItem*>(QStringLiteral("comboBox"));
     QVERIFY(combo != nullptr);
@@ -654,6 +674,188 @@ void TestQmlMainWindow::filterBoxesNarrowTheGrid() {
     m_controller->setColumnFilter(PatientsModel::ColumnName, QStringLiteral("*ZZZ"));
     QCOMPARE(m_controller->gridModel()->rowCount(), 0);
     QCOMPARE(item(QStringLiteral("nameInput"))->property("text").toString(), QString());
+}
+
+
+void TestQmlMainWindow::gridHasAFrame() {
+    seedPatients();
+    openScreen();
+    auto* frame = m_window->findChild<QQuickItem*>(QStringLiteral("gridBorder"));
+    QVERIFY(frame != nullptr);
+    for (const QString& theme : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        m_settings->setTheme(theme);
+        QTest::qWait(50);
+        const QColor border = themeColor("inputBorder");
+        const QImage shot = m_window->grabWindow();
+        const QRect r = frame->mapRectToScene(QRectF(0, 0, frame->width(), frame->height()))
+                            .toRect();
+        // Middle of each side, where no cell or header corner can blend in.
+        const QPoint sides[] = {{r.left(), r.center().y()}, {r.right(), r.center().y()},
+                                {r.center().x(), r.top()}, {r.center().x(), r.bottom()}};
+        for (const QPoint& side : sides)
+            QVERIFY2(shot.pixelColor(side) == border,
+                     qPrintable(QStringLiteral("theme=%1 at %2,%3: %4 instead of %5")
+                                    .arg(theme)
+                                    .arg(side.x())
+                                    .arg(side.y())
+                                    .arg(shot.pixelColor(side).name(), border.name())));
+    }
+    m_settings->setTheme(QStringLiteral("claro"));
+}
+
+
+void TestQmlMainWindow::photoKeepsTheOriginalSize() {
+    seedPatients();
+    openScreen();
+    auto* frame = item(QStringLiteral("photoFrame"));
+    auto* photo = item(QStringLiteral("photoImage"));
+    QVERIFY(frame != nullptr);
+    QVERIFY(photo != nullptr);
+    // pbxFotoPaciente of the original application.
+    QCOMPARE(QSizeF(frame->width(), frame->height()), QSizeF(240, 204));
+    // Its top lines up with the grid frame's, and the history buttons follow
+    // right below it, 6 px apart.
+    auto* grid = m_window->findChild<QQuickItem*>(QStringLiteral("gridBorder"));
+    QVERIFY(grid != nullptr);
+    const auto top = [](QQuickItem* it) { return it->mapToScene(QPointF(0, 0)).y(); };
+    QCOMPARE(top(frame), top(grid));
+    QCOMPARE(top(item(QStringLiteral("createPediatricButton"))), top(frame) + frame->height() + 6);
+
+    const auto shownAt = [&](const QString& file, QSize expected) {
+        photo->setProperty("source", QUrl::fromLocalFile(file));
+        QTRY_COMPARE(photo->property("status").toInt(), 1); // Image.Ready
+        QCOMPARE(QSizeF(photo->width(), photo->height()), QSizeF(expected));
+        // Centred in the frame.
+        QCOMPARE(photo->x() + photo->width() / 2.0, frame->width() / 2.0);
+        QCOMPARE(photo->y() + photo->height() / 2.0, frame->height() / 2.0);
+    };
+    // The default picture (204x204) fills the height at its natural size.
+    QTRY_COMPARE(photo->property("status").toInt(), 1);
+    QCOMPARE(QSizeF(photo->width(), photo->height()), QSizeF(204, 204));
+
+    // A smaller picture is never enlarged; a larger one is reduced whole.
+    const QString small = m_dir.filePath(QStringLiteral("small.png"));
+    const QString large = m_dir.filePath(QStringLiteral("large.png"));
+    QImage(100, 80, QImage::Format_RGB32).save(small);
+    QImage(600, 300, QImage::Format_RGB32).save(large);
+    shownAt(small, QSize(100, 80));
+    shownAt(large, QSize(240, 120));
+
+    // Framed like the grid: a 1 px border of the field border colour on the
+    // four sides, in both themes, even under a picture that fills the frame.
+    photo->setProperty("source", QUrl::fromLocalFile(large));
+    for (const QString& theme : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        m_settings->setTheme(theme);
+        QTest::qWait(50);
+        const QColor border = themeColor("inputBorder");
+        const QImage shot = m_window->grabWindow();
+        const QRect r = frame->mapRectToScene(QRectF(0, 0, frame->width(), frame->height())).toRect();
+        const QPoint sides[] = {{r.left(), r.center().y()}, {r.right(), r.center().y()},
+                                {r.center().x(), r.top()}, {r.center().x(), r.bottom()}};
+        for (const QPoint& side : sides)
+            QVERIFY2(shot.pixelColor(side) == border,
+                     qPrintable(QStringLiteral("theme=%1 at %2,%3: %4 instead of %5")
+                                    .arg(theme)
+                                    .arg(side.x())
+                                    .arg(side.y())
+                                    .arg(shot.pixelColor(side).name(), border.name())));
+    }
+    m_settings->setTheme(QStringLiteral("claro"));
+}
+
+
+void TestQmlMainWindow::detailGroupsAreSections() {
+    seedPatients();
+    openScreen();
+    // The same GxGroup sections as the history forms, in both themes.
+    for (const QString& theme : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        m_settings->setTheme(theme);
+        QTest::qWait(50);
+        const QColor section = themeColor("groupBackground");
+        QVERIFY(section != themeColor("windowBackground"));
+        const QImage shot = m_window->grabWindow();
+        for (const char* name : {"basicDataGroup", "addressGroup"}) {
+            auto* group = item(QLatin1String(name));
+            QVERIFY2(group != nullptr, name);
+            auto* frame = group->findChild<QQuickItem*>(QStringLiteral("groupFrame"));
+            QVERIFY2(frame != nullptr, name);
+            // Just inside the top-right corner of the card, clear of the title
+            // badge (on the left) and of any field.
+            const QPoint spot = frame->mapToScene(QPointF(frame->width() - 12, 4)).toPoint();
+            QVERIFY2(shot.pixelColor(spot) == section,
+                     qPrintable(QStringLiteral("%1 %2: %3 instead of %4")
+                                    .arg(QLatin1String(name), theme,
+                                         shot.pixelColor(spot).name(), section.name())));
+        }
+    }
+    m_settings->setTheme(QStringLiteral("claro"));
+}
+
+
+void TestQmlMainWindow::gridHeadersFitAndNumbersAreCentred() {
+    seedPatients();
+    const QFont original = QGuiApplication::font();
+    for (int points : {9, 10, 11, 12}) {
+        QFont font = original;
+        font.setPointSize(points);
+        QGuiApplication::setFont(font);
+        openScreen();
+        // The sort arrow on the code column: its widest title.
+        m_controller->sortByColumn(0);
+        for (const QString& code : {QStringLiteral("es"), QStringLiteral("pt"), QStringLiteral("en")}) {
+            m_settings->setLanguage(code);
+            QTest::qWait(50);
+            const QList<QQuickItem*> headers = visualItems(m_screen, QStringLiteral("headerCell"));
+            QCOMPARE(headers.size(), 8);
+            for (QQuickItem* header : headers) {
+                auto* text = header->property("contentItem").value<QQuickItem*>();
+                QVERIFY(text != nullptr);
+                QVERIFY2(!text->property("truncated").toBool(),
+                         qPrintable(QStringLiteral("%1 pt, %2: \"%3\" is cut")
+                                        .arg(points)
+                                        .arg(code, text->property("text").toString())));
+            }
+        }
+        // Code and age centred, the other columns left-aligned.
+        const QList<QQuickItem*> cells = visualItems(m_screen, QStringLiteral("gridCell"));
+        QVERIFY(!cells.isEmpty());
+        for (QQuickItem* cell : cells) {
+            const int column = cell->property("column").toInt();
+            const QList<QQuickItem*> texts = cell->childItems();
+            QQuickItem* text = texts.last();
+            const int expected = (column == 0 || column == 3) ? Qt::AlignHCenter : Qt::AlignLeft;
+            QCOMPARE(text->property("horizontalAlignment").toInt(), expected);
+        }
+    }
+    QGuiApplication::setFont(original);
+    m_settings->setLanguage(QStringLiteral("en"));
+}
+
+
+void TestQmlMainWindow::filterRowSitsInsideTheGrid() {
+    seedPatients();
+    openScreen();
+    auto* frame = m_window->findChild<QQuickItem*>(QStringLiteral("gridBorder"));
+    auto* grid = item(QStringLiteral("gridTable"));
+    QVERIFY(frame != nullptr);
+    QVERIFY(grid != nullptr);
+    const QList<QQuickItem*> headers = visualItems(m_screen, QStringLiteral("headerCell"));
+    const QList<QQuickItem*> boxes = visualItems(m_screen, QStringLiteral("filterBox"));
+    QCOMPARE(boxes.size(), headers.size());
+    const QRectF frameRect = frame->mapRectToScene(QRectF(0, 0, frame->width(), frame->height()));
+    const qreal headerBottom = headers.first()->mapToScene(QPointF(0, headers.first()->height())).y();
+    const qreal rowsTop = grid->mapToScene(QPointF(0, 0)).y();
+    for (int i = 0; i < boxes.size(); ++i) {
+        const QRectF box = boxes.at(i)->mapRectToScene(
+            QRectF(0, 0, boxes.at(i)->width(), boxes.at(i)->height()));
+        // Inside the grid frame, between the header and the first data row...
+        QVERIFY(frameRect.contains(box.topLeft()));
+        QVERIFY(box.top() >= headerBottom);
+        QVERIFY(box.bottom() <= rowsTop);
+        // ...and aligned with its column.
+        QCOMPARE(box.left(), headers.at(i)->mapToScene(QPointF(0, 0)).x());
+        QCOMPARE(box.width(), headers.at(i)->width());
+    }
 }
 
 } // namespace gambasse

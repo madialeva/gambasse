@@ -18,6 +18,31 @@
 namespace gambasse {
 namespace {
 
+// Every section title badge of a form: it must not cover any control of its
+// group, and its title must be shown whole (not elided).
+QString badgeProblems(QQuickItem* item) {
+    QString problems;
+    if (item->objectName() == QLatin1String("groupTitleBadge") && item->isVisible()) {
+        QQuickItem* group = item->parentItem();
+        const QRectF badge(item->x(), item->y(), item->width(), item->height());
+        for (QQuickItem* sibling : group->childItems()) {
+            const QString name = sibling->objectName();
+            if (sibling == item || !sibling->isVisible() || name == QLatin1String("groupFrame")
+                || name == QLatin1String("groupBody"))
+                continue;
+            const QRectF rect(sibling->x(), sibling->y(), sibling->width(), sibling->height());
+            if (badge.intersects(rect))
+                problems += QStringLiteral("%1 covers %2; ").arg(group->objectName(), name);
+        }
+        auto* title = item->findChild<QQuickItem*>(QStringLiteral("groupTitle"));
+        if (title != nullptr && title->property("truncated").toBool())
+            problems += QStringLiteral("%1 title elided; ").arg(group->objectName());
+    }
+    for (QQuickItem* kid : item->childItems())
+        problems += badgeProblems(kid);
+    return problems;
+}
+
 QQuickItem* child(QObject* parent, const QString& name) {
     return parent->findChild<QQuickItem*>(name);
 }
@@ -102,6 +127,8 @@ private slots:
     void fullCycle_data();
     void fullCycle();
     void fixedRowsAreNotPersisted();
+    void titleBadgesLeaveControlsClear_data();
+    void titleBadgesLeaveControlsClear();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -357,6 +384,20 @@ void TestQmlHistories::fixedRowsAreNotPersisted() {
         QVERIFY2(!name.contains(QStringLiteral("Iron")) && !name.contains(QStringLiteral("Folic"))
                      && !name.contains(QStringLiteral("Deworming")),
                  qPrintable(name));
+}
+
+
+void TestQmlHistories::titleBadgesLeaveControlsClear_data() {
+    newHistoryCannotBeDeleted_data();
+}
+
+void TestQmlHistories::titleBadgesLeaveControlsClear() {
+    QFETCH(int, row);
+    open(screenData().at(row));
+    auto* form = inHistory(QStringLiteral("historyForm"));
+    QVERIFY(form != nullptr);
+    const QString problems = badgeProblems(form);
+    QVERIFY2(problems.isEmpty(), qPrintable(problems));
 }
 
 } // namespace gambasse

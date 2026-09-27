@@ -114,7 +114,11 @@ Item {
             // goes below the field, never half above and half below.
             Layout.topMargin: root.labelPosition === "above" ? 0 : Math.max(0, Math.floor((root.height - Theme.fieldHeight) / 2))
             verticalAlignment: TextInput.AlignVCenter
-            // QLineEdit text margins: 3 px on the left, 5 on the right.
+            // QLineEdit text margins: 3 px on the left, 5 on the right, and no
+            // vertical padding: the Basic style's 6 px would leave less than a
+            // text line in the 21-22 px fields (the text is centred instead).
+            topPadding: 0
+            bottomPadding: 0
             leftPadding: 3
             rightPadding: calendarButton.width + 8
             // A display-only field is a disabled line edit in Widgets: the

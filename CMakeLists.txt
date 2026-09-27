@@ -67,6 +67,8 @@ qt_add_qml_module(GambasseQml
     # QAbstractItemModel (PatientController.gridModel) is declared there.
     DEPENDENCIES QtQml.Models
     SOURCES
+        src/ui/AppIcon.cpp
+        src/ui/AppIcon.h
         src/ui/DateFormat.h
         src/ui/InterfaceSettings.cpp
         src/ui/InterfaceSettings.h
