@@ -15,11 +15,20 @@ QtObject {
     // Base metrics (same base UI as the Widgets windows).
     readonly property int baseWidth: 1008
     readonly property int baseHeight: 561
-    readonly property int titleBarHeight: 32
+    // Title bar: its buttons take the 40 px of the Basic tool buttons
+    // (language and theme) and the bar adds its 1 px bottom line, so those
+    // buttons fit exactly.
+    readonly property int titleBarButtonHeight: 40
+    readonly property int titleBarHeight: titleBarButtonHeight + 1
     // Height of a line edit or combo box in the Widgets windows.
     readonly property int fieldHeight: 22
     // Narrowest a squeezed line edit gets beside a long label.
     readonly property int fieldMinimumWidth: 28
+
+    // Title bar: a light (claro) or muted dark (oscuro) blue-green that
+    // stands out from the window grey, with a darker separating line.
+    readonly property color titleBarBackground: dark ? "#243B3A" : "#DCEEEA"
+    readonly property color titleBarBorder: dark ? "#1A2C2B" : "#B7D6CF"
 
     // Window and text.
     readonly property color windowBackground: dark ? "#353535" : "#F3F2EE"
@@ -58,13 +67,15 @@ QtObject {
     readonly property color tabInactiveTop: dark ? "#3E3E3E" : "#E8E7E3"
     readonly property color tabInactiveBottom: dark ? "#3C3C3C" : "#E5E4DF"
     readonly property color tabInactiveTopLine: dark ? "#555555" : "#E8E7E3"
-    // Group boxes: Fusion paints them translucent over whatever holds them,
-    // so a nested box comes out one step darker (measured on the Widgets
-    // windows: fill 243 -> 240 -> 237 in claro, 53 -> 52 -> 51 in oscuro).
-    readonly property color groupBackground: Qt.rgba(0, 0, 0, 3 / 255)
-    readonly property color groupBorder: dark ? Qt.rgba(1, 1, 1, 15 / 255) : Qt.rgba(0, 0, 0, 25 / 255)
-    // Faint line just inside the frame (claro only).
-    readonly property color groupInnerLine: dark ? "transparent" : Qt.rgba(0, 0, 0, 4 / 255)
+    // Sections (GxGroup): a rounded card in a soft blue that stands out from
+    // the window grey without looking like a button (the buttons use the
+    // stronger accentBackground).
+    readonly property int groupRadius: 6
+    readonly property color groupBackground: dark ? "#2E3A46" : "#EAF1F8"
+    readonly property color groupBorder: dark ? "#41505E" : "#C5D5E4"
+    // Title badge of a section: the theme's text colours inverted.
+    readonly property color groupTitleBackground: dark ? "#B7CCE0" : "#5A7FA6"
+    readonly property color groupTitleText: dark ? "#1A1A1A" : "white"
     readonly property color checkBorder: dark ? "#2A2A2A" : "#BFBEBB"
 
     // Highlighted buttons (toolbar, history entry/create, dialog buttons).

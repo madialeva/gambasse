@@ -569,6 +569,7 @@ Item {
         // Inner groups: their titles share the line of the outer one.
         GxGroup {
             objectName: "uterineGroup"
+            nested: true
             x: 208
             y: 11
             width: 122
@@ -600,6 +601,7 @@ Item {
         }
         GxGroup {
             objectName: "urineGroup"
+            nested: true
             x: 337
             y: 11
             width: 97
@@ -623,6 +625,7 @@ Item {
         }
         GxGroup {
             objectName: "edemasGroup"
+            nested: true
             x: 440
             y: 11
             width: 68

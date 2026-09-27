@@ -9,8 +9,9 @@ Window {
     id: root
     flags: Qt.FramelessWindowHint
     visible: true
-    minimumWidth: 960
-    minimumHeight: 540
+    // Opens at the base size, which is also the smallest it can shrink to.
+    minimumWidth: Theme.baseWidth
+    minimumHeight: Theme.baseHeight
     width: Theme.baseWidth
     height: Theme.baseHeight
     title: "Gambasse"

@@ -7,7 +7,7 @@ import Gambasse
 // double-click to toggle maximize/restore, close-only mode for children.
 Item {
     id: root
-    height: 32
+    height: Theme.titleBarHeight
 
     property string title: "Gambasse"
     property bool closeOnly: false
@@ -36,6 +36,20 @@ Item {
             Window.window.showNormal();
         else
             Window.window.showMaximized();
+    }
+
+    // Own background so the bar stands out from the window grey, with a
+    // 1 px line separating it from the content below.
+    Rectangle {
+        objectName: "titleBarBackground"
+        anchors.fill: parent
+        color: Theme.titleBarBackground
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: 1
+            color: Theme.titleBarBorder
+        }
     }
 
     // Double click toggles maximize/restore. A MouseArea, not a TapHandler:
@@ -72,7 +86,9 @@ Item {
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 8
-        anchors.verticalCenter: parent.verticalCenter
+        // Centred in the button band, above the bottom line; every button
+        // fills that band.
+        y: Math.floor((Theme.titleBarButtonHeight - height) / 2)
         spacing: 6
         Image {
             objectName: "logoImage"
@@ -99,7 +115,7 @@ Item {
         property color hoverColor: Theme.accentHover
         property color pressedColor: Theme.accentPressed
         width: 44
-        height: 28
+        height: Theme.titleBarButtonHeight
         focusPolicy: Qt.NoFocus
         font.bold: true
         contentItem: Text {
@@ -119,11 +135,12 @@ Item {
     Row {
         anchors.right: parent.right
         anchors.rightMargin: 2
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: parent.top
         spacing: 6
         ToolButton {
             id: languageButton
             objectName: "languageButton"
+            height: Theme.titleBarButtonHeight
             visible: root.showLanguageTheme
             text: {
                 if (root.languageCode === "es")
@@ -182,6 +199,7 @@ Item {
         }
         ToolButton {
             objectName: "themeButton"
+            height: Theme.titleBarButtonHeight
             visible: root.showLanguageTheme
             icon.source: InterfaceSettings.theme === "oscuro" ? "qrc:/img/moon.svg" : "qrc:/img/sun.svg"
             text: InterfaceSettings.theme === "oscuro" ? qsTr("Dark") : qsTr("Light")

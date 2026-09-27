@@ -103,9 +103,11 @@ Window {
     TitleBar {
         id: titleBar
         objectName: "historyTitleBar"
-        x: root.frameMargin
+        // Edge to edge like the main window; only the content keeps the side
+        // margins.
+        x: 0
         y: 0
-        width: root.contentWidth
+        width: root.width
         height: Theme.titleBarHeight
         title: root.screenTitle
         closeOnly: true

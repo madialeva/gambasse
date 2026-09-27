@@ -19,6 +19,31 @@
 namespace gambasse {
 namespace {
 
+// Every section title badge of a form: it must not cover any control of its
+// group, and its title must be shown whole (not elided).
+QString badgeProblems(QQuickItem* item) {
+    QString problems;
+    if (item->objectName() == QLatin1String("groupTitleBadge") && item->isVisible()) {
+        QQuickItem* group = item->parentItem();
+        const QRectF badge(item->x(), item->y(), item->width(), item->height());
+        for (QQuickItem* sibling : group->childItems()) {
+            const QString name = sibling->objectName();
+            if (sibling == item || !sibling->isVisible() || name == QLatin1String("groupFrame")
+                || name == QLatin1String("groupBody"))
+                continue;
+            const QRectF rect(sibling->x(), sibling->y(), sibling->width(), sibling->height());
+            if (badge.intersects(rect))
+                problems += QStringLiteral("%1 covers %2; ").arg(group->objectName(), name);
+        }
+        auto* title = item->findChild<QQuickItem*>(QStringLiteral("groupTitle"));
+        if (title != nullptr && title->property("truncated").toBool())
+            problems += QStringLiteral("%1 title elided; ").arg(group->objectName());
+    }
+    for (QQuickItem* kid : item->childItems())
+        problems += badgeProblems(kid);
+    return problems;
+}
+
 QQuickItem* child(QObject* parent, const QString& name) {
     return parent->findChild<QQuickItem*>(name);
 }
@@ -90,6 +115,7 @@ private slots:
     void init();
 
     void newHistoryCannotBeDeleted();
+    void titleBadgesLeaveControlsClear();
     void formRendersEveryControllerField();
     void savingInsertsAndReopeningShowsTheValues();
     void editingUpdatesTheStoredRow();
@@ -227,6 +253,13 @@ void TestQmlAdultHistory::newHistoryCannotBeDeleted() {
              m_controller->patientName());
     QCOMPARE(controller->value(QStringLiteral("openingDate")).toString(),
              QDate::currentDate().toString(QStringLiteral("dd/MM/yyyy")));
+    // The title bar runs edge to edge like the main window's.
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY(window != nullptr);
+    auto* bar = inHistory(QStringLiteral("historyTitleBar"));
+    QVERIFY(bar != nullptr);
+    QCOMPARE(bar->mapToScene(QPointF(0, 0)), QPointF(0, 0));
+    QCOMPARE(bar->width(), qreal(window->width()));
 }
 
 void TestQmlAdultHistory::formRendersEveryControllerField() {
@@ -374,6 +407,17 @@ void TestQmlAdultHistory::boundsAndDatesAreCoercedOnSave() {
     QCOMPARE(values.value(QStringLiteral("historyChildCount")).toInt(), 99);
     QCOMPARE(values.value(QStringLiteral("physicalExamHeight")).toInt(), 999);
     QCOMPARE(values.value(QStringLiteral("allergies")).toString().size(), 100);
+}
+
+
+void TestQmlAdultHistory::titleBadgesLeaveControlsClear() {
+    QVERIFY(createPatient());
+    openScreen();
+    openHistory();
+    auto* form = inHistory(QStringLiteral("historyForm"));
+    QVERIFY(form != nullptr);
+    const QString problems = badgeProblems(form);
+    QVERIFY2(problems.isEmpty(), qPrintable(problems));
 }
 
 } // namespace gambasse

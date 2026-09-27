@@ -17,11 +17,73 @@ Item {
     property var filterTexts: ["", "", "", "", "", "", "", ""]
     // Fixed column widths (identifier column narrow); the last stretches.
     property var baseWidths: [60, 170, 95, 55, 75, 170, 120, 120]
+    // Numeric columns (code and age) are centred.
+    readonly property var centredColumns: [0, 3]
+
+    // Width of each bold header title with its sort arrow, measured by laying
+    // it out exactly as the header draws it (the arrow may come from a
+    // fallback font, which font metrics alone misjudge), so no title is ever
+    // cut in any language (the code column used to cut "Código").
+    // Controls take their font from the controls theme, not from the
+    // application font a bare Text uses: the probes borrow it from a hidden
+    // button set up like the header cells.
+    Button {
+        id: headerFontSource
+        visible: false
+        font.bold: true
+    }
+    Repeater {
+        id: headerProbes
+        model: root.hasController() ? root.controller.columnNames : []
+        onItemAdded: root.updateHeaderWidths()
+        onItemRemoved: root.updateHeaderWidths()
+        Text {
+            required property string modelData
+            visible: false
+            font: headerFontSource.font
+            text: modelData + " \u25B2"
+            onImplicitWidthChanged: root.updateHeaderWidths()
+        }
+    }
+
+    // Measured header widths (with the 6 px side padding of the header
+    // cells). A notifying property, so the header row, the filter boxes and
+    // the grid follow a new language or font.
+    property var headerWidths: []
+
+    function updateHeaderWidths() {
+        const widths = [];
+        for (let i = 0; i < headerProbes.count; ++i) {
+            const probe = headerProbes.itemAt(i) as Text;
+            widths.push(probe ? Math.ceil(probe.implicitWidth) + 12 : 0);
+        }
+        headerWidths = widths;
+    }
+
+    // The table only asks columnWidthProvider again when told to.
+    onHeaderWidthsChanged: gridTable.forceLayout()
+
+    function headerWidth(col) {
+        return col < headerWidths.length ? headerWidths[col] : 0;
+    }
+
+    function fixedWidth(col) {
+        return Math.max(baseWidths[col], headerWidth(col));
+    }
 
     function columnWidth(col) {
         if (col < 7)
-            return baseWidths[col];
-        return Math.max(120, listArea.width - 745 - 14);
+            return fixedWidth(col);
+        let used = 0;
+        for (let c = 0; c < 7; ++c)
+            used += fixedWidth(c);
+        // The last column takes the rest, minus the vertical scroll bar and
+        // the two sides of the grid frame.
+        return Math.max(Math.max(baseWidths[7], headerWidth(7)), listArea.width - used - 14 - 2);
+    }
+
+    function columnAlignment(col) {
+        return centredColumns.indexOf(col) >= 0 ? Text.AlignHCenter : Text.AlignLeft;
     }
 
     function hasController() {
@@ -203,137 +265,168 @@ Item {
                         anchors.fill: parent
                         spacing: 2
 
-                        // Filter row: one box per column, aligned with it.
+                        // Header, filter row and rows inside a 1 px frame, like the grid
+                        // of the original application.
                         Item {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 30
-                            clip: true
-                            RowLayout {
-                                x: -gridTable.contentX
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                spacing: 0
-                                Repeater {
-                                    objectName: "filterBoxes"
-                                    model: root.hasController() ? root.controller.columnNames : []
-                                    GxTextInput {
-                                        required property int index
-                                        required property string modelData
-                                        objectName: "filterBox"
-                                        Layout.preferredWidth: root.columnWidth(index)
-                                        Layout.preferredHeight: 30
-                                        placeholderText: modelData
-                                        text: root.filterTexts[index]
-                                        onTextEdited: {
-                                            root.filterTexts[index] = text;
-                                            root.controller.setColumnFilter(index, text);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Header row with sort indicators.
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 28
-                            clip: true
-                            RowLayout {
-                                x: -gridTable.contentX
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                spacing: 0
-                                Repeater {
-                                    objectName: "headerRow"
-                                    model: root.hasController() ? root.controller.columnNames : []
-                                    Button {
-                                        id: headerButton
-                                        required property int index
-                                        required property string modelData
-                                        objectName: "headerCell"
-                                        Layout.preferredWidth: root.columnWidth(index)
-                                        Layout.preferredHeight: 28
-                                        flat: true
-                                        font.bold: true
-                                        text: modelData + (root.hasController() && root.controller.sortColumn === index ? (root.controller.sortOrder === 0 ? " \u25B2" : " \u25BC") : "")
-                                        contentItem: Text {
-                                            text: headerButton.text
-                                            color: Theme.windowText
-                                            font: headerButton.font
-                                            elide: Text.ElideRight
-                                        }
-                                        background: Rectangle {
-                                            color: Theme.windowBackground
-                                        }
-                                        onClicked: root.controller.sortByColumn(index)
-                                    }
-                                }
-                            }
-                        }
-
-                        TableView {
-                            id: gridTable
-                            objectName: "gridTable"
+                            objectName: "gridFrame"
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            clip: true
-                            // The grid takes the focus when the screen opens, so
-                            // the arrow keys and the wheel work right away.
-                            focus: true
-                            keyNavigationEnabled: true
-                            // A data grid must stop at the ends: the default
-                            // overscroll left a blank band above the first row
-                            // that sprang back on its own.
-                            boundsBehavior: Flickable.StopAtBounds
-                            model: root.hasController() ? root.controller.gridModel : null
-                            selectionModel: ItemSelectionModel {
-                                id: gridSelection
-                                model: root.hasController() ? root.controller.gridModel : null
-                                // The model can arrive after the controller (it is
-                                // injected from C++), so the grid selection is
-                                // (re)applied whenever the model is set.
-                                onModelChanged: root.syncSelection()
-                                onCurrentChanged: (current, previous) => {
-                                    if (root.hasController() && current.row !== root.controller.currentRow)
-                                        root.controller.selectRow(current.row);
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                spacing: 2
+
+                                // Header row with sort indicators.
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 28
+                                    clip: true
+                                    RowLayout {
+                                        x: -gridTable.contentX
+                                        anchors.top: parent.top
+                                        anchors.bottom: parent.bottom
+                                        spacing: 0
+                                        Repeater {
+                                            objectName: "headerRow"
+                                            model: root.hasController() ? root.controller.columnNames : []
+                                            Button {
+                                                id: headerButton
+                                                required property int index
+                                                required property string modelData
+                                                objectName: "headerCell"
+                                                Layout.preferredWidth: root.columnWidth(index)
+                                                Layout.preferredHeight: 28
+                                                flat: true
+                                                // 6 px each side, the 12 px headerWidth() reserves.
+                                                leftPadding: 6
+                                                rightPadding: 6
+                                                font.bold: true
+                                                text: modelData + (root.hasController() && root.controller.sortColumn === index ? (root.controller.sortOrder === 0 ? " \u25B2" : " \u25BC") : "")
+                                                contentItem: Text {
+                                                    horizontalAlignment: root.columnAlignment(headerButton.index)
+                                                    text: headerButton.text
+                                                    color: Theme.windowText
+                                                    font: headerButton.font
+                                                    elide: Text.ElideRight
+                                                }
+                                                background: Rectangle {
+                                                    color: Theme.windowBackground
+                                                }
+                                                onClicked: root.controller.sortByColumn(index)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Filter row inside the grid, between the header and the
+                                // first row: one box per column, aligned with it.
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 26
+                                    clip: true
+                                    RowLayout {
+                                        x: -gridTable.contentX
+                                        anchors.top: parent.top
+                                        anchors.bottom: parent.bottom
+                                        spacing: 0
+                                        Repeater {
+                                            objectName: "filterBoxes"
+                                            model: root.hasController() ? root.controller.columnNames : []
+                                            GxTextInput {
+                                                required property int index
+                                                required property string modelData
+                                                objectName: "filterBox"
+                                                Layout.preferredWidth: root.columnWidth(index)
+                                                Layout.preferredHeight: 26
+                                                placeholderText: modelData
+                                                text: root.filterTexts[index]
+                                                onTextEdited: {
+                                                    root.filterTexts[index] = text;
+                                                    root.controller.setColumnFilter(index, text);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                TableView {
+                                    id: gridTable
+                                    objectName: "gridTable"
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    clip: true
+                                    // The grid takes the focus when the screen opens, so
+                                    // the arrow keys and the wheel work right away.
+                                    focus: true
+                                    keyNavigationEnabled: true
+                                    // A data grid must stop at the ends: the default
+                                    // overscroll left a blank band above the first row
+                                    // that sprang back on its own.
+                                    boundsBehavior: Flickable.StopAtBounds
+                                    model: root.hasController() ? root.controller.gridModel : null
+                                    selectionModel: ItemSelectionModel {
+                                        id: gridSelection
+                                        model: root.hasController() ? root.controller.gridModel : null
+                                        // The model can arrive after the controller (it is
+                                        // injected from C++), so the grid selection is
+                                        // (re)applied whenever the model is set.
+                                        onModelChanged: root.syncSelection()
+                                        onCurrentChanged: (current, previous) => {
+                                            if (root.hasController() && current.row !== root.controller.currentRow)
+                                                root.controller.selectRow(current.row);
+                                        }
+                                    }
+                                    selectionBehavior: TableView.SelectRows
+                                    selectionMode: TableView.SingleSelection
+                                    columnWidthProvider: function (col) {
+                                        return root.columnWidth(col);
+                                    }
+                                    rowHeightProvider: function (row) {
+                                        return 24;
+                                    }
+                                    ScrollBar.vertical: ScrollBar {
+                                        policy: ScrollBar.AlwaysOn
+                                    }
+                                    ScrollBar.horizontal: ScrollBar {
+                                        policy: ScrollBar.AsNeeded
+                                    }
+                                    delegate: Rectangle {
+                                        id: cell
+                                        objectName: "gridCell"
+                                        required property string display
+                                        required property int row
+                                        required property int column
+                                        readonly property bool current: root.isCurrentRow(cell.row)
+                                        color: cell.current ? Theme.highlight : (cell.row % 2 ? Theme.alternateRowBackground : Theme.fieldBackground)
+                                        Rectangle {
+                                            anchors.bottom: parent.bottom
+                                            width: parent.width
+                                            height: 1
+                                            color: Theme.fieldBorder
+                                        }
+                                        Text {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 4
+                                            anchors.rightMargin: 4
+                                            horizontalAlignment: root.columnAlignment(cell.column)
+                                            verticalAlignment: Text.AlignVCenter
+                                            elide: Text.ElideRight
+                                            color: cell.current ? Theme.highlightedText : Theme.windowText
+                                            text: cell.display
+                                        }
+                                    }
                                 }
                             }
-                            selectionBehavior: TableView.SelectRows
-                            selectionMode: TableView.SingleSelection
-                            columnWidthProvider: function (col) {
-                                return root.columnWidth(col);
-                            }
-                            rowHeightProvider: function (row) {
-                                return 24;
-                            }
-                            ScrollBar.vertical: ScrollBar {
-                                policy: ScrollBar.AlwaysOn
-                            }
-                            ScrollBar.horizontal: ScrollBar {
-                                policy: ScrollBar.AsNeeded
-                            }
-                            delegate: Rectangle {
-                                id: cell
-                                objectName: "gridCell"
-                                required property string display
-                                required property int row
-                                required property int column
-                                readonly property bool current: root.isCurrentRow(cell.row)
-                                color: cell.current ? Theme.highlight : (cell.row % 2 ? Theme.alternateRowBackground : Theme.fieldBackground)
-                                Rectangle {
-                                    anchors.bottom: parent.bottom
-                                    width: parent.width
-                                    height: 1
-                                    color: Theme.fieldBorder
-                                }
-                                Text {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 4
-                                    verticalAlignment: Text.AlignVCenter
-                                    elide: Text.ElideRight
-                                    color: cell.current ? Theme.highlightedText : Theme.windowText
-                                    text: cell.display
-                                }
+
+                            // Drawn above the cells so a scrolled row never covers it.
+                            Rectangle {
+                                objectName: "gridBorder"
+                                anchors.fill: parent
+                                z: 1
+                                color: "transparent"
+                                border.color: Theme.inputBorder
+                                border.width: 1
                             }
                         }
                     }
@@ -342,36 +435,62 @@ Item {
 
             // Photo with history creation buttons below.
             ColumnLayout {
-                Layout.preferredWidth: 230
+                Layout.preferredWidth: 240
                 Layout.fillHeight: true
                 spacing: 6
-                Image {
-                    objectName: "photoImage"
-                    Layout.preferredWidth: 220
-                    Layout.preferredHeight: 190
-                    source: root.hasController() ? root.controller.photoSource : ""
-                    fillMode: Image.PreserveAspectFit
+                // 240x204 like pbxFotoPaciente in the original application: the
+                // picture is centred at its natural size (CenterImage) and only
+                // reduced, keeping its proportions, when it is larger.
+                Item {
+                    objectName: "photoFrame"
+                    Layout.preferredWidth: 240
+                    Layout.preferredHeight: 204
+                    Image {
+                        id: photo
+                        objectName: "photoImage"
+                        readonly property real fit: implicitWidth > 0 && implicitHeight > 0 ? Math.min(1, parent.width / implicitWidth, parent.height / implicitHeight) : 1
+                        anchors.centerIn: parent
+                        width: Math.round(implicitWidth * fit)
+                        height: Math.round(implicitHeight * fit)
+                        smooth: true
+                        source: root.hasController() ? root.controller.photoSource : ""
+                    }
+                    // 1 px border like the grid's, drawn above the picture so a
+                    // photo that fills the frame never hides it.
+                    Rectangle {
+                        objectName: "photoBorder"
+                        anchors.fill: parent
+                        z: 1
+                        color: "transparent"
+                        border.color: Theme.inputBorder
+                        border.width: 1
+                    }
                 }
                 ActionButton {
                     objectName: "createPediatricButton"
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 240
                     text: qsTr("Create pediatric history")
                     enabled: root.hasController() && root.controller.canCreatePediatric
                     onClicked: root.controller.openPediatricHistory()
                 }
                 ActionButton {
                     objectName: "createAdultButton"
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 240
                     text: qsTr("Create adult history")
                     enabled: root.hasController() && root.controller.canCreateAdult
                     onClicked: root.controller.openAdultHistory()
                 }
                 ActionButton {
                     objectName: "createPregnancyButton"
-                    Layout.preferredWidth: 220
+                    Layout.preferredWidth: 240
                     text: qsTr("Create pregnancy history")
                     enabled: root.hasController() && root.controller.canCreatePregnancy
                     onClicked: root.controller.openPregnancyHistory()
+                }
+                // Takes the spare height, so the photo lines up with the top of
+                // the grid and the history buttons follow right below it.
+                Item {
+                    Layout.fillHeight: true
                 }
             }
         }
@@ -434,22 +553,26 @@ Item {
                 objectName: "detailGroups"
                 Layout.fillWidth: true
                 spacing: 8
-                GroupBox {
+                GxGroup {
                     id: basicDataGroup
                     objectName: "basicDataGroup"
                     title: qsTr("Basic data")
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 138
+                    // As tall as the taller content of the two groups, rows packed
+                    // at the field height, so the panel fits the base window.
+                    Layout.preferredHeight: Math.max(basicDataLayout.implicitHeight, addressLayout.implicitHeight) + basicDataGroup.contentTop + 2 * basicDataGroup.padding
                     Layout.preferredWidth: 0
                     GridLayout {
-                        anchors.fill: parent
+                        id: basicDataLayout
+                        anchors.fill: basicDataGroup.body
                         columns: 1
+                        rowSpacing: 4
                         // Line 1: the identifier (read-only).
                         GxLabel {
                             id: codeLabel
                             objectName: "codeLabel"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 20
+                            Layout.preferredHeight: Theme.fieldHeight
                         }
                         // Line 2: the name on its own.
                         GxTextInput {
@@ -460,14 +583,14 @@ Item {
                             required: true
                             maxLength: 200
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.preferredHeight: Theme.fieldHeight
                             enabled: root.hasController() && root.controller.editing
                         }
                         // Line 3: age (three digits), birth date and sex. The
                         // date takes what is left so it shows a full date.
                         GridLayout {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.preferredHeight: Theme.fieldHeight
                             columns: 3
                             columnSpacing: 6
                             GxNumberInput {
@@ -476,7 +599,7 @@ Item {
                                 labelText: qsTr("Age:")
                                 integerDigits: 3
                                 Layout.preferredWidth: 84
-                                Layout.preferredHeight: 30
+                                Layout.preferredHeight: Theme.fieldHeight
                                 enabled: root.hasController() && root.controller.editing
                             }
                             GxDateInput {
@@ -484,7 +607,7 @@ Item {
                                 objectName: "dateInput"
                                 labelText: qsTr("Birth date:")
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 30
+                                Layout.preferredHeight: Theme.fieldHeight
                                 enabled: root.hasController() && root.controller.editing
                             }
                             GxComboInput {
@@ -493,35 +616,39 @@ Item {
                                 labelText: qsTr("Sex:")
                                 Layout.minimumWidth: 150
                                 Layout.preferredWidth: 150
-                                Layout.preferredHeight: 30
+                                Layout.preferredHeight: Theme.fieldHeight
                                 enabled: root.hasController() && root.controller.editing
                             }
                         }
                     }
                 }
-                GroupBox {
+                GxGroup {
                     id: addressGroup
                     objectName: "addressGroup"
                     title: qsTr("Address")
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 138
+                    // As tall as the taller content of the two groups, rows packed
+                    // at the field height, so the panel fits the base window.
+                    Layout.preferredHeight: Math.max(basicDataLayout.implicitHeight, addressLayout.implicitHeight) + addressGroup.contentTop + 2 * addressGroup.padding
                     Layout.preferredWidth: 0
                     GridLayout {
-                        anchors.fill: parent
+                        id: addressLayout
+                        anchors.fill: addressGroup.body
                         columns: 1
+                        rowSpacing: 4
                         GxTextInput {
                             id: addressInput
                             objectName: "addressInput"
                             labelText: qsTr("Address:")
                             maxLength: 100
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.preferredHeight: Theme.fieldHeight
                             enabled: root.hasController() && root.controller.editing
                         }
                         // Line 2: cohabitants and contact side by side.
                         GridLayout {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 30
+                            Layout.preferredHeight: Theme.fieldHeight
                             columns: 2
                             columnSpacing: 6
                             GxTextInput {
@@ -530,7 +657,7 @@ Item {
                                 labelText: qsTr("Cohabitants:")
                                 maxLength: 100
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 30
+                                Layout.preferredHeight: Theme.fieldHeight
                                 enabled: root.hasController() && root.controller.editing
                             }
                             GxTextInput {
@@ -539,7 +666,7 @@ Item {
                                 labelText: qsTr("Contact:")
                                 maxLength: 100
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 30
+                                Layout.preferredHeight: Theme.fieldHeight
                                 enabled: root.hasController() && root.controller.editing
                             }
                         }
@@ -550,7 +677,7 @@ Item {
                             labelText: qsTr("Siblings:")
                             integerDigits: 2
                             Layout.preferredWidth: 116
-                            Layout.preferredHeight: 30
+                            Layout.preferredHeight: Theme.fieldHeight
                             enabled: root.hasController() && root.controller.editing
                         }
                     }

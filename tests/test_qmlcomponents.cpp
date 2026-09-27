@@ -1,3 +1,4 @@
+#include <QFontMetrics>
 #include <QGuiApplication>
 #include <QImage>
 #include <QJSValue>
@@ -94,6 +95,8 @@ private slots:
     void comboInput();
     void label();
     void checkBox();
+    void fieldTextFitsTheBox();
+    void group();
 };
 
 void TestQmlComponents::initTestCase() {
@@ -372,6 +375,89 @@ void TestQmlComponents::checkBox() {
         QCOMPARE(root->property("checked").toBool(), false);
         root->setProperty("checked", true);
         QCOMPARE(root->property("checked").toBool(), true);
+        delete harness.window;
+    }
+}
+
+
+// The history forms give the entry fields 21 px: the text line must fit in
+// the field without the style's vertical padding eating it, whatever the
+// interface font size of the desktop (checked from 9 to 12 points).
+void TestQmlComponents::fieldTextFitsTheBox() {
+    const QFont original = QGuiApplication::font();
+    for (int points : {9, 10, 11, 12}) {
+        QFont font = original;
+        font.setPointSize(points);
+        QGuiApplication::setFont(font);
+        for (const char* file : {"GxTextInput.qml", "GxNumberInput.qml", "GxDateInput.qml"}) {
+            QQmlApplicationEngine engine;
+            Harness harness;
+            QVERIFY(openHarness(&engine, file, QStringLiteral("claro"), harness));
+            QObject* root = harness.component;
+            root->setProperty("labelText", QStringLiteral("Label:"));
+            root->setProperty("width", 200);
+            root->setProperty("height", 21);
+            harness.window->show();
+            QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+            auto* field = root->findChild<QQuickItem*>(QStringLiteral("field"));
+            QVERIFY(field != nullptr);
+            QTRY_COMPARE(field->height(), 21.0);
+            const qreal available = field->height() - field->property("topPadding").toReal()
+                                    - field->property("bottomPadding").toReal();
+            const int line = QFontMetrics(field->property("font").value<QFont>()).height();
+            QVERIFY2(available >= line,
+                     qPrintable(QStringLiteral("%1 at %2 pt: %3 px for a %4 px line")
+                                    .arg(QLatin1String(file)).arg(points).arg(available).arg(line)));
+            delete harness.window;
+        }
+    }
+    QGuiApplication::setFont(original);
+}
+
+
+// Sections: a rounded card with its own background below the title; a nested
+// group keeps only the border, and `body` is the padded area for a layout.
+void TestQmlComponents::group() {
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        QQmlApplicationEngine engine;
+        Harness harness;
+        QVERIFY(openHarness(&engine, "GxGroup.qml", mode, harness));
+        QObject* root = harness.component;
+        root->setProperty("title", QStringLiteral("Section"));
+        root->setProperty("width", 300);
+        root->setProperty("height", 120);
+        harness.window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+        auto* frame = root->findChild<QQuickItem*>(QStringLiteral("groupFrame"));
+        auto* body = root->findChild<QQuickItem*>(QStringLiteral("groupBody"));
+        QVERIFY(frame != nullptr);
+        QVERIFY(body != nullptr);
+
+        // Card from halfway down the 18 px title strip, rounded, with the
+        // section colour; the title badge sits centred on its top border.
+        QCOMPARE(frame->y(), 8.0);
+        auto* badge = root->findChild<QQuickItem*>(QStringLiteral("groupTitleBadge"));
+        QVERIFY(badge != nullptr);
+        QCOMPARE(badge->y() + badge->height() / 2, frame->y());
+        QCOMPARE(badge->height(), 16.0);
+        QCOMPARE(badge->property("radius").toReal(), 8.0);
+        QVERIFY(badge->property("color").value<QColor>() != frame->property("color").value<QColor>());
+        QCOMPARE(frame->property("radius").toReal(), 6.0);
+        const QColor card = frame->property("color").value<QColor>();
+        QCOMPARE(card.alpha(), 255);
+        const QImage shot = harness.window->grabWindow();
+        const QPointF inside = frame->mapToScene(QPointF(frame->width() / 2, frame->height() / 2));
+        QCOMPARE(shot.pixelColor(inside.toPoint()), card);
+        QVERIFY(card != shot.pixelColor(0, harness.window->height() - 1)); // not the window grey
+
+        // Body: below the badge, with 8 px of padding on every side.
+        QCOMPARE(QRectF(body->x(), body->y(), body->width(), body->height()),
+                 QRectF(8, 16 + 8, 300 - 16, 120 - 16 - 16));
+
+        // Nested: border only, a smaller radius.
+        root->setProperty("nested", true);
+        QCOMPARE(frame->property("color").value<QColor>().alpha(), 0);
+        QCOMPARE(frame->property("radius").toReal(), 4.0);
         delete harness.window;
     }
 }

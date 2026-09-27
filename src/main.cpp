@@ -10,6 +10,7 @@
 
 #include <Paths.h>
 #include <data/common/Database.h>
+#include <ui/AppIcon.h>
 #include <ui/InterfaceSettings.h>
 
 #ifdef Q_OS_WIN
@@ -48,6 +49,9 @@ int main(int argc, char** argv) {
     QGuiApplication::setApplicationName(QStringLiteral("Gambasse"));
     QGuiApplication::setOrganizationName(QStringLiteral("Gambasse"));
     QGuiApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
+    // The title bar logo for the task bar and every window, instead of the
+    // generic default icon.
+    QGuiApplication::setWindowIcon(gambasse::applicationIcon());
 
     // Deployment base path (the root directory above lib/). The launcher passes
     // it through --base; otherwise the executable directory is used.
