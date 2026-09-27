@@ -37,6 +37,7 @@ CMakeLists.txt.user.*
 .claude/
 .opencode/
 openspec/
+CLAUDE.md
 
 # Configuración local
 config.ini

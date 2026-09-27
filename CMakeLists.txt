@@ -4,79 +4,127 @@ project(Gambasse VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
+# Qt 6.6 everywhere (development machines, Windows kit and CI): no code paths
+# for other versions. The setup also enables AUTOMOC and every Qt policy up to
+# 6.6 (QTP0001: the QML module under the standard qrc:/qt/qml/ prefix).
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Sql Qml Quick QuickControls2)
+qt_standard_project_setup(REQUIRES 6.6)
 
 include(CTest)
 
-# --- UxWidgets control library (vendored) ------------------------------------
-# Self-contained copy under src/ui/uxwidgets, so the project does not depend on
-# the external Qt.UxWidgets repository. Adoption in the screens belongs to
-# later issues; here the library only needs to compile and link.
-add_subdirectory(src/ui/uxwidgets)
-
-set(SOURCES
-    src/main.cpp
-    src/ui/window/SplashWindow.cpp
-    src/ui/window/MainWindow.cpp
-    src/ui/window/AdultHistoryWindow.cpp
-    src/ui/window/PediatricHistoryWindow.cpp
-    src/ui/window/PregnancyHistoryWindow.cpp
-    src/ui/window/TitleBar.cpp
-    src/data/common/Database.cpp
-    src/data/common/SchemaMigrator.cpp
-    src/data/model/PatientsModel.cpp
-    src/logic/AdultHistoryService.cpp
-    src/logic/AppSettings.cpp
-    src/logic/ClinicalContext.cpp
-    src/logic/PatientService.cpp
-    src/logic/PediatricHistoryLabels.cpp
-    src/logic/PediatricHistoryService.cpp
-    src/logic/PregnancyHistoryService.cpp
-    src/logic/PhotoManager.cpp
-    src/logic/SexLabel.cpp
-    src/ui/filter/ColumnFilterProxy.cpp
-)
-
-set(HEADERS
+# --- Core: data access and business rules -----------------------------------
+# QtCore/QtSql only, no UI: shared by the QML module and the GUI-less tests.
+qt_add_library(GambasseCore STATIC
     src/Paths.h
-    src/ui/window/SplashWindow.h
-    src/ui/window/MainWindow.h
-    src/ui/window/AdultHistoryWindow.h
-    src/ui/window/PediatricHistoryWindow.h
-    src/ui/window/PregnancyHistoryWindow.h
-    src/ui/window/TitleBar.h
+    src/data/common/Database.cpp
     src/data/common/Database.h
+    src/data/common/SchemaMigrator.cpp
     src/data/common/SchemaMigrator.h
     src/data/model/AdultHistory.h
     src/data/model/Patient.h
+    src/data/model/PatientsModel.cpp
     src/data/model/PatientsModel.h
     src/data/model/PediatricHistory.h
     src/data/model/PregnancyHistory.h
+    src/logic/AdultHistoryService.cpp
     src/logic/AdultHistoryService.h
+    src/logic/AppSettings.cpp
     src/logic/AppSettings.h
+    src/logic/ClinicalContext.cpp
     src/logic/ClinicalContext.h
+    src/logic/PatientService.cpp
     src/logic/PatientService.h
+    src/logic/PediatricHistoryLabels.cpp
     src/logic/PediatricHistoryLabels.h
+    src/logic/PediatricHistoryService.cpp
     src/logic/PediatricHistoryService.h
+    src/logic/PregnancyHistoryService.cpp
     src/logic/PregnancyHistoryService.h
+    src/logic/PhotoManager.cpp
     src/logic/PhotoManager.h
+    src/logic/SexLabel.cpp
     src/logic/SexLabel.h
-    src/ui/filter/ColumnFilterProxy.h
+)
+target_include_directories(GambasseCore PUBLIC src)
+target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Sql)
+
+# --- QML module `Gambasse` ----------------------------------------------------
+# Views (QML_FILES) plus the C++ types they use (SOURCES): the controllers and
+# settings are registered declaratively (QML_ELEMENT / QML_SINGLETON), so the
+# views import them as typed QML types instead of receiving context objects.
+# A static library shared by the application and the tests, so both resolve
+# `import Gambasse` identically.
+qt_add_library(GambasseQml STATIC)
+set_source_files_properties(qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+qt_add_qml_module(GambasseQml
+    URI Gambasse
+    VERSION 1.0
+    # Under an import path (build/qml) like an installed module, so qmllint and
+    # qmlls find it; build/Gambasse is taken by the Linux executable.
+    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Gambasse
+    # QAbstractItemModel (PatientController.gridModel) is declared there.
+    DEPENDENCIES QtQml.Models
+    SOURCES
+        src/ui/DateFormat.h
+        src/ui/InterfaceSettings.cpp
+        src/ui/InterfaceSettings.h
+        src/ui/controller/AdultHistoryController.cpp
+        src/ui/controller/AdultHistoryController.h
+        src/ui/controller/HistoryController.cpp
+        src/ui/controller/HistoryController.h
+        src/ui/controller/PatientController.cpp
+        src/ui/controller/PatientController.h
+        src/ui/controller/PediatricHistoryController.cpp
+        src/ui/controller/PediatricHistoryController.h
+        src/ui/controller/PregnancyHistoryController.cpp
+        src/ui/controller/PregnancyHistoryController.h
+        src/ui/filter/ColumnFilterProxy.cpp
+        src/ui/filter/ColumnFilterProxy.h
+    QML_FILES
+        qml/App.qml
+        qml/Root.qml
+        qml/Theme.qml
+        qml/TitleBar.qml
+        qml/ResizeHandles.qml
+        qml/windows/SplashWindow.qml
+        qml/windows/MainWindow.qml
+        qml/components/GxTextInput.qml
+        qml/components/GxNumberInput.qml
+        qml/components/GxDateInput.qml
+        qml/components/GxComboInput.qml
+        qml/components/GxLabel.qml
+        qml/components/GxCheck.qml
+        qml/components/GxDialog.qml
+        qml/components/GxField.qml
+        qml/components/GxGroup.qml
+        qml/components/GxTextArea.qml
+        qml/components/GxCheckField.qml
+        qml/windows/HistoryWindow.qml
+        qml/windows/AdultHistoryForm.qml
+        qml/windows/PediatricHistoryForm.qml
+        qml/windows/PregnancyHistoryForm.qml
+        qml/windows/StartupError.qml
+)
+# The generated type registration includes each registered header by its bare
+# file name; project code keeps including them from the `src` root.
+target_include_directories(GambasseQml PRIVATE src/ui src/ui/controller)
+target_link_libraries(GambasseQml PUBLIC
+    GambasseCore
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
 )
 
-set(RESOURCES
+# --- Application ---------------------------------------------------------------
+qt_add_executable(Gambasse WIN32
+    src/main.cpp
     resources/resources.qrc
     resources/bd/bd.qrc
     translations/i18n.qrc
 )
-
-qt_add_executable(Gambasse WIN32 ${SOURCES} ${HEADERS} ${RESOURCES})
-
-target_include_directories(Gambasse PRIVATE src)
 
 # Single source of truth for the program version, published at runtime with
 # QCoreApplication::setApplicationVersion() and checked against the branch name
@@ -84,11 +132,8 @@ target_include_directories(Gambasse PRIVATE src)
 target_compile_definitions(Gambasse PRIVATE GAMBASSE_VERSION="${PROJECT_VERSION}")
 
 target_link_libraries(Gambasse PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Sql
-    UxWidgets::UxWidgets
+    GambasseQml
+    GambasseQmlplugin
 )
 
 # After building, copy Qt DLLs and plugins next to the executable on Windows so
@@ -101,6 +146,7 @@ if(WIN32)
     if(WINDEPLOYQT_EXECUTABLE)
         add_custom_command(TARGET Gambasse POST_BUILD
             COMMAND "${WINDEPLOYQT_EXECUTABLE}" --no-translations
+                    --qmldir "${CMAKE_SOURCE_DIR}/qml"
                     $<TARGET_FILE:Gambasse>
             COMMENT "Running windeployqt for Gambasse.exe"
         )

@@ -1,19 +1,16 @@
-#include <QApplication>
 #include <QGuiApplication>
-#include <QMessageBox>
 #include <QObject>
 #include <QPixmap>
-#include <QScreen>
-#include <QSqlError>
+#include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include <QSqlQuery>
 #include <QStringList>
-#include <QStyleFactory>
+#include <QVariantMap>
 #include <cstdio>
 
 #include <Paths.h>
 #include <data/common/Database.h>
-#include <ui/window/MainWindow.h>
-#include <ui/window/SplashWindow.h>
+#include <ui/InterfaceSettings.h>
 
 #ifdef Q_OS_WIN
 #  include <windows.h>
@@ -35,16 +32,22 @@ void attachConsoleIfNeeded() {
     }
 #endif
 }
+
+// Engine ready for the views: the Basic style as a blank canvas for Theme, and
+// the InterfaceSettings singleton created up front so the language catalog is
+// installed before the first view is built.
+void prepareEngine(QQmlApplicationEngine& engine) {
+    QQuickStyle::setStyle(QStringLiteral("Basic"));
+    engine.singletonInstance<gambasse::InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                           QStringLiteral("InterfaceSettings"));
+}
 } // namespace
 
 int main(int argc, char** argv) {
-    QApplication app(argc, argv);
-    QApplication::setApplicationName(QStringLiteral("Gambasse"));
-    QApplication::setOrganizationName(QStringLiteral("Gambasse"));
-    QApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
-    // Fusion is necessary for the custom dark palette to apply consistently;
-    // the native Windows style ignores the palette.
-    QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
+    QGuiApplication app(argc, argv);
+    QGuiApplication::setApplicationName(QStringLiteral("Gambasse"));
+    QGuiApplication::setOrganizationName(QStringLiteral("Gambasse"));
+    QGuiApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
 
     // Deployment base path (the root directory above lib/). The launcher passes
     // it through --base; otherwise the executable directory is used.
@@ -83,7 +86,24 @@ int main(int argc, char** argv) {
     // Open the SQLite database (path from config.ini, database.db by default).
     QString error;
     if (!gambasse::Database::instance().open(&error)) {
-        QMessageBox::critical(nullptr, QObject::tr("Database error"), error);
+        // Diagnostic modes report on the console; the interface shows the
+        // error in a themed, translated window and exits once it is closed.
+        const QStringList a = app.arguments();
+        if (a.contains(QStringLiteral("--check-db")) || a.contains(QStringLiteral("--crud-selftest"))) {
+            attachConsoleIfNeeded();
+            std::fprintf(stderr, "database: %s\n", error.toUtf8().constData());
+            return 1;
+        }
+        QQmlApplicationEngine engine;
+        prepareEngine(engine);
+        engine.setInitialProperties(
+            {{QStringLiteral("titleText"), QObject::tr("Database error")},
+             {QStringLiteral("messageText"), error}});
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("StartupError"));
+        if (engine.rootObjects().isEmpty())
+            std::fprintf(stderr, "database: %s\n", error.toUtf8().constData());
+        else
+            app.exec();
         return 1;
     }
 
@@ -125,20 +145,14 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    // Create the main window now and show it when the splash screen finishes.
-    auto* window = new gambasse::MainWindow();
-
-    auto* splash = new gambasse::SplashWindow();
-    QObject::connect(splash, &gambasse::SplashWindow::finished, window, [window, splash]() {
-        // Center on the primary screen's available area, like the splash.
-        if (QScreen* screen = QGuiApplication::primaryScreen()) {
-            const QRect g = screen->availableGeometry();
-            window->move(g.center() - window->rect().center());
-        }
-        window->show();
-        splash->deleteLater();
-    });
-    splash->show();
-
+    // The views take over from here: App.qml shows the splash and then the
+    // main shell, which reads the database opened above.
+    QQmlApplicationEngine engine;
+    prepareEngine(engine);
+    engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+    if (engine.rootObjects().isEmpty()) {
+        std::fprintf(stderr, "qml: could not load the interface\n");
+        return 1;
+    }
     return app.exec();
 }

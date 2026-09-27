@@ -20,16 +20,35 @@ jobs:
         if: github.event_name == 'push'
         run: sh scripts/check-branch-version.sh "${GITHUB_REF_NAME}"
 
-      - name: Install Qt 6 and build tools
+      - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build qt6-base-dev qt6-base-dev-tools libqt6sql6-sqlite
+          sudo apt-get install -y cmake ninja-build
+
+      # Same Qt as the development machines (CMakeLists.txt requires 6.6), so
+      # the code never needs paths for other versions. The base desktop
+      # install brings Qt Quick, the SQLite driver and qmllint/qmlformat.
+      - name: Install Qt 6.6.2
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.6.2'
+          host: linux
+          target: desktop
+          # Qt 6.6 publishes the Linux desktop build as gcc_64 (linux_gcc_64
+          # is the name from Qt 6.7 on).
+          arch: gcc_64
+          cache: true
 
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: cmake --build build
+
+      - name: Lint QML
+        run: |
+          find qml -name '*.qml' -exec qmllint -i build/qml/Gambasse/qmldir {} +
+          for f in $(find qml -name '*.qml'); do qmlformat "$f" | diff -u "$f" -; done
 
       - name: Test
         run: ctest --test-dir build --output-on-failure

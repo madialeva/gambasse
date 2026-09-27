@@ -1,8 +1,8 @@
-# AGENTS.md — DispensarioQt
+# AGENTS.md — Gambasse
 
 ## Project
 
-DispensarioQt is a clinical-record and nursing-consultation application for an
+Gambasse is a clinical-record and nursing-consultation application for an
 NGO in Guinea-Bissau. It continues an earlier desktop application that is no
 longer maintained; the SQLite schema is owned by this project, and a legacy
 database with Spanish table and column names is still supported through the
@@ -16,13 +16,15 @@ developed: `src/Dispensario/Forms/` (including the six
 per area), and `src/Dispensario/Utilidades/` (shared framework, NOT to be
 ported: Qt covers those services natively).
 
-Use Qt Widgets, CMake, Ninja, and a MinGW/GCC Qt kit for Windows deployment. Do
-not introduce QML, MSVC, PostgreSQL, or new production dependencies without an
-approved OpenSpec change.
+Use Qt Quick (QML), CMake, Ninja, and a MinGW/GCC Qt kit for Windows
+deployment. Qt is 6.6 everywhere (CMake requires it; the CI installs 6.6.2):
+never add code paths or workarounds for other Qt versions. Do not introduce Qt Widgets, MSVC, PostgreSQL, or new production
+dependencies without an approved OpenSpec change.
 
 ## Source layout
 
-The Qt sources under `src/` are organized by layer:
+The Qt sources under `src/` are organized by layer, and the views live in the
+`Gambasse` QML module under `qml/`:
 
 ```text
 src/
@@ -32,16 +34,43 @@ src/
 │   ├── common/              database and migration infrastructure
 │   └── model/               data model (Patient, PatientsModel)
 ├── logic/                   business logic, UI-independent
-└── ui/
-    ├── window/              windows
-    ├── filter/              view helpers (proxy models)
-    └── uxwidgets/           vendored custom controls
+└── ui/                      bridge to QML: interface settings, shared formats
+    ├── controller/          one controller per screen (patients, histories)
+    └── filter/              view helpers (proxy models)
+qml/
+├── App.qml                  entry point: splash, then the main shell
+├── Root.qml, Theme.qml, TitleBar.qml, ...   shell and theme singleton
+├── components/              Gx* custom control library
+└── windows/                 screens
 ```
 
-Dependencies flow `ui -> logic -> data`; `logic/` uses only QtCore and `data/`,
-never QtWidgets or `ui/`, so it can be tested without a GUI. Business rules
-(patient writes, photo files, clinical availability, language/theme persistence)
-live in `logic/`, not in the windows.
+Dependencies flow `qml -> ui -> logic -> data`; `logic/` uses only QtCore and
+`data/`, never Qt Quick or `ui/`, so it can be tested without a GUI. QML only
+presents: business rules (patient writes, photo files, clinical availability,
+language/theme persistence) live in `logic/`, and the `ui/` controllers expose
+them to the views.
+
+CMake mirrors the layers: `GambasseCore` (static, `data/` + `logic/`, QtCore
+and QtSql only), `GambasseQml` (the `Gambasse` QML module: the `qml/` views plus
+the `ui/` C++ types) and the `Gambasse` executable (`main.cpp` + resources).
+Tests link the layer they exercise through `gambasse_add_test()` in
+`tests/CMakeLists.txt` instead of listing sources.
+
+## QML and C++
+
+C++ types reach QML by declarative registration in the `Gambasse` module, never
+by context properties or objects injected from `main.cpp`:
+
+- Screen controllers use `QML_ELEMENT`. A view that owns its controller
+  instantiates it (`Root.qml` creates `PatientController`); controllers created
+  by another one (the history controllers) add `QML_UNCREATABLE`.
+- Application-wide services are `QML_SINGLETON` with a static `create()`
+  (`InterfaceSettings`). Qt prefers a default constructor over `create()`, so
+  such a class must not be default-constructible.
+- Views declare typed properties (`property PatientController controller`),
+  never `var`, so `qmllint` checks every access.
+- `main.cpp` only opens the database, handles the diagnostic flags and loads
+  `App`; no wiring between C++ objects and views lives there.
 
 ## OpenSpec
 
@@ -89,20 +118,23 @@ never line-ending-normalize binaries such as `.qm`, images, or databases.
 
 Every `#include` uses angle brackets, never double quotes: Qt and system headers
 (`<QtTest>`, `<QSqlDatabase>`) and project headers resolved from the `src`
-include root (`<Paths.h>`, `<data/common/Database.h>`, `<ui/window/MainWindow.h>`,
-`<ui/filter/ColumnFilterProxy.h>`, `<UxWidgets/UxField.h>`). Never use relative
+include root (`<Paths.h>`, `<data/common/Database.h>`,
+`<ui/controller/PatientController.h>`,
+`<ui/filter/ColumnFilterProxy.h>`). Never use relative
 include paths such as `"../Paths.h"`. The only exception is the Qt AUTOMOC
 generated file for a `Q_OBJECT` defined in a `.cpp`, which stays double-quoted
-(`#include "test_schemamigrator.moc"`). CMake must expose the include roots so
-angle includes resolve: `src` for the application and the tests, and
-`src/ui/uxwidgets/include` (PUBLIC on the `UxWidgets` target) for the controls.
+(`#include "test_schemamigrator.moc"`). CMake must expose `src` as the include
+root of the application and the tests so angle includes resolve. The QML type
+registration Qt generates includes each registered header by its bare file
+name, so `GambasseQml` also adds `src/ui` and `src/ui/controller` as private
+include directories; project code never relies on them.
 
 ## Deployment notes
 
 Keep a 1008×561 base UI with elastic layouts. The Windows launcher starts the Qt
-application in `lib/` using `--base <root>`. `QToolBar::addWidget()` visibility is
-controlled by its returned `QAction`. Windows GUI diagnostics must be piped or
-redirected because the process has no standard console.
+application in `lib/` using `--base <root>`. `windeployqt` must get
+`--qmldir qml` so the Qt Quick modules ship. Windows GUI diagnostics must be piped
+or redirected because the process has no standard console.
 
 ## Working preferences
 
