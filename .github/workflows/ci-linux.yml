@@ -34,7 +34,9 @@ jobs:
           version: '6.6.2'
           host: linux
           target: desktop
-          arch: linux_gcc_64
+          # Qt 6.6 publishes the Linux desktop build as gcc_64 (linux_gcc_64
+          # is the name from Qt 6.7 on).
+          arch: gcc_64
           cache: true
 
       - name: Configure
