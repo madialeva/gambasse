@@ -23,7 +23,7 @@
   they live with domestic animals or have treated running water, as well as birth
   dates when known — in many cases there are no birth certificates and people do not
   know when, or even if, they were born. Built in <strong>C++</strong> with
-  <strong>Qt Widgets</strong> for the UI and <strong>SQLite</strong> for storage, a
+  <strong>Qt Quick (QML)</strong> for the UI and <strong>SQLite</strong> for storage, a
   choice that lets it run on less powerful computers while keeping excellent
   performance.
 </p>
@@ -73,9 +73,8 @@ baselined without re-running the initial schema, so its data is preserved.
 ## Requirements
 
 - GCC 11+ (C++17).
-- Qt 6 Core, Gui, Widgets and Sql, with the SQLite driver.
-- Qt 6 Qml, Quick and QuickControls2 (declarative UI; `qt6-declarative-dev`
-  on Debian/Ubuntu, plus `qt6-declarative-dev-tools` for `qmllint`/`qmlformat`).
+- Qt 6.6 (the CI builds with 6.6.2): Core, Gui, Sql with the SQLite driver,
+  Qml, Quick and QuickControls2, plus the `qmllint`/`qmlformat` tools.
 - CMake 3.21+ and Ninja.
 - Windows deployment: a Qt MinGW kit, `windeployqt`, and MinGW runtime DLLs.
 
@@ -96,13 +95,15 @@ The database file is created and migrated on first run.
 
 The declarative UI lives in `qml/` as the `Gambasse` module (`qt_add_qml_module`):
 shell (`Root.qml`, `Theme.qml` singleton, `TitleBar.qml`, `ResizeHandles.qml`)
-plus the `qml/components/` custom control library; screens land under `qml/`
-as they are ported. Run it with `./build-linux/Gambasse --qml` (default stays
-Widgets until the final cutover). Keep every file formatted and lint-clean:
+plus the `qml/components/` custom control library and the screens under
+`qml/windows/`, started by `App.qml`. C++ only decides and persists: thin
+controllers in `src/ui/`, registered in the same module (`QML_ELEMENT`,
+`QML_SINGLETON`), expose the `logic/` services and the models to the views as
+typed QML types. Keep every file formatted and lint-clean:
 
 ```sh
 qmlformat -i qml/<file>.qml
-qmllint -i build-linux/qmldir qml/<file>.qml   # needs a configured build
+qmllint -i build-linux/qml/Gambasse/qmldir qml/<file>.qml   # needs a configured build
 ```
 
 Windows deployment adds the QML runtime with

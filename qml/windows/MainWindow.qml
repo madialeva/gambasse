@@ -12,7 +12,7 @@ import Gambasse
 Item {
     id: root
 
-    property var controller: null
+    property PatientController controller: null
     // User-typed filter per column (survives language-driven rebuilds).
     property var filterTexts: ["", "", "", "", "", "", "", ""]
     // Fixed column widths (identifier column narrow); the last stretches.
@@ -85,6 +85,12 @@ Item {
 
     Connections {
         target: root.controller
+        function onOpenHistoryScreen(screen, historyController) {
+            historyWindow.screenId = screen;
+            historyWindow.screenTitle = screen === "adult" ? qsTr("Adult History") : screen === "pediatric" ? qsTr("Pediatric History") : qsTr("Pregnancy History");
+            historyWindow.controller = historyController;
+            historyWindow.present();
+        }
         function onEditingChanged() {
             // Saving or cancelling gives the keyboard back to the grid.
             if (!root.controller.editing)
@@ -550,6 +556,35 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    // History screen: PatientController prepares the data and asks for it
+    // through openHistoryScreen; the window here is the QML presentation.
+    HistoryWindow {
+        id: historyWindow
+        objectName: "historyWindow"
+        // Saving or deleting a history changes what the patient screen offers,
+        // like the availability refresh the Widgets window did when it closed.
+        onHistoryChanged: {
+            if (root.hasController())
+                root.controller.refreshAvailability();
+        }
+        formComponent: historyWindow.screenId === "pediatric" ? pediatricForm : historyWindow.screenId === "pregnancy" ? pregnancyForm : adultForm
+    }
+    Component {
+        id: adultForm
+        AdultHistoryForm {
+        }
+    }
+    Component {
+        id: pediatricForm
+        PediatricHistoryForm {
+        }
+    }
+    Component {
+        id: pregnancyForm
+        PregnancyHistoryForm {
         }
     }
 

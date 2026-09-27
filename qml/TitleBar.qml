@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import Gambasse
 
-// qmllint disable signal-handler-parameters
-
 // Custom title bar for frameless windows (mirrors the Widgets TitleBar):
 // logo and title on the left, window buttons on the right, drag to move,
 // double-click to toggle maximize/restore, close-only mode for children.
@@ -13,9 +11,8 @@ Item {
 
     property string title: "Gambasse"
     property bool closeOnly: false
-    // Interface bridge for the optional language/theme controls (main
-    // window only; child windows leave showLanguageTheme false).
-    property var uiSettings: null
+    // Optional language/theme controls, bound to the InterfaceSettings
+    // singleton (main window only; child windows leave it false).
     property bool showLanguageTheme: false
     // config.ini is free text, so the code is checked before building any URL
     // (a wrong one used to point at a non-existing flag image).
@@ -23,7 +20,7 @@ Item {
     // pointer handlers (which are not Items) read the window from here.
     readonly property var window: Window.window
     readonly property string languageCode: {
-        const code = root.uiSettings ? root.uiSettings.language : "en";
+        const code = InterfaceSettings.language;
         return (code === "es" || code === "pt") ? code : "en";
     }
     readonly property string flagSource: "qrc:/img/flag-" + languageCode + ".png"
@@ -41,6 +38,17 @@ Item {
             Window.window.showMaximized();
     }
 
+    // Double click toggles maximize/restore. A MouseArea, not a TapHandler:
+    // TapHandler.doubleTapped carries a QEventPoint, which qmllint cannot type.
+    // It sits below the controls, which therefore keep their own clicks.
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton
+        onDoubleClicked: mouse => {
+            if (mouse.button === Qt.LeftButton)
+                root.maximizeFromDoubleClick();
+        }
+    }
     // Moving the window: startSystemMove() hands the drag to the window
     // manager, so the window follows the pointer natively instead of jumping
     // step by step as the incremental x/y math did.
@@ -54,11 +62,11 @@ Item {
                 root.window.startSystemMove();
         }
     }
-    // Double click still toggles maximize (the drag handler owns the press).
-    TapHandler {
-        acceptedButtons: Qt.LeftButton
-        gesturePolicy: TapHandler.ReleaseWithinBounds
-        onDoubleTapped: root.maximizeFromDoubleClick()
+
+    // Unstyled text: carries the application font the title is sized from.
+    Text {
+        id: appFont
+        visible: false
     }
 
     Row {
@@ -74,9 +82,13 @@ Item {
         }
         Text {
             text: root.title
+            // The Widgets title bar: application font, bold, one point larger.
             font.bold: true
+            font.pointSize: appFont.font.pointSize + 1
             color: Theme.windowText
             anchors.verticalCenter: parent.verticalCenter
+            // QLabel rounds the centring down to whole pixels.
+            anchors.verticalCenterOffset: 1
         }
     }
 
@@ -112,7 +124,7 @@ Item {
         ToolButton {
             id: languageButton
             objectName: "languageButton"
-            visible: root.showLanguageTheme && root.uiSettings !== null
+            visible: root.showLanguageTheme
             text: {
                 if (root.languageCode === "es")
                     return qsTr("Spanish");
@@ -148,7 +160,7 @@ Item {
                     icon.color: "transparent" // keep the flag colours, no tint
                     checkable: true
                     checked: root.languageCode === "es"
-                    onTriggered: root.uiSettings.language = "es"
+                    onTriggered: InterfaceSettings.language = "es"
                 }
                 MenuItem {
                     text: qsTr("Portuguese")
@@ -156,7 +168,7 @@ Item {
                     icon.color: "transparent" // keep the flag colours, no tint
                     checkable: true
                     checked: root.languageCode === "pt"
-                    onTriggered: root.uiSettings.language = "pt"
+                    onTriggered: InterfaceSettings.language = "pt"
                 }
                 MenuItem {
                     text: qsTr("English")
@@ -164,15 +176,15 @@ Item {
                     icon.color: "transparent" // keep the flag colours, no tint
                     checkable: true
                     checked: root.languageCode === "en"
-                    onTriggered: root.uiSettings.language = "en"
+                    onTriggered: InterfaceSettings.language = "en"
                 }
             }
         }
         ToolButton {
             objectName: "themeButton"
-            visible: root.showLanguageTheme && root.uiSettings !== null
-            icon.source: root.uiSettings && root.uiSettings.theme === "oscuro" ? "qrc:/img/moon.svg" : "qrc:/img/sun.svg"
-            text: root.uiSettings && root.uiSettings.theme === "oscuro" ? qsTr("Dark") : qsTr("Light")
+            visible: root.showLanguageTheme
+            icon.source: InterfaceSettings.theme === "oscuro" ? "qrc:/img/moon.svg" : "qrc:/img/sun.svg"
+            text: InterfaceSettings.theme === "oscuro" ? qsTr("Dark") : qsTr("Light")
             ToolTip.text: qsTr("Theme")
             ToolTip.visible: hovered
             onClicked: themeMenu.open()
@@ -182,15 +194,15 @@ Item {
                     text: qsTr("Light")
                     icon.source: "qrc:/img/sun.svg"
                     checkable: true
-                    checked: !root.uiSettings || root.uiSettings.theme === "claro"
-                    onTriggered: root.uiSettings.theme = "claro"
+                    checked: InterfaceSettings.theme === "claro"
+                    onTriggered: InterfaceSettings.theme = "claro"
                 }
                 MenuItem {
                     text: qsTr("Dark")
                     icon.source: "qrc:/img/moon.svg"
                     checkable: true
-                    checked: root.uiSettings && root.uiSettings.theme === "oscuro"
-                    onTriggered: root.uiSettings.theme = "oscuro"
+                    checked: InterfaceSettings.theme === "oscuro"
+                    onTriggered: InterfaceSettings.theme = "oscuro"
                 }
             }
         }

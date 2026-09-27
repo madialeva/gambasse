@@ -18,7 +18,15 @@ CheckBox {
             focus = false;
     }
 
-    spacing: 6
+    // Fusion metrics used by UxCheck: 20 px tall row (3 px above/below the
+    // 14 px indicator) and the label 19 px from the left edge. The Basic
+    // style would pad the control by 6 on every side, pushing both the
+    // indicator and the label off the Widgets geometry.
+    topPadding: 3
+    bottomPadding: 3
+    leftPadding: 0
+    rightPadding: 0
+    spacing: 5
     focusPolicy: root.readOnly ? Qt.NoFocus : Qt.StrongFocus
     contentItem: Text {
         objectName: "checkText"
@@ -26,22 +34,33 @@ CheckBox {
         color: root.checked ? Theme.checkedText : Theme.windowText
         font: root.font
         verticalAlignment: Text.AlignVCenter
+        // A caption longer than the box is cut, like QCheckBox's.
+        clip: true
+        // The control places contentItem at (leftPadding, topPadding), so the
+        // label offset is carried here: indicator width + spacing = 19 px.
         leftPadding: root.indicator.width + root.spacing
     }
     indicator: Rectangle {
-        implicitWidth: 18
-        implicitHeight: 18
+        // Same box as the Widgets UxCheck: 14 px square, neutral border.
+        implicitWidth: 14
+        implicitHeight: 14
         anchors.verticalCenter: parent.verticalCenter
         color: Theme.fieldBackground
-        border.color: Theme.fieldBorder
+        border.color: Theme.checkBorder
         border.width: 1
-        radius: 2
+        Rectangle {
+            x: 1
+            y: 1
+            width: parent.width - 2
+            height: 1
+            color: Theme.checkShadow
+        }
         Text {
             anchors.centerIn: parent
             visible: root.checked
             text: "\u2713"
             color: Theme.windowText
-            font.pixelSize: 13
+            font.pixelSize: 11
             font.bold: true
         }
     }

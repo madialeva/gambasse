@@ -21,11 +21,20 @@ Popup {
     signal accepted
     signal rejected
 
+    // Opening the popup straight from the click that asks for it fights the
+    // focus change of that same event (the popup opens and closes again), so it
+    // is shown once the event has been delivered.
+    function present() {
+        Qt.callLater(function () {
+            root.open();
+        });
+    }
+
     function showInfo(title, message) {
         titleText = title;
         messageText = message;
         yesNo = false;
-        open();
+        present();
     }
 
     background: Rectangle {

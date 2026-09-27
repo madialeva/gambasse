@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QSignalSpy>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -9,7 +9,7 @@
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
-#include <ui/PatientController.h>
+#include <ui/controller/PatientController.h>
 
 namespace gambasse {
 namespace {
@@ -417,7 +417,7 @@ void TestPatientController::editingLocksTheSelection() {
 } // namespace gambasse
 
 int main(int argc, char** argv) {
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     app.setAttribute(Qt::AA_Use96Dpi, true);
     gambasse::TestPatientController test;
     return QTest::qExec(&test, argc, argv);

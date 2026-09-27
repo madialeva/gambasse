@@ -1,69 +1,20 @@
-#include <QApplication>
 #include <QGuiApplication>
-#include <QMessageBox>
 #include <QObject>
 #include <QPixmap>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
-#include <QQuickWindow>
-#include <QScreen>
-#include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
-#include <QStyleFactory>
+#include <QVariantMap>
 #include <cstdio>
 
 #include <Paths.h>
 #include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
-#include <ui/PatientController.h>
-#include <ui/window/MainWindow.h>
-#include <ui/window/SplashWindow.h>
 
 #ifdef Q_OS_WIN
 #  include <windows.h>
 #endif
-
-// Opens the QML main shell once the splash finishes. QML-defined signals can
-// only connect via QMetaMethod to real slots (no lambdas), hence this helper.
-class SplashGate : public QObject {
-    Q_OBJECT
-public:
-    SplashGate(QQmlApplicationEngine* engine, gambasse::InterfaceSettings* settings,
-               QObject* parent = nullptr)
-        : QObject(parent), m_engine(engine), m_settings(settings) {
-        m_patients = new gambasse::PatientController(this);
-        m_patients->load();
-    }
-    gambasse::PatientController* patients() const { return m_patients; }
-public slots:
-    void openMain() {
-        m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
-        if (m_engine->rootObjects().isEmpty())
-            return;
-        QObject* root = m_engine->rootObjects().last();
-        // Inject the bridges (Theme.mode and the patient screen follow them).
-        root->setProperty("uiSettings",
-                          QVariant::fromValue(qobject_cast<QObject*>(m_settings)));
-        root->setProperty("patientController",
-                          QVariant::fromValue(qobject_cast<QObject*>(m_patients)));
-        // Centered like the splash it replaces, so the shell does not open in
-        // a corner while the splash was in the middle of the screen.
-        if (auto* mainWindow = qobject_cast<QQuickWindow*>(root)) {
-            QScreen* screen = mainWindow->screen();
-            if (screen == nullptr)
-                screen = QGuiApplication::primaryScreen();
-            if (screen != nullptr) {
-                const QRect g = screen->availableGeometry();
-                mainWindow->setPosition(g.center() - mainWindow->geometry().center());
-            }
-        }
-    }
-private:
-    QQmlApplicationEngine* m_engine;
-    gambasse::InterfaceSettings* m_settings;
-    gambasse::PatientController* m_patients = nullptr;
-};
 
 namespace {
 // A GUI application in the WIN32 subsystem has no attached console, so stdout
@@ -81,16 +32,22 @@ void attachConsoleIfNeeded() {
     }
 #endif
 }
+
+// Engine ready for the views: the Basic style as a blank canvas for Theme, and
+// the InterfaceSettings singleton created up front so the language catalog is
+// installed before the first view is built.
+void prepareEngine(QQmlApplicationEngine& engine) {
+    QQuickStyle::setStyle(QStringLiteral("Basic"));
+    engine.singletonInstance<gambasse::InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                           QStringLiteral("InterfaceSettings"));
+}
 } // namespace
 
 int main(int argc, char** argv) {
-    QApplication app(argc, argv);
-    QApplication::setApplicationName(QStringLiteral("Gambasse"));
-    QApplication::setOrganizationName(QStringLiteral("Gambasse"));
-    QApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
-    // Fusion is necessary for the custom dark palette to apply consistently;
-    // the native Windows style ignores the palette.
-    QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
+    QGuiApplication app(argc, argv);
+    QGuiApplication::setApplicationName(QStringLiteral("Gambasse"));
+    QGuiApplication::setOrganizationName(QStringLiteral("Gambasse"));
+    QGuiApplication::setApplicationVersion(QStringLiteral(GAMBASSE_VERSION));
 
     // Deployment base path (the root directory above lib/). The launcher passes
     // it through --base; otherwise the executable directory is used.
@@ -129,7 +86,24 @@ int main(int argc, char** argv) {
     // Open the SQLite database (path from config.ini, database.db by default).
     QString error;
     if (!gambasse::Database::instance().open(&error)) {
-        QMessageBox::critical(nullptr, QObject::tr("Database error"), error);
+        // Diagnostic modes report on the console; the interface shows the
+        // error in a themed, translated window and exits once it is closed.
+        const QStringList a = app.arguments();
+        if (a.contains(QStringLiteral("--check-db")) || a.contains(QStringLiteral("--crud-selftest"))) {
+            attachConsoleIfNeeded();
+            std::fprintf(stderr, "database: %s\n", error.toUtf8().constData());
+            return 1;
+        }
+        QQmlApplicationEngine engine;
+        prepareEngine(engine);
+        engine.setInitialProperties(
+            {{QStringLiteral("titleText"), QObject::tr("Database error")},
+             {QStringLiteral("messageText"), error}});
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("StartupError"));
+        if (engine.rootObjects().isEmpty())
+            std::fprintf(stderr, "database: %s\n", error.toUtf8().constData());
+        else
+            app.exec();
         return 1;
     }
 
@@ -171,55 +145,14 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    // QML mode: same diagnostics above apply; only the UI shell changes.
-    // The Widgets windows stay the default until the final cutover.
-    if (app.arguments().contains(QStringLiteral("--qml"))) {
-        // Blank canvas for the custom Theme (see qml/Theme.qml in task 2.2).
-        QQuickStyle::setStyle(QStringLiteral("Basic"));
-        QQmlApplicationEngine engine;
-        gambasse::InterfaceSettings uiSettings;
-        auto* gate = new SplashGate(&engine, &uiSettings, &app);
-        // Language catalog and hot QML retranslation (same lookup as Widgets),
-        // plus translated headers and labels for the patient screen.
-        uiSettings.applyLanguage(&engine);
-        QObject::connect(&uiSettings, &gambasse::InterfaceSettings::languageChanged, &engine,
-                         [&engine, &uiSettings, gate]() {
-                             uiSettings.applyLanguage(&engine);
-                             gate->patients()->refreshLanguage();
-                         });
-        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("SplashWindow"));
-        if (engine.rootObjects().isEmpty()) {
-            std::fprintf(stderr, "qml: could not load the QML splash\n");
-            return 1;
-        }
-        QObject* splash = engine.rootObjects().first();
-        if (auto* splashWindow = qobject_cast<QQuickWindow*>(splash)) {
-            // Center on the primary screen's available area, like the splash.
-            if (QScreen* screen = QGuiApplication::primaryScreen()) {
-                const QRect g = screen->availableGeometry();
-                splashWindow->setPosition(g.center() - splashWindow->geometry().center());
-            }
-        }
-        QObject::connect(splash, SIGNAL(finished()), gate, SLOT(openMain()));
-        return app.exec();
+    // The views take over from here: App.qml shows the splash and then the
+    // main shell, which reads the database opened above.
+    QQmlApplicationEngine engine;
+    prepareEngine(engine);
+    engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+    if (engine.rootObjects().isEmpty()) {
+        std::fprintf(stderr, "qml: could not load the interface\n");
+        return 1;
     }
-
-    // Create the main window now and show it when the splash screen finishes.
-    auto* window = new gambasse::MainWindow();
-
-    auto* splash = new gambasse::SplashWindow();
-    QObject::connect(splash, &gambasse::SplashWindow::finished, window, [window, splash]() {
-        // Center on the primary screen's available area, like the splash.
-        if (QScreen* screen = QGuiApplication::primaryScreen()) {
-            const QRect g = screen->availableGeometry();
-            window->move(g.center() - window->rect().center());
-        }
-        window->show();
-        splash->deleteLater();
-    });
-    splash->show();
-
     return app.exec();
 }
-
-#include "main.moc"

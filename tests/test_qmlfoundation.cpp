@@ -9,6 +9,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
 namespace gambasse {
@@ -32,6 +33,19 @@ QPoint itemCenter(QQuickItem* item) {
     return item->mapToScene(QPointF(item->width() / 2.0, item->height() / 2.0)).toPoint();
 }
 
+// Persists the interface settings the next engine's singleton starts from.
+void persistInterface(const QString& theme, const QString& language) {
+    InterfaceSettings settings(nullptr);
+    settings.setTheme(theme);
+    settings.setLanguage(language);
+}
+
+// The InterfaceSettings singleton of an engine (created on first use).
+InterfaceSettings* settingsOf(QQmlEngine& engine) {
+    return engine.singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                        QStringLiteral("InterfaceSettings"));
+}
+
 } // namespace
 
 // Verifies the QML foundation wiring: theme/language persistence through
@@ -43,10 +57,10 @@ class TestQmlFoundation : public QObject {
 private:
     QTemporaryDir m_dir;
     QQmlApplicationEngine* m_engine = nullptr;
-    InterfaceSettings* m_settings = nullptr;
 
-    // Fresh shell like main.cpp wires it (module load + settings injection).
-    // Null when the module fails to load; slots check it.
+    // Fresh shell loaded like the application does, with the given theme
+    // persisted beforehand (read by the engine's settings singleton) and the
+    // English source texts. Null when the module fails to load.
     QQuickWindow* openShell(const QString& theme);
     void cleanup();
 
@@ -57,6 +71,7 @@ private slots:
     void qmlShellFollowsThemeInHot();
     void qmlLanguageSwitchesInHot();
     void splashSequence();
+    void appOpensShellAfterSplash();
     void titleBarChrome();
     void titleBarWindowButtons();
     void titleBarDrag();
@@ -65,33 +80,29 @@ private slots:
 
 QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
     cleanup();
-    m_settings = new InterfaceSettings();
-    m_settings->setTheme(theme);
+    persistInterface(theme, QStringLiteral("en"));
     m_engine = new QQmlApplicationEngine();
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     if (m_engine->rootObjects().isEmpty())
         return nullptr;
-    auto* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
-    if (window == nullptr)
-        return nullptr;
-    window->setProperty("uiSettings", QVariant::fromValue(qobject_cast<QObject*>(m_settings)));
-    return window;
+    return qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
 }
 
 void TestQmlFoundation::cleanup() {
     delete m_engine;
     m_engine = nullptr;
-    delete m_settings;
-    m_settings = nullptr;
 }
 
 void TestQmlFoundation::initTestCase() {
     QVERIFY(m_dir.isValid());
     setBasePath(m_dir.path());
+    // The shell loads the patients on completion, as in the application.
+    QString error;
+    QVERIFY2(Database::instance().open(&error), qPrintable(error));
 }
 
 void TestQmlFoundation::themePersistsAndNotifies() {
-    InterfaceSettings settings;
+    InterfaceSettings settings(nullptr);
     QCOMPARE(settings.theme(), QStringLiteral("claro")); // config.ini default
 
     QSignalSpy spy(&settings, &InterfaceSettings::themeChanged);
@@ -102,7 +113,7 @@ void TestQmlFoundation::themePersistsAndNotifies() {
     settings.setTheme(QStringLiteral("oscuro")); // same value: no signal
     QCOMPARE(spy.count(), 1);
 
-    InterfaceSettings reloaded; // persistence round trip
+    InterfaceSettings reloaded(nullptr); // persistence round trip
     QCOMPARE(reloaded.theme(), QStringLiteral("oscuro"));
 
     settings.setTheme(QStringLiteral("whatever")); // normalized to claro
@@ -110,7 +121,7 @@ void TestQmlFoundation::themePersistsAndNotifies() {
 }
 
 void TestQmlFoundation::languagePersistsAndNotifies() {
-    InterfaceSettings settings;
+    InterfaceSettings settings(nullptr);
     QCOMPARE(settings.language(), QStringLiteral("pt")); // config.ini default
 
     QSignalSpy spy(&settings, &InterfaceSettings::languageChanged);
@@ -120,42 +131,35 @@ void TestQmlFoundation::languagePersistsAndNotifies() {
     settings.setLanguage(QStringLiteral("es")); // same value: no signal
     QCOMPARE(spy.count(), 1);
 
-    InterfaceSettings reloaded; // persistence round trip
+    InterfaceSettings reloaded(nullptr); // persistence round trip
     QCOMPARE(reloaded.language(), QStringLiteral("es"));
 }
 
 void TestQmlFoundation::qmlShellFollowsThemeInHot() {
-    InterfaceSettings settings;
-    settings.setTheme(QStringLiteral("claro"));
-
+    persistInterface(QStringLiteral("claro"), QStringLiteral("en"));
     QQmlApplicationEngine engine;
-    // Same loading as main.cpp: the module (and its resources) comes from
-    // the shared GambasseQml library in both binaries.
+    // Same loading as the application: the module (and its resources) comes
+    // from the shared GambasseQml library in both binaries.
     engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!engine.rootObjects().isEmpty());
 
     auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
     QVERIFY(window != nullptr);
-    // Same injection as main.cpp: drives Theme.mode (see Root.qml).
-    window->setProperty("uiSettings", QVariant::fromValue(qobject_cast<QObject*>(&settings)));
     QVERIFY(QTest::qWaitForWindowExposed(window));
     QCOMPARE(grabCenter(window), expectedShell(QStringLiteral("claro")));
 
-    settings.setTheme(QStringLiteral("oscuro")); // hot change, no reload
+    // Theme.mode follows the singleton: hot change, no reload.
+    settingsOf(engine)->setTheme(QStringLiteral("oscuro"));
     QTRY_COMPARE(grabCenter(window), expectedShell(QStringLiteral("oscuro")));
 }
 
 void TestQmlFoundation::qmlLanguageSwitchesInHot() {
-    InterfaceSettings settings;
+    // Deterministic baseline whatever previous tests persisted: the singleton
+    // installs the persisted catalog when the engine creates it.
+    persistInterface(QStringLiteral("claro"), QStringLiteral("pt"));
     QQmlApplicationEngine engine;
-    // Same wiring as main.cpp: every language change reapplies the catalog
-    // and refreshes all QML-bound strings.
-    QObject::connect(&settings, &InterfaceSettings::languageChanged,
-                     [&]() { settings.applyLanguage(&engine); });
-
-    // Deterministic baseline whatever previous tests persisted.
-    settings.setLanguage(QStringLiteral("pt"));
-    settings.applyLanguage(&engine);
+    InterfaceSettings* settings = settingsOf(engine);
+    QVERIFY(settings != nullptr);
 
     QQmlComponent probe(
         &engine, QUrl::fromLocalFile(QStringLiteral(QML_FIXTURE_DIR "/LangProbe.qml")));
@@ -163,12 +167,13 @@ void TestQmlFoundation::qmlLanguageSwitchesInHot() {
     QVERIFY(item != nullptr);
     QCOMPARE(item->property("probed").toString(), QStringLiteral("En Estabulo"));
 
-    settings.setLanguage(QStringLiteral("es"));
+    // Every change reapplies the catalog and retranslates the engine itself.
+    settings->setLanguage(QStringLiteral("es"));
     QCOMPARE(item->property("probed").toString(), QStringLiteral("En establo"));
-    settings.setLanguage(QStringLiteral("en")); // back to the source language
+    settings->setLanguage(QStringLiteral("en")); // back to the source language
     QCOMPARE(item->property("probed").toString(), QStringLiteral("In stable"));
 
-    InterfaceSettings reloaded; // persistence rode along
+    InterfaceSettings reloaded(nullptr); // persistence rode along
     QCOMPARE(reloaded.language(), QStringLiteral("en"));
     delete item;
 }
@@ -186,6 +191,25 @@ void TestQmlFoundation::splashSequence() {
     QSignalSpy finishedSpy(splash, SIGNAL(finished()));
     QTRY_VERIFY_WITH_TIMEOUT(!splash->isVisible(), 5000);
     QCOMPARE(finishedSpy.count(), 1);
+}
+
+void TestQmlFoundation::appOpensShellAfterSplash() {
+    // The application entry point: the splash first, then the main shell.
+    persistInterface(QStringLiteral("claro"), QStringLiteral("en"));
+    QQmlApplicationEngine engine;
+    engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+    QVERIFY(!engine.rootObjects().isEmpty());
+    QObject* app = engine.rootObjects().first();
+    auto* splash = qvariant_cast<QQuickWindow*>(app->property("splash"));
+    QVERIFY(splash != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(splash));
+    QVERIFY(app->property("shell").value<QObject*>() == nullptr);
+
+    QTRY_VERIFY_WITH_TIMEOUT(app->property("shell").value<QObject*>() != nullptr, 5000);
+    auto* shell = qvariant_cast<QQuickWindow*>(app->property("shell"));
+    QVERIFY(shell != nullptr);
+    QVERIFY(!splash->isVisible());
+    QVERIFY(QTest::qWaitForWindowExposed(shell));
 }
 
 void TestQmlFoundation::titleBarChrome() {
@@ -270,9 +294,16 @@ void TestQmlFoundation::titleBarDrag() {
     QVERIFY(bar != nullptr);
     QVERIFY(bar->findChild<QObject*>(QStringLiteral("windowDrag")) != nullptr);
 
+    // The double-click MouseArea must not swallow the drag: the handler still
+    // becomes active when the pointer moves with the button down.
+    QObject* handler = bar->findChild<QObject*>(QStringLiteral("windowDrag"));
+    QVERIFY(handler != nullptr);
     QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(300, 16));
     QTest::mouseMove(window, QPoint(360, 56));
+    QTRY_VERIFY(handler->property("active").toBool());
     QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(360, 56));
+    QTRY_VERIFY(!handler->property("active").toBool());
+    // QML no longer moves the window by itself.
     QCOMPARE(window->position(), QPoint(100, 100));
 
     // A double click on the bar still toggles maximize.

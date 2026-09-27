@@ -1,30 +1,71 @@
 pragma Singleton
 import QtQuick
+import Gambasse
 
-// Application theme: mirrors the Widgets claro/oscuro palettes so both UI
-// stacks look the same. `mode` is driven by the uiSettings context property
-// (one-way binding); every color below follows it, so switching the theme
-// updates the whole interface in hot through bindings.
+// Application theme: the claro/oscuro palettes measured on the former Widgets
+// windows. `mode` follows the persisted InterfaceSettings theme and every
+// color below follows `mode`, so switching the theme updates the whole
+// interface in hot through bindings.
 QtObject {
-    // Driven from the root window (see Root.qml); defaults to claro.
-    property string mode: "claro"
+    // Bound to the settings; the component tests assign it directly.
+    property string mode: InterfaceSettings.theme
 
     readonly property bool dark: mode === "oscuro"
 
     // Base metrics (same base UI as the Widgets windows).
     readonly property int baseWidth: 1008
     readonly property int baseHeight: 561
+    readonly property int titleBarHeight: 32
+    // Height of a line edit or combo box in the Widgets windows.
+    readonly property int fieldHeight: 22
+    // Narrowest a squeezed line edit gets beside a long label.
+    readonly property int fieldMinimumWidth: 28
 
     // Window and text.
     readonly property color windowBackground: dark ? "#353535" : "#F3F2EE"
     readonly property color windowText: dark ? "white" : "#1A1A1A"
     readonly property color mutedText: dark ? "#969696" : "#A6A6A6"
+    // Text of a disabled line edit (the display-only fields).
+    readonly property color disabledText: dark ? "#7A7A7A" : "#A0A0A0"
+    // Placeholder text: the text color at half opacity, like QPalette's.
+    readonly property color placeholderText: dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0.102, 0.102, 0.102, 0.5)
 
     // Editable areas.
     readonly property color fieldBackground: dark ? "#232323" : "#FBFAF6"
     readonly property color fieldBorder: dark ? "#1B3550" : "#9FC3E8"
     readonly property color focusBackground: dark ? "#14375A" : "#CCE8FF"
+    readonly property color focusBorder: dark ? "#53A0ED" : "#316598"
+    readonly property color focusRing: dark ? "#1E4771" : "#B4D4EF"
     readonly property color requiredBackground: "#FFE4C4"
+
+    // Chrome of the standard controls, taken from the Widgets windows (the
+    // palette the application installs: line edits, group boxes and check
+    // boxes are painted by the platform style, not by a stylesheet).
+    readonly property color inputBorder: dark ? "#262626" : "#AEADAA"
+    // Fusion's sunken line just inside the top border of a line edit / box.
+    readonly property color fieldShadow: dark ? "#212121" : "#E9E8E5"
+    readonly property color checkShadow: dark ? "#212121" : "#EDECE8"
+    // Combo boxes and tab headers (Fusion button gradient, top and bottom
+    // light lines, drop-down arrow), measured on the Widgets windows.
+    readonly property color buttonTop: dark ? "#4A4A4A" : "#FDFDFC"
+    readonly property color buttonBottom: dark ? "#3F3F3F" : "#EAE9E7"
+    readonly property color buttonTopLine: dark ? "#606060" : "#FDFDFC"
+    readonly property color buttonBottomLine: dark ? "#565656" : "#ECECEA"
+    readonly property color comboArrow: dark ? "#BABABA" : "#6B6B6B"
+    readonly property color tabPage: dark ? "#434343" : "#F8F6F1"
+    readonly property color tabTop: dark ? "#444444" : "#FFFEFB"
+    readonly property color tabTopLine: dark ? "#5B5B5B" : "#FFFEFB"
+    readonly property color tabInactiveTop: dark ? "#3E3E3E" : "#E8E7E3"
+    readonly property color tabInactiveBottom: dark ? "#3C3C3C" : "#E5E4DF"
+    readonly property color tabInactiveTopLine: dark ? "#555555" : "#E8E7E3"
+    // Group boxes: Fusion paints them translucent over whatever holds them,
+    // so a nested box comes out one step darker (measured on the Widgets
+    // windows: fill 243 -> 240 -> 237 in claro, 53 -> 52 -> 51 in oscuro).
+    readonly property color groupBackground: Qt.rgba(0, 0, 0, 3 / 255)
+    readonly property color groupBorder: dark ? Qt.rgba(1, 1, 1, 15 / 255) : Qt.rgba(0, 0, 0, 25 / 255)
+    // Faint line just inside the frame (claro only).
+    readonly property color groupInnerLine: dark ? "transparent" : Qt.rgba(0, 0, 0, 4 / 255)
+    readonly property color checkBorder: dark ? "#2A2A2A" : "#BFBEBB"
 
     // Highlighted buttons (toolbar, history entry/create, dialog buttons).
     readonly property color accentBackground: dark ? "#27496D" : "#CFE2F3"
@@ -34,6 +75,7 @@ QtObject {
     readonly property color accentText: dark ? "white" : "#1A1A1A"
     readonly property color accentDisabledBackground: dark ? "#3A3A3A" : "#E4E3DF"
     readonly property color accentDisabledText: dark ? "#7A7A7A" : "#A6A6A6"
+    readonly property color accentDisabledBorder: dark ? "#333333" : "#CFCFCF"
 
     // Selection and danger.
     readonly property color highlight: dark ? "#2A82DA" : "#3D7EBE"

@@ -1,9 +1,8 @@
 import QtQuick
 
-// Frameless centered splash with the logo image and a credits strip at the
-// bottom (mirrors the Widgets SplashWindow). Closes after three seconds and
-// emits finished(). Centering on the primary screen is done by the loader
-// (see main.cpp), like the Widgets splash.
+// Frameless splash with the logo image and a credits strip at the bottom.
+// Closes after three seconds and emits finished(); App.qml centres it and
+// opens the main shell afterwards.
 Window {
     id: root
     flags: Qt.FramelessWindowHint | Qt.SplashScreen

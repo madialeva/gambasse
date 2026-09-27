@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QImage>
 #include <QSet>
@@ -15,7 +15,7 @@
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
 #include <ui/InterfaceSettings.h>
-#include <ui/PatientController.h>
+#include <ui/controller/PatientController.h>
 
 namespace gambasse {
 namespace {
@@ -88,7 +88,9 @@ QColor pixelAt(QQuickWindow* window, QPoint topLeft, int row) {
 void clickIn(QQuickWindow* window, QQuickItem* item, const QPointF& offset) {
     const QPoint pos = item->mapToScene(offset).toPoint();
     QTest::mouseMove(window, pos);
-    QTest::qWait(20);
+    // The hover must be delivered before the press, or the click lands on
+    // whatever was under the cursor (a modal overlay, typically).
+    QTest::qWait(100);
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, pos);
 }
 
@@ -118,8 +120,7 @@ private:
 
     QQuickItem* item(const QString& name) const { return child(m_screen, name); }
 
-    // Fresh shell wired exactly like main.cpp: module load plus injection of
-    // the two C++ bridges.
+    // Fresh shell loaded exactly like the application.
     void openScreen();
     void cleanup();
     void seedPatients();
@@ -165,9 +166,8 @@ void TestQmlMainWindow::cleanupTestCase() {
 void TestQmlMainWindow::cleanup() {
     if (m_window != nullptr)
         m_window->close();
-    delete m_controller;
+    // The controller and the settings belong to the engine.
     m_controller = nullptr;
-    delete m_settings;
     m_settings = nullptr;
     delete m_engine;
     m_engine = nullptr;
@@ -177,16 +177,25 @@ void TestQmlMainWindow::cleanup() {
 
 void TestQmlMainWindow::openScreen() {
     cleanup();
-    m_controller = new PatientController();
-    QVERIFY(m_controller->load());
+    {
+        // English source texts and the light theme, read by the engine's
+        // settings singleton when the shell creates it.
+        InterfaceSettings baseline(nullptr);
+        baseline.setTheme(QStringLiteral("claro"));
+        baseline.setLanguage(QStringLiteral("en"));
+    }
     m_engine = new QQmlApplicationEngine();
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
     QVERIFY(m_window != nullptr);
-    m_window->setProperty("patientController", QVariant::fromValue<QObject*>(m_controller));
-    m_settings = new InterfaceSettings();
-    m_window->setProperty("uiSettings", QVariant::fromValue<QObject*>(m_settings));
+    // The shell owns its controller (loaded on completion) and the settings
+    // are the engine's singleton, exactly as in the application.
+    m_controller = m_window->property("patientController").value<PatientController*>();
+    QVERIFY(m_controller != nullptr);
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
+    QVERIFY(m_settings != nullptr);
     m_screen = child(m_window, QStringLiteral("mainView"));
     QVERIFY(m_screen != nullptr);
     QVERIFY(QTest::qWaitForWindowExposed(m_window));
@@ -338,19 +347,15 @@ void TestQmlMainWindow::toolbarFollowsTheLanguage() {
     const QString english = addButton->property("text").toString();
     QCOMPARE(english, QStringLiteral("Add"));
 
-    // Same wiring as main.cpp: the catalog plus engine.retranslate() repaints
-    // the QML strings in place.
-    InterfaceSettings settings;
-    settings.setLanguage(QStringLiteral("es"));
-    settings.applyLanguage(m_engine);
+    // The settings singleton switches the catalog and retranslates the
+    // engine, which repaints the QML strings in place.
+    m_settings->setLanguage(QStringLiteral("es"));
     QCOMPARE(addButton->property("text").toString(), QStringLiteral("A\u00f1adir"));
 
-    settings.setLanguage(QStringLiteral("pt"));
-    settings.applyLanguage(m_engine);
+    m_settings->setLanguage(QStringLiteral("pt"));
     QCOMPARE(addButton->property("text").toString(), QStringLiteral("Adicionar"));
 
-    settings.setLanguage(QStringLiteral("en"));
-    settings.applyLanguage(m_engine);
+    m_settings->setLanguage(QStringLiteral("en"));
     QCOMPARE(addButton->property("text").toString(), english);
 }
 
@@ -397,7 +402,10 @@ void TestQmlMainWindow::languageFlagKeepsItsColours() {
     seedPatients();
     openScreen();
 
-    auto* flag = m_window->findChild<QQuickItem*>(QStringLiteral("languageFlag"));
+    // Scoped to the main title bar: the history windows have one too.
+    auto* titleBar = m_window->findChild<QQuickItem*>(QStringLiteral("titleBar"));
+    QVERIFY(titleBar != nullptr);
+    auto* flag = titleBar->findChild<QQuickItem*>(QStringLiteral("languageFlag"));
     QVERIFY(flag != nullptr);
     QVERIFY(flag->isVisible());
 
@@ -423,7 +431,7 @@ void TestQmlMainWindow::languageFlagKeepsItsColours() {
     m_settings->setTheme(QStringLiteral("claro"));
 
     // Same inside the language menu: the entry icons keep their colours too.
-    auto* languageButton = m_window->findChild<QQuickItem*>(QStringLiteral("languageButton"));
+    auto* languageButton = titleBar->findChild<QQuickItem*>(QStringLiteral("languageButton"));
     QVERIFY(languageButton != nullptr);
     clickIn(m_window, languageButton);
     QTest::qWait(200); // the modal overlay needs to settle before the click
@@ -651,8 +659,8 @@ void TestQmlMainWindow::filterBoxesNarrowTheGrid() {
 } // namespace gambasse
 
 int main(int argc, char** argv) {
-    QApplication::setQuitOnLastWindowClosed(false);
-    QApplication app(argc, argv);
+    QGuiApplication::setQuitOnLastWindowClosed(false);
+    QGuiApplication app(argc, argv);
     gambasse::TestQmlMainWindow test;
     return QTest::qExec(&test, argc, argv);
 }

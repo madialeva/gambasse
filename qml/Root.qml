@@ -1,8 +1,10 @@
 import QtQuick
 import Gambasse
 
-// Empty shell window (screens land in later phases).
-// uiSettings is injected from C++ after loading (see main.cpp).
+// Main shell window: frameless, with the custom title bar (language and
+// theme controls) over the patient screen. It owns the patient controller,
+// loaded from the database already opened by main.cpp; the theme follows the
+// InterfaceSettings singleton through Theme.
 Window {
     id: root
     flags: Qt.FramelessWindowHint
@@ -14,20 +16,23 @@ Window {
     title: "Gambasse"
     color: Theme.windowBackground
 
-    property var uiSettings: null
-    property var patientController: null
+    readonly property alias patientController: patients
 
-    onUiSettingsChanged: {
-        if (root.uiSettings)
-            Theme.mode = root.uiSettings.theme;
+    PatientController {
+        id: patients
+        objectName: "patientController"
     }
 
+    // The catalog is already switched when the signal arrives, so the grid
+    // headers and language-dependent cells are rebuilt in the new language.
     Connections {
-        target: root.uiSettings
-        function onThemeChanged() {
-            Theme.mode = root.uiSettings.theme;
+        target: InterfaceSettings
+        function onLanguageChanged() {
+            patients.refreshLanguage();
         }
     }
+
+    Component.onCompleted: patients.load()
 
     MainWindow {
         objectName: "mainView"
@@ -35,7 +40,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        controller: root.patientController
+        controller: patients
     }
     TitleBar {
         id: titleBar
@@ -43,7 +48,6 @@ Window {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        uiSettings: root.uiSettings
         showLanguageTheme: true
     }
     ResizeHandles {

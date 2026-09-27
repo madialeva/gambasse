@@ -32,6 +32,9 @@ Item {
         objectName: "labelText"
         anchors.fill: parent
         anchors.leftMargin: icon.visible ? icon.width + 4 : 0
+        // QLabel paints inside its rect: a long caption is cut, never drawn
+        // over the neighbours.
+        clip: true
         color: hoverArea.containsMouse && root.highlight ? root.highlightColor : Theme.windowText
         font.underline: hoverArea.containsMouse && root.highlight
         horizontalAlignment: root.horizontalAlignment
