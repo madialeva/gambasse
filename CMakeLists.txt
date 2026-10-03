@@ -20,13 +20,19 @@ qt_add_library(GambasseCore STATIC
     src/Paths.h
     src/data/common/Database.cpp
     src/data/common/Database.h
+    src/data/common/ConsultationTable.h
+    src/data/common/DatabaseConsultations.cpp
     src/data/common/SchemaMigrator.cpp
     src/data/common/SchemaMigrator.h
+    src/data/model/AdultConsultation.h
     src/data/model/AdultHistory.h
+    src/data/model/Consultation.h
     src/data/model/Patient.h
     src/data/model/PatientsModel.cpp
     src/data/model/PatientsModel.h
+    src/data/model/PediatricConsultation.h
     src/data/model/PediatricHistory.h
+    src/data/model/PregnancyConsultation.h
     src/data/model/PregnancyHistory.h
     src/logic/AdultHistoryService.cpp
     src/logic/AdultHistoryService.h
@@ -34,8 +40,11 @@ qt_add_library(GambasseCore STATIC
     src/logic/AppSettings.h
     src/logic/ClinicalContext.cpp
     src/logic/ClinicalContext.h
+    src/logic/ConsultationService.h
     src/logic/PatientService.cpp
     src/logic/PatientService.h
+    src/logic/PediatricConsultationLabels.cpp
+    src/logic/PediatricConsultationLabels.h
     src/logic/PediatricHistoryLabels.cpp
     src/logic/PediatricHistoryLabels.h
     src/logic/PediatricHistoryService.cpp
@@ -72,14 +81,24 @@ qt_add_qml_module(GambasseQml
         src/ui/DateFormat.h
         src/ui/InterfaceSettings.cpp
         src/ui/InterfaceSettings.h
+        src/ui/controller/AdultConsultationController.cpp
+        src/ui/controller/AdultConsultationController.h
         src/ui/controller/AdultHistoryController.cpp
         src/ui/controller/AdultHistoryController.h
+        src/ui/controller/ConsultationController.cpp
+        src/ui/controller/ConsultationController.h
+        src/ui/controller/FormController.cpp
+        src/ui/controller/FormController.h
         src/ui/controller/HistoryController.cpp
         src/ui/controller/HistoryController.h
         src/ui/controller/PatientController.cpp
         src/ui/controller/PatientController.h
+        src/ui/controller/PediatricConsultationController.cpp
+        src/ui/controller/PediatricConsultationController.h
         src/ui/controller/PediatricHistoryController.cpp
         src/ui/controller/PediatricHistoryController.h
+        src/ui/controller/PregnancyConsultationController.cpp
+        src/ui/controller/PregnancyConsultationController.h
         src/ui/controller/PregnancyHistoryController.cpp
         src/ui/controller/PregnancyHistoryController.h
         src/ui/filter/ColumnFilterProxy.cpp
@@ -103,7 +122,14 @@ qt_add_qml_module(GambasseQml
         qml/components/GxGroup.qml
         qml/components/GxTextArea.qml
         qml/components/GxCheckField.qml
+        qml/components/GxTabView.qml
+        qml/components/GxActionButton.qml
         qml/windows/HistoryWindow.qml
+        qml/windows/ConsultationWindow.qml
+        qml/windows/ConsultationList.qml
+        qml/windows/AdultConsultationForm.qml
+        qml/windows/PregnancyConsultationForm.qml
+        qml/windows/PediatricConsultationForm.qml
         qml/windows/AdultHistoryForm.qml
         qml/windows/PediatricHistoryForm.qml
         qml/windows/PregnancyHistoryForm.qml

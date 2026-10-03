@@ -93,10 +93,13 @@ private slots:
     void numberInput();
     void dateInput();
     void comboInput();
+    void comboPopupHighlightIsReadable();
+    void comboPopupScrollsLongLists();
     void label();
     void checkBox();
     void fieldTextFitsTheBox();
     void group();
+    void tabView();
 };
 
 void TestQmlComponents::initTestCase() {
@@ -283,6 +286,114 @@ void TestQmlComponents::comboInput() {
     delete harness.window;
 }
 
+void TestQmlComponents::comboPopupHighlightIsReadable() {
+    // The entry under the cursor must keep a readable text in both themes:
+    // the Basic delegate painted it white on near white in the light theme.
+    const auto luminance = [](const QColor& c) {
+        return 0.2126 * c.redF() + 0.7152 * c.greenF() + 0.0722 * c.blueF();
+    };
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        QQmlApplicationEngine engine;
+        Harness harness;
+        QVERIFY(openHarness(&engine, "GxComboInput.qml", mode, harness));
+        QObject* root = harness.component;
+        root->setProperty("width", 300);
+        root->setProperty("height", 30);
+        harness.window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+        for (const char* text : {"None", "Stable", "Dwelling"})
+            QVERIFY(QMetaObject::invokeMethod(root, "addItem",
+                                             Q_ARG(QVariant, QString::fromLatin1(text)),
+                                             Q_ARG(QVariant, 0)));
+        root->setProperty("currentIndex", 0);
+
+        auto* combo = root->findChild<QQuickItem*>(QStringLiteral("comboBox"));
+        QVERIFY(combo != nullptr);
+        QObject* popup = combo->property("popup").value<QObject*>();
+        QVERIFY(popup != nullptr);
+        combo->forceActiveFocus();
+        QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+        QTRY_VERIFY(popup->property("opened").toBool());
+        // Move the highlight to the second entry with the keyboard.
+        QTest::keyClick(harness.window, Qt::Key_Down);
+        QTRY_COMPARE(combo->property("highlightedIndex").toInt(), 1);
+
+        QList<QQuickItem*> entries;
+        collectVisualItems(harness.window->contentItem(), QStringLiteral("comboEntry"), entries);
+        QCOMPARE(entries.size(), 3);
+        int highlighted = 0;
+        for (QQuickItem* entry : entries) {
+            auto* text = entry->findChild<QQuickItem*>(QStringLiteral("comboEntryText"));
+            auto* background = entry->findChild<QQuickItem*>(QStringLiteral("comboEntryBackground"));
+            QVERIFY(text != nullptr && background != nullptr);
+            const QColor fg = text->property("color").value<QColor>();
+            const QColor bg = background->property("color").value<QColor>();
+            QVERIFY2(qAbs(luminance(fg) - luminance(bg)) > 0.4,
+                     qPrintable(QStringLiteral("%1: %2 on %3")
+                                    .arg(mode, fg.name(), bg.name())));
+            if (entry->property("highlighted").toBool())
+                ++highlighted;
+        }
+        QCOMPARE(highlighted, 1);
+        delete harness.window;
+    }
+}
+
+void TestQmlComponents::comboPopupScrollsLongLists() {
+    // A long list (the 153 active ingredients) shows about ten entries and a
+    // visible scroll bar; a short one shows every entry and no bar.
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        for (int count : {40, 3}) {
+            QQmlApplicationEngine engine;
+            Harness harness;
+            QVERIFY(openHarness(&engine, "GxComboInput.qml", mode, harness));
+            QObject* root = harness.component;
+            root->setProperty("width", 300);
+            root->setProperty("height", 30);
+            harness.window->show();
+            QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+            for (int i = 0; i < count; ++i)
+                QVERIFY(QMetaObject::invokeMethod(root, "addItem",
+                                                 Q_ARG(QVariant, QStringLiteral("Entry %1").arg(i)),
+                                                 Q_ARG(QVariant, i)));
+            root->setProperty("currentIndex", 0);
+            auto* combo = root->findChild<QQuickItem*>(QStringLiteral("comboBox"));
+            QVERIFY(combo != nullptr);
+            QObject* popup = combo->property("popup").value<QObject*>();
+            QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+            QTRY_VERIFY(popup->property("opened").toBool());
+
+            QList<QQuickItem*> found;
+            collectVisualItems(harness.window->contentItem(), QStringLiteral("comboPopupList"), found);
+            QCOMPARE(found.size(), 1);
+            QQuickItem* list = found.first();
+            found.clear();
+            collectVisualItems(harness.window->contentItem(), QStringLiteral("comboScrollBar"), found);
+            QCOMPARE(found.size(), 1);
+            QQuickItem* bar = found.first();
+            QTRY_VERIFY(list->property("contentHeight").toReal() > 0);
+            const qreal entry = list->property("entryHeight").toReal();
+            QVERIFY(entry > 0);
+            if (count > 10) {
+                // Ten entries tall, the rest reached through a visible bar.
+                QCOMPARE(qRound(list->height()), qRound(entry * 10));
+                QVERIFY(list->property("contentHeight").toReal() > list->height());
+                QTRY_VERIFY(bar->isVisible());
+                QVERIFY(bar->property("size").toReal() < 1.0);
+                QVERIFY(bar->width() > 0);
+                auto* handle = bar->findChild<QQuickItem*>(QStringLiteral("comboScrollHandle"));
+                QVERIFY(handle != nullptr);
+                QVERIFY(handle->property("color").value<QColor>()
+                        != list->parentItem()->property("color").value<QColor>());
+            } else {
+                QCOMPARE(qRound(list->height()), qRound(list->property("contentHeight").toReal()));
+                QVERIFY(!bar->isVisible() || bar->property("policy").toInt() == 0);
+            }
+            delete harness.window;
+        }
+    }
+}
+
 void TestQmlComponents::label() {
     QQmlApplicationEngine engine;
     Harness harness;
@@ -458,6 +569,65 @@ void TestQmlComponents::group() {
         root->setProperty("nested", true);
         QCOMPARE(frame->property("color").value<QColor>().alpha(), 0);
         QCOMPARE(frame->property("radius").toReal(), 4.0);
+        delete harness.window;
+    }
+}
+
+void TestQmlComponents::tabView() {
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        QQmlApplicationEngine engine;
+        Harness harness;
+        QVERIFY(openHarness(&engine, "GxTabView.qml", mode, harness));
+        QObject* root = harness.component;
+        root->setProperty("width", 400);
+        root->setProperty("height", 200);
+        root->setProperty("titles", QStringList{QStringLiteral("First"), QStringLiteral("Second"),
+                                                QStringLiteral("Third")});
+        harness.window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+
+        // One page per tab, stacked: only the current one is visible.
+        auto* stack = root->findChild<QQuickItem*>(QStringLiteral("tabStack"));
+        QVERIFY(stack != nullptr);
+        QQmlComponent pageComponent(&engine);
+        pageComponent.setData("import QtQuick\nItem {}", QUrl());
+        QList<QQuickItem*> pages;
+        for (int i = 0; i < 3; ++i) {
+            auto* page = qobject_cast<QQuickItem*>(pageComponent.create());
+            QVERIFY(page != nullptr);
+            page->setParent(stack);
+            page->setParentItem(stack);
+            pages.append(page);
+        }
+
+        QList<QQuickItem*> tabs;
+        for (int i = 0; i < 3; ++i) {
+            QList<QQuickItem*> found;
+            collectVisualItems(asItem(root), QStringLiteral("tab%1").arg(i), found);
+            QCOMPARE(found.size(), 1);
+            tabs.append(found.first());
+        }
+        QCOMPARE(tabs[0]->property("text").toString(), QStringLiteral("First"));
+        QCOMPARE(tabs[0]->property("checked").toBool(), true);
+        QTRY_VERIFY(pages[0]->isVisible());
+        QVERIFY(!pages[1]->isVisible());
+
+        // Clicking a tab selects it and shows its page; neighbours share
+        // their border line and each tab is as wide as its caption.
+        const QPointF centre = tabs[1]->mapToScene(QPointF(tabs[1]->width() / 2, 12));
+        QTest::mouseClick(harness.window, Qt::LeftButton, Qt::NoModifier, centre.toPoint());
+        QTRY_COMPARE(root->property("currentIndex").toInt(), 1);
+        QCOMPARE(tabs[1]->property("checked").toBool(), true);
+        QCOMPARE(tabs[0]->property("checked").toBool(), false);
+        QTRY_VERIFY(pages[1]->isVisible());
+        QVERIFY(!pages[0]->isVisible());
+        QCOMPARE(tabs[1]->x(), tabs[0]->x() + tabs[0]->width() - 1);
+        QCOMPARE(tabs[0]->height(), 25.0);
+
+        // A tighter padding narrows every tab by the same amount.
+        const qreal wide = tabs[2]->width();
+        root->setProperty("tabPadding", 5);
+        QTRY_COMPARE(tabs[2]->width(), wide - 16);
         delete harness.window;
     }
 }

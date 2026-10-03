@@ -3,13 +3,16 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTemporaryDir>
+#include <QTranslator>
 #include <QtTest>
 
 #include <Paths.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
+#include <logic/ConsultationService.h>
 #include <logic/PatientService.h>
 #include <ui/controller/PatientController.h>
+#include <ui/controller/PediatricConsultationController.h>
 
 namespace gambasse {
 namespace {
@@ -77,6 +80,8 @@ private slots:
     void removeDeletesAndReselects();
     void historyAvailabilityFollowsSelection();
     void editingLocksTheSelection();
+    void adultConsultationOpensWithTheList();
+    void pediatricOptionsFollowTheLanguage();
 };
 
 void TestPatientController::initTestCase() {
@@ -412,6 +417,123 @@ void TestPatientController::editingLocksTheSelection() {
     QVERIFY(controller.canCreateAdult());
     controller.selectRow(other);
     QCOMPARE(controller.currentRow(), other); // unlocked again
+}
+
+void TestPatientController::adultConsultationOpensWithTheList() {
+    Patient patient = makePatient(QStringLiteral("PCONTROL_CONSULT"));
+    QCOMPARE(static_cast<int>(m_service.create(patient)), kSaved);
+    QSqlQuery history(Database::instance().connection());
+    history.prepare(QStringLiteral("INSERT INTO b03_adult_history (patient_id) VALUES (?)"));
+    history.addBindValue(patient.id);
+    QVERIFY(history.exec());
+    AdultConsultationService service;
+    for (int day : {1, 2}) {
+        AdultConsultation c = service.newConsultation(patient.id);
+        c.date = QDateTime(QDate(2026, 4, day), QTime(9, 30));
+        c.reason = QStringLiteral("Visit %1").arg(day);
+        QCOMPARE(service.save(c), AdultConsultationService::SaveResult::Saved);
+    }
+
+    PatientController controller;
+    QVERIFY(controller.load());
+    controller.selectRow(0);
+    QSignalSpy openSpy(&controller, &PatientController::openConsultationScreen);
+    controller.openAdultConsultation();
+    QCOMPARE(openSpy.count(), 1);
+    QCOMPARE(openSpy.first().at(0).toString(), QStringLiteral("adult"));
+    auto* consultation = openSpy.first().at(1).value<ConsultationController*>();
+    QVERIFY(consultation != nullptr);
+
+    // The list, most recent first, and a new consultation dated today.
+    QVERIFY(consultation->loaded());
+    QCOMPARE(consultation->patientName(), patient.name);
+    const QVariantList rows = consultation->consultations();
+    QCOMPARE(rows.size(), 2);
+    QCOMPARE(rows.at(0).toMap().value(QStringLiteral("date")).toString(),
+             QStringLiteral("02/04/2026 09:30"));
+    QCOMPARE(rows.at(0).toMap().value(QStringLiteral("reason")).toString(),
+             QStringLiteral("Visit 2"));
+    QVERIFY(consultation->isNew());
+    QCOMPARE(consultation->currentIndex(), -1);
+    QVERIFY(!consultation->canDelete());
+    QVERIFY(!consultation->canStartNew());
+    QCOMPARE(consultation->dateText(), QDate::currentDate().toString(QStringLiteral("dd/MM/yyyy")));
+    QCOMPARE(consultation->value(QStringLiteral("reason")).toString(), QString());
+
+    // Selecting a row edits that consultation.
+    consultation->select(1);
+    QCOMPARE(consultation->currentIndex(), 1);
+    QCOMPARE(consultation->value(QStringLiteral("reason")).toString(), QStringLiteral("Visit 1"));
+    QCOMPARE(consultation->dateText(), QStringLiteral("01/04/2026"));
+    QVERIFY(consultation->canDelete());
+    QVERIFY(consultation->canStartNew());
+
+    // A new one saved stays edited, first in the list.
+    consultation->startNew();
+    consultation->setValue(QStringLiteral("reason"), QStringLiteral("Today"));
+    consultation->setValue(QStringLiteral("lesionRegion3"), QStringLiteral("47"));
+    QCOMPARE(consultation->save(), 0);
+    QCOMPARE(consultation->consultations().size(), 3);
+    QCOMPARE(consultation->currentIndex(), 0);
+    QVERIFY(!consultation->isNew());
+    QCOMPARE(consultation->value(QStringLiteral("lesionRegion3")).toInt(), 47);
+
+    // Deleting it leaves a new consultation.
+    QVERIFY(consultation->remove());
+    QCOMPARE(consultation->consultations().size(), 2);
+    QVERIFY(consultation->isNew());
+    QCOMPARE(consultation->value(QStringLiteral("reason")).toString(), QString());
+    QVERIFY(!consultation->remove());
+}
+
+void TestPatientController::pediatricOptionsFollowTheLanguage() {
+    Patient child = makePatient(QStringLiteral("PCONTROL_CHILD"));
+    child.ageRange = 5;
+    child.birthDate = QDate::currentDate().addYears(-5);
+    QCOMPARE(static_cast<int>(m_service.create(child)), kSaved);
+    QSqlQuery history(Database::instance().connection());
+    history.prepare(QStringLiteral("INSERT INTO b05_pediatric_history (patient_id) VALUES (?)"));
+    history.addBindValue(child.id);
+    QVERIFY(history.exec());
+
+    PatientController controller;
+    QVERIFY(controller.load());
+    controller.selectRow(0);
+    QSignalSpy openSpy(&controller, &PatientController::openConsultationScreen);
+    controller.openPediatricConsultation();
+    QCOMPARE(openSpy.count(), 1);
+    auto* consultation =
+        qobject_cast<PediatricConsultationController*>(openSpy.first().at(1).value<QObject*>());
+    QVERIFY(consultation != nullptr);
+
+    const auto labelOf = [consultation](const char* domain, int code) {
+        const QVariantList options =
+            consultation->domainOptions().value(QLatin1String(domain)).toList();
+        for (const QVariant& option : options) {
+            if (option.toMap().value(QStringLiteral("value")).toInt() == code)
+                return option.toMap().value(QStringLiteral("label")).toString();
+        }
+        return QString();
+    };
+    QCOMPARE(consultation->domainOptions().size(), 28);
+    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Disinfectant:"));
+
+    // The selection is the code: it survives a save and a language change.
+    consultation->setValue(QStringLiteral("treatmentMedication1"), 1001);
+    consultation->setValue(QStringLiteral("treatmentMedication2"), 500); // not a code
+    QCOMPARE(consultation->save(), 0);
+    QTranslator portuguese;
+    QVERIFY(portuguese.load(QStringLiteral("gambasse_pt"), QStringLiteral(":/i18n")));
+    QCoreApplication::installTranslator(&portuguese);
+    QSignalSpy optionsSpy(consultation, &PediatricConsultationController::domainOptionsChanged);
+    consultation->refreshLanguage();
+    QCOMPARE(optionsSpy.count(), 1);
+    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Desinfectante:"));
+    QCOMPARE(consultation->value(QStringLiteral("treatmentMedication1")).toInt(), 1001);
+    QCOMPARE(consultation->value(QStringLiteral("treatmentMedication2")).toInt(), 0);
+    QCoreApplication::removeTranslator(&portuguese);
+    consultation->refreshLanguage();
+    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Disinfectant:"));
 }
 
 } // namespace gambasse

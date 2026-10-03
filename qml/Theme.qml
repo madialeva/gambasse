@@ -94,6 +94,10 @@ QtObject {
     readonly property color alternateRowBackground: dark ? "#353535" : "#ECEAE3"
     readonly property color danger: "#E81123"
     readonly property color dangerPressed: "#A00A18"
+    // Veil over the patient screen while a history or consultation window
+    // is open on top of it, so only the window in front looks active.
+    readonly property color modalVeil: dark ? Qt.rgba(0, 0, 0, 0.6) : Qt.rgba(0, 0, 0, 0.3)
+    readonly property int modalVeilFade: 150
 
     // Check boxes and label highlight.
     readonly property color checkFocusBackground: dark ? "#1E3A55" : "#D9ECFA"

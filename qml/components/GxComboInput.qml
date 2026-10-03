@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -99,6 +100,101 @@ Item {
                 id: comboModel
             }
             onActivated: root.valueSelected()
+
+            // Height of a drop-down entry: one text line plus 4 px above and
+            // below, compact like the QComboBox list.
+            readonly property int entryHeight: Math.ceil(entryMetrics.height) + 8
+            FontMetrics {
+                id: entryMetrics
+                font: combo.font
+            }
+
+            // Drop-down list: at most about ten entries (like QComboBox) and
+            // never beyond the window, with a scroll bar shown whenever the
+            // entries do not fit. The Basic popup only had a scroll indicator,
+            // visible while scrolling, so a long list (the active
+            // ingredients) gave no hint that it went on.
+            popup: Popup {
+                id: dropDown
+                objectName: "comboPopup"
+                readonly property int maxVisibleEntries: 10
+                y: combo.height
+                width: combo.width
+                height: Math.min(Math.min(combo.count, dropDown.maxVisibleEntries) * combo.entryHeight + topPadding + bottomPadding, combo.Window.height - topMargin - bottomMargin)
+                topMargin: 6
+                bottomMargin: 6
+                padding: 1
+                contentItem: ListView {
+                    id: dropDownList
+                    objectName: "comboPopupList"
+                    readonly property int entryHeight: combo.entryHeight
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    model: dropDown.visible ? combo.delegateModel : null
+                    currentIndex: combo.highlightedIndex
+                    highlightMoveDuration: 0
+                    ScrollBar.vertical: ScrollBar {
+                        id: dropDownBar
+                        objectName: "comboScrollBar"
+                        policy: dropDownList.contentHeight > dropDownList.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        // A handle of at least a sixth of the bar, even for
+                        // the 153 active ingredients.
+                        minimumSize: 1 / 6
+                        // A faint track, so the bar reads as one on both themes.
+                        background: Rectangle {
+                            implicitWidth: 10
+                            color: Theme.tabInactiveBottom
+                        }
+                        // Theme colours: the Basic handle follows palette.dark,
+                        // which is the field background in the dark theme.
+                        contentItem: Rectangle {
+                            objectName: "comboScrollHandle"
+                            implicitWidth: 6
+                            radius: 3
+                            color: Theme.comboArrow
+                            opacity: dropDownBar.pressed ? 1.0 : 0.7
+                        }
+                    }
+                }
+                background: Rectangle {
+                    color: Theme.fieldBackground
+                    border.color: Theme.inputBorder
+                    border.width: 1
+                }
+            }
+
+            // Popup entries with the theme colours. The Basic delegate paints
+            // the highlighted entry with the palette's light colour (near
+            // white) and its text with highlightedText, which is white in the
+            // light theme: the entry under the cursor lost its text.
+            delegate: ItemDelegate {
+                id: entry
+                required property var model
+                required property int index
+                objectName: "comboEntry"
+                width: ListView.view ? ListView.view.width : combo.width
+                height: combo.entryHeight
+                topPadding: 0
+                bottomPadding: 0
+                leftPadding: 6
+                rightPadding: 6
+                text: entry.model.text
+                font: combo.font
+                highlighted: combo.highlightedIndex === entry.index
+                hoverEnabled: combo.hoverEnabled
+                contentItem: Text {
+                    objectName: "comboEntryText"
+                    text: entry.text
+                    font: entry.font
+                    color: entry.highlighted ? Theme.highlightedText : Theme.windowText
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    objectName: "comboEntryBackground"
+                    color: entry.highlighted ? Theme.highlight : Theme.fieldBackground
+                }
+            }
 
             // Fusion look of the Widgets QComboBox: a raised gradient button
             // with a small arrow; an editable one shows a line edit on the

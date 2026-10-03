@@ -8,8 +8,11 @@
 #include <data/common/Database.h>
 #include <logic/SexLabel.h>
 #include <ui/DateFormat.h>
+#include <ui/controller/AdultConsultationController.h>
 #include <ui/controller/AdultHistoryController.h>
+#include <ui/controller/PediatricConsultationController.h>
 #include <ui/controller/PediatricHistoryController.h>
+#include <ui/controller/PregnancyConsultationController.h>
 #include <ui/controller/PregnancyHistoryController.h>
 
 namespace gambasse {
@@ -339,6 +342,28 @@ void PatientController::openPregnancyHistory() {
         return;
     }
     emit openHistoryScreen(QStringLiteral("pregnancy"), controller);
+}
+
+void PatientController::openAdultConsultation() {
+    openConsultation(QStringLiteral("adult"), new AdultConsultationController(this));
+}
+
+void PatientController::openPregnancyConsultation() {
+    openConsultation(QStringLiteral("pregnancy"), new PregnancyConsultationController(this));
+}
+
+void PatientController::openPediatricConsultation() {
+    openConsultation(QStringLiteral("pediatric"), new PediatricConsultationController(this));
+}
+
+void PatientController::openConsultation(const QString& screen,
+                                         ConsultationController* controller) {
+    const Patient* p = selectedPatient();
+    if (!p || !controller->load(p->id, p->name)) {
+        delete controller;
+        return;
+    }
+    emit openConsultationScreen(screen, controller);
 }
 
 const Patient* PatientController::selectedPatient() const {

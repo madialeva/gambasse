@@ -12,7 +12,7 @@ Item {
 
     // text | multiline | number | date | combo
     property string type: "text"
-    property HistoryController controller: null
+    property FormController controller: null
     property string field: ""
     property string labelText: ""
     property string labelPosition: "left"

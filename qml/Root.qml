@@ -36,6 +36,7 @@ Window {
     Component.onCompleted: patients.load()
 
     MainWindow {
+        id: mainView
         objectName: "mainView"
         anchors.top: titleBar.bottom
         anchors.left: parent.left
@@ -53,5 +54,31 @@ Window {
     }
     ResizeHandles {
         anchors.fill: parent
+    }
+
+    // While a history or consultation window is open (modal, in front), the
+    // whole shell, title bar included, fades behind a veil so it no longer
+    // looks active. It also swallows the pointer, so nothing underneath
+    // reacts to hovering.
+    Rectangle {
+        objectName: "modalVeil"
+        anchors.fill: parent
+        z: 10
+        color: Theme.modalVeil
+        opacity: mainView.formWindowOpen ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.modalVeilFade
+            }
+        }
+        MouseArea {
+            anchors.fill: parent
+            // Only while the window is open: fading out never blocks.
+            enabled: mainView.formWindowOpen
+            hoverEnabled: true
+            acceptedButtons: Qt.AllButtons
+            onWheel: wheel => wheel.accepted = true
+        }
     }
 }

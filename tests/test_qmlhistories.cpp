@@ -258,6 +258,12 @@ void TestQmlHistories::newHistoryCannotBeDeleted() {
     QVERIFY(!inHistory(QStringLiteral("deleteHistoryButton"))->property("enabled").toBool());
     // The form shows the patient name of the selected patient.
     QCOMPARE(history()->patientName(), m_controller->patientName());
+    // The patient screen behind fades under its veil until the window closes.
+    QQuickItem* veil = child(m_window, QStringLiteral("modalVeil"));
+    QVERIFY(veil != nullptr);
+    QTRY_COMPARE(veil->opacity(), 1.0);
+    qobject_cast<QQuickWindow*>(historyWindow())->close();
+    QTRY_VERIFY(!veil->isVisible());
 }
 
 void TestQmlHistories::formRendersEveryField_data() {

@@ -68,6 +68,10 @@ Item {
             color: readOnly ? Theme.disabledText : Theme.windowText
             placeholderTextColor: Theme.placeholderText
             maximumLength: root.maxLength
+            // A display-only text longer than the field shows its start, like
+            // the original read-only boxes, not the end where setting the
+            // text leaves the cursor.
+            autoScroll: !readOnly
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredHeight: Theme.fieldHeight

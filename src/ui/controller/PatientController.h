@@ -11,6 +11,7 @@
 #include <logic/ClinicalContext.h>
 #include <logic/PatientService.h>
 #include <logic/PhotoManager.h>
+#include <ui/controller/ConsultationController.h>
 #include <ui/controller/HistoryController.h>
 #include <ui/filter/ColumnFilterProxy.h>
 
@@ -118,10 +119,20 @@ public:
     Q_INVOKABLE void openAdultHistory();
     Q_INVOKABLE void openPregnancyHistory();
 
+    // Consultation screens: same pattern, with the list of consultations of
+    // the selected patient loaded (see openConsultationScreen).
+    Q_INVOKABLE void openAdultConsultation();
+    Q_INVOKABLE void openPregnancyConsultation();
+    Q_INVOKABLE void openPediatricConsultation();
+
 signals:
     // The screen to open ("pediatric", "adult", "pregnancy") and the loaded
     // history controller, owned by this object.
     void openHistoryScreen(const QString& screen, gambasse::HistoryController* controller);
+    // The consultation screen to open and its loaded controller, owned by
+    // this object.
+    void openConsultationScreen(const QString& screen,
+                                gambasse::ConsultationController* controller);
     void headersChanged();
     void currentChanged();
     void detailChanged();
@@ -131,6 +142,9 @@ signals:
 
 private:
     const Patient* selectedPatient() const; // proxy row -> source patient
+    // Loads the consultations of the selected patient into the controller and
+    // asks the view to show them; the controller is dropped on failure.
+    void openConsultation(const QString& screen, ConsultationController* controller);
     void refreshDetail(); // fields from selection, defaults or cleared
     void clampSelection(); // valid row after filtering, detail always refreshed
     void updateAvailability();
