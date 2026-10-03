@@ -15,6 +15,7 @@
 #include <ui/InterfaceSettings.h>
 #include <ui/controller/ConsultationController.h>
 #include <ui/controller/PatientController.h>
+#include <ui/controller/PediatricConsultationController.h>
 
 namespace gambasse {
 namespace {
@@ -156,6 +157,7 @@ private slots:
     void titleBadgesLeaveControlsClear();
     void pregnancyFixedRowsAreReadOnly();
     void pediatricCoughAndCodesPersist();
+    void reusedWindowKeepsTheFormControllerTyped();
     void pediatricTabsShowWholeCaptions_data();
     void pediatricTabsShowWholeCaptions();
 };
@@ -550,6 +552,30 @@ void TestQmlConsultations::pediatricCoughAndCodesPersist() {
     QVERIFY(shown != nullptr);
     QTRY_COMPARE(shown->property("text").toString(), QStringLiteral("Desinfectante:"));
     settings->setLanguage(QStringLiteral("en"));
+}
+
+// The window is reused between screens: opening the pediatric consultation
+// after another one must not hand the previous controller to the pediatric
+// form, whose controller property has the pediatric type.
+void TestQmlConsultations::reusedWindowKeepsTheFormControllerTyped() {
+    const ScreenData adult = screenData().at(0);
+    open(adult, 1);
+    consultationWindow()->close();
+    QSqlQuery history(Database::instance().connection());
+    history.prepare(QStringLiteral("INSERT INTO b05_pediatric_history (patient_id) VALUES (?)"));
+    history.addBindValue(m_patientId);
+    QVERIFY2(history.exec(), qPrintable(history.lastError().text()));
+
+    QTest::failOnWarning(QRegularExpression(QStringLiteral("Cannot assign")));
+    m_controller->openPediatricConsultation();
+    QTRY_VERIFY(consultationWindow()->isVisible());
+    QVERIFY(qobject_cast<PediatricConsultationController*>(
+                consultationWindow()->property("controller").value<QObject*>())
+            != nullptr);
+    auto* form = consultationWindow()->findChild<QQuickItem*>(QStringLiteral("consultationForm"));
+    QVERIFY(form != nullptr);
+    QCOMPARE(form->property("item").value<QObject*>()->property("controller").value<QObject*>(),
+             consultationWindow()->property("controller").value<QObject*>());
 }
 
 void TestQmlConsultations::pediatricTabsShowWholeCaptions_data() {

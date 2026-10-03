@@ -156,6 +156,10 @@ Item {
             historyWindow.present();
         }
         function onOpenConsultationScreen(screen, consultationController) {
+            // The window is reused: changing screenId reloads the form, which
+            // must not receive the previous screen's controller (the pediatric
+            // form types its controller property).
+            consultationWindow.controller = null;
             consultationWindow.screenId = screen;
             consultationWindow.screenTitle = screen === "adult" ? qsTr("Adult Consultation") : screen === "pediatric" ? qsTr("Pediatric Consultation") : qsTr("Pregnancy Consultation");
             consultationWindow.controller = consultationController;
