@@ -137,6 +137,14 @@ application in `lib/` using `--base <root>`. `windeployqt` must get
 `--qmldir qml` so the Qt Quick modules ship. Windows GUI diagnostics must be piped
 or redirected because the process has no standard console.
 
+The Linux package (`deploy-linux.sh`, a tar.gz) has no launcher: the executable
+sits at the root with RUNPATH `$ORIGIN/lib`, and Qt libraries, plugins and QML
+modules live in `lib/`, so `basePath()` is the extracted directory. It must never
+ship a `database.db` or `config.ini`. A QML module the views start importing must
+also be added to the QML copy list in the script (the Basic style is the only
+Controls style shipped). Verify a package with `--check-db` under
+`QT_QPA_PLATFORM=offscreen` and an empty environment (`env -i`).
+
 ## Working preferences
 
 - Conversation with the user in Spanish.
