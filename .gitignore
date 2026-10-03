@@ -6,6 +6,8 @@ cmake-build-*/
 
 # Deploy / empaquetado
 deploy/
+deploy-linux/
+build-deploy/
 
 # Qt / MOC / UIC / RCC generados
 *_autogen/

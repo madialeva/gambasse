@@ -1,0 +1,69 @@
+GAMBASSE - Linux (64 bits)
+==========================
+
+[ES] CÓMO ARRANCAR
+  1. Extraiga el archivo .tar.gz (clic derecho -> "Extraer aquí").
+  2. Abra la carpeta extraída y haga doble clic en "Gambasse".
+     Si el gestor de archivos le pregunta, elija "Ejecutar".
+     También puede abrir una terminal en la carpeta y escribir:  ./Gambasse
+  No hace falta instalar nada ni ser administrador.
+
+  Los datos (base de datos "database.db", fotos en "fotos/" y la
+  configuración "config.ini") se guardan en esta misma carpeta. Para hacer
+  una copia de seguridad o llevar el programa a otro equipo, copie la
+  carpeta entera. Se crean la primera vez que se usa el programa.
+
+  Requisitos: un Linux de 64 bits con escritorio gráfico y glibc 2.34 o
+  superior (Ubuntu 22.04, Debian 12, Fedora 35, RHEL/Alma/Rocky 9 o
+  posteriores).
+
+  Si el programa no arranca y habla de una librería que falta, instale estos
+  paquetes y vuelva a intentarlo:
+    Debian/Ubuntu:  sudo apt install libgl1 libopengl0 libegl1 libfontconfig1 \
+                    libfreetype6 libharfbuzz0b libglib2.0-0 libdbus-1-3 \
+                    libx11-6 libx11-xcb1 libxcb1
+    Fedora:         sudo dnf install mesa-libGL mesa-libEGL libglvnd-opengl \
+                    fontconfig freetype harfbuzz glib2 dbus-libs libX11 libxcb
+  En un equipo muy antiguo o sin aceleración gráfica, pruebe:
+    QT_QUICK_BACKEND=software ./Gambasse
+
+[PT] COMO ARRANCAR
+  1. Extraia o ficheiro .tar.gz (clique com o botão direito -> "Extrair aqui").
+  2. Abra a pasta extraída e faça duplo clique em "Gambasse".
+     Se o gestor de ficheiros perguntar, escolha "Executar".
+     Também pode abrir um terminal na pasta e escrever:  ./Gambasse
+  Não é preciso instalar nada nem ser administrador.
+
+  Os dados (base de dados "database.db", fotografias em "fotos/" e a
+  configuração "config.ini") ficam nesta mesma pasta. Para fazer uma cópia
+  de segurança ou levar o programa para outro computador, copie a pasta
+  inteira. São criados na primeira vez que o programa é usado.
+
+  Requisitos: um Linux de 64 bits com ambiente gráfico e glibc 2.34 ou
+  superior (Ubuntu 22.04, Debian 12, Fedora 35, RHEL/Alma/Rocky 9 ou
+  posteriores).
+
+  Se o programa não arrancar e indicar uma biblioteca em falta, instale
+  estes pacotes e tente de novo (comandos na secção [ES]).
+  Num computador muito antigo ou sem aceleração gráfica, experimente:
+    QT_QUICK_BACKEND=software ./Gambasse
+
+[EN] HOW TO START
+  1. Extract the .tar.gz archive (right click -> "Extract Here").
+  2. Open the extracted folder and double-click "Gambasse".
+     If the file manager asks, choose "Run".
+     Or open a terminal in the folder and type:  ./Gambasse
+  Nothing to install and no administrator rights needed.
+
+  The data (the "database.db" database, photos in "fotos/" and the
+  "config.ini" settings) is stored in this same folder. To back it up or
+  move the program to another computer, copy the whole folder. They are
+  created the first time the program is used.
+
+  Requirements: a 64-bit Linux with a graphical desktop and glibc 2.34 or
+  newer (Ubuntu 22.04, Debian 12, Fedora 35, RHEL/Alma/Rocky 9 or later).
+
+  If the program does not start and names a missing library, install the
+  packages listed in the [ES] section and try again.
+  On a very old computer or without graphics acceleration, try:
+    QT_QUICK_BACKEND=software ./Gambasse

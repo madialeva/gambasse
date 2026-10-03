@@ -40,6 +40,7 @@
 | ✅ | Patient CRUD |
 | ✅ | Language/theme selection |
 | ✅ | Windows launcher |
+| ✅ | Linux package (tar.gz) |
 | ✅ | Automatic database creation and schema migration |
 | ✅ | Histories |
 | ✅ | Consultations |
@@ -77,6 +78,7 @@ baselined without re-running the initial schema, so its data is preserved.
   Qml, Quick and QuickControls2, plus the `qmllint`/`qmlformat` tools.
 - CMake 3.21+ and Ninja.
 - Windows deployment: a Qt MinGW kit, `windeployqt`, and MinGW runtime DLLs.
+- Linux deployment: `patchelf` and `ldd` besides the tools above.
 
 ## Linux development
 
@@ -132,6 +134,38 @@ layout:
 
 The launcher starts `lib/gambasse.exe --base <destination>`, keeping Qt DLLs
 beside the application while data remains at the distribution root.
+
+## Linux deployment
+
+`deploy-linux.sh` builds in Release and creates
+`deploy-linux/gambasse-<version>-linux-x86_64.tar.gz` (the version comes from
+`CMakeLists.txt`) plus the extracted directory beside it. Set
+`QT_PREFIX=/path/to/Qt/6.x/gcc_64` to use a Qt kit other than the system one.
+It needs `cmake`, `ninja`, `patchelf` and `ldd`.
+
+```text
+gambasse-<version>-linux-x86_64/
+├── Gambasse           the application (RUNPATH $ORIGIN/lib)
+├── qt.conf            plugin and QML paths relative to lib/
+├── LEEME-linux.txt    end-user instructions (ES/PT/EN)
+├── fotos/
+└── lib/
+    ├── Qt libraries and their third-party dependencies
+    ├── plugins/       xcb, offscreen, SQLite, JPEG/SVG, input contexts
+    └── qml/           QtQml and the QtQuick modules the views import
+```
+
+There is no launcher: the executable sits at the root, so the base path is
+the extracted directory and `config.ini`, `database.db` and `fotos/` live
+there, as on Windows. The package ships no database or `config.ini`; the
+application creates and migrates the database on first run. The archive keeps
+the executable bit, so users only extract it and double-click `Gambasse`.
+
+The graphics stack (OpenGL/EGL, X11/xcb core, fontconfig, FreeType, HarfBuzz,
+GLib, D-Bus) and the C/C++ runtime are not bundled; every desktop provides
+them. The minimum target system is set by the glibc of the build machine: the
+script prints it at the end (glibc 2.34 when built on Oracle Linux 9, which
+covers Ubuntu 22.04+, Debian 12+, Fedora 35+ and RHEL 9+).
 
 ## Diagnostics
 
