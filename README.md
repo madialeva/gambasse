@@ -42,7 +42,7 @@
 | ✅ | Windows launcher |
 | ✅ | Automatic database creation and schema migration |
 | ✅ | Histories |
-| ⬜ | Consultations |
+| ✅ | Consultations |
 | ⬜ | Interactive photo management |
 | ⬜ | USB backup |
 

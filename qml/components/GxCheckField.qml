@@ -7,7 +7,7 @@ import Gambasse
 GxCheck {
     id: root
 
-    property HistoryController controller: null
+    property FormController controller: null
     property string field: ""
     property bool readOnly: false
 

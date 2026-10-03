@@ -143,7 +143,7 @@ Window {
         width: root.contentWidth
         height: root.contentHeight
 
-        ActionButton {
+        GxActionButton {
             objectName: "deleteHistoryButton"
             x: root.deleteButtonRect.x
             y: root.deleteButtonRect.y
@@ -154,7 +154,7 @@ Window {
             enabled: root.ready && root.controller.canDelete
             onClicked: root.requestDelete()
         }
-        ActionButton {
+        GxActionButton {
             objectName: "saveHistoryButton"
             x: root.saveButtonRect.x
             y: root.saveButtonRect.y
@@ -164,7 +164,7 @@ Window {
             enabled: root.ready
             onClicked: root.requestSave()
         }
-        ActionButton {
+        GxActionButton {
             objectName: "exitHistoryButton"
             x: root.exitButtonRect.x
             y: root.exitButtonRect.y
@@ -193,23 +193,6 @@ Window {
             // Widgets windows did after a successful delete.
             root.controller.load(root.controller.patientId, root.controller.patientName);
             root.historyChanged();
-        }
-    }
-
-    component ActionButton: Button {
-        id: actionButton
-        font.bold: true
-        background: Rectangle {
-            color: !actionButton.enabled ? Theme.accentDisabledBackground : (actionButton.down ? Theme.accentPressed : (actionButton.hovered ? Theme.accentHover : Theme.accentBackground))
-            border.color: !actionButton.enabled ? Theme.accentDisabledBorder : Theme.accentBorder
-            radius: 4
-        }
-        contentItem: Text {
-            text: actionButton.text
-            color: !actionButton.enabled ? Theme.accentDisabledText : Theme.accentText
-            font: actionButton.font
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
         }
     }
 }

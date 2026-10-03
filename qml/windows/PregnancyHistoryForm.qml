@@ -1,7 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
 import Gambasse
 
 // Pregnancy history form (Widgets PregnancyHistoryWindow): personal data,
@@ -17,11 +15,12 @@ Item {
     property HistoryController controller: null
 
     // Previous treatment: five rows of date / medication / dose at the
-    // coordinates of the .cpp arrays (prevY, prevH).
+    // coordinates of the .cpp arrays (prevY, prevH). The first row keeps the
+    // 22 px of the others, its column captions are labels above it.
     readonly property var previousRows: [
         {
-            "y": 51,
-            "h": 38,
+            "y": 66,
+            "h": 22,
             "date": "supplementDate1",
             "medication": "supplementMedication1",
             "dose": "supplementDose1"
@@ -64,8 +63,8 @@ Item {
             "labelX": 19,
             "labelY": 32,
             "labelW": 116,
-            "fieldY": 13,
-            "fieldH": 38,
+            "fieldY": 30,
+            "fieldH": 21,
             "fixed": false,
             "fields": ["supplementCalciumD", "supplementCalciumM", "supplementCalciumPd"]
         },
@@ -666,258 +665,179 @@ Item {
         height: 295
         title: ""
 
-        Item {
-            id: tabWidget
+        GxTabView {
+            objectName: "treatmentTabs"
             x: 7
             y: 16
             width: 501
             height: 271
+            titles: [qsTr("Previous treatment"), qsTr("Current treatments")]
 
-            // QTabBar look (Fusion): each tab as wide as its caption, the
-            // selected one 2 px taller and open towards the page, the others
-            // closed by the page frame line.
-            // A plain row rather than a TabBar: the TabBar list view shifts
-            // and stretches its buttons, and these tabs need exact geometry.
+            // Previous treatment: five rows of date, medication, dose.
             Item {
-                id: treatmentTabs
-                objectName: "treatmentTabs"
-                property int currentIndex: 0
-                // Above the page frame: the selected tab hides its top line.
-                z: 1
-                width: parent.width
-                height: 25
-                Row {
-                    // Neighbouring tabs share their border line.
-                    spacing: -1
-                    TreatmentTab {
-                        index: 0
-                        text: qsTr("Previous treatment")
-                    }
-                    TreatmentTab {
-                        index: 1
-                        text: qsTr("Current treatments")
+                objectName: "previousTreatmentPage"
+
+                GxLabel {
+                    x: 11
+                    y: 3
+                    width: 327
+                    height: 52
+                    text: qsTr("MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON")
+                }
+                // Column captions above the first row.
+                Repeater {
+                    model: [
+                        {
+                            "x": 5,
+                            "w": 100,
+                            "caption": qsTr("Date:")
+                        },
+                        {
+                            "x": 111,
+                            "w": 179,
+                            "caption": qsTr("Medication:")
+                        },
+                        {
+                            "x": 296,
+                            "w": 183,
+                            "caption": qsTr("Dose:")
+                        }
+                    ]
+                    delegate: GxLabel {
+                        required property var modelData
+                        x: modelData.x
+                        y: 46
+                        width: modelData.w
+                        height: 17
+                        text: modelData.caption
                     }
                 }
-            }
+                Repeater {
+                    model: root.previousRows
+                    delegate: Item {
+                        id: previousRow
+                        required property var modelData
+                        required property int index
+                        x: 0
+                        y: previousRow.modelData.y
+                        width: parent ? parent.width : 0
+                        height: previousRow.modelData.h
 
-            // Page frame of the tab widget; the page content sits 2 px inside
-            // it, where the QTabWidget places its stacked page.
-            Rectangle {
-                objectName: "treatmentPageFrame"
-                x: 0
-                y: 24
-                width: tabWidget.width
-                height: tabWidget.height - 25
-                color: Theme.tabPage
-                border.color: Theme.inputBorder
-                border.width: 1
-
-                Item {
-                    x: 2
-                    y: 2
-                    width: parent.width - 4
-                    height: parent.height - 3
-
-                    StackLayout {
-                        anchors.fill: parent
-                        currentIndex: treatmentTabs.currentIndex
-
-                        // Previous treatment: five rows of date, medication, dose.
-                        Item {
-                            objectName: "previousTreatmentPage"
-
-                            GxLabel {
-                                x: 11
-                                y: 3
-                                width: 327
-                                height: 52
-                                text: qsTr("MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON")
-                            }
-                            Repeater {
-                                model: root.previousRows
-                                delegate: Item {
-                                    id: previousRow
-                                    required property var modelData
-                                    required property int index
-                                    x: 0
-                                    y: previousRow.modelData.y
-                                    width: parent ? parent.width : 0
-                                    height: previousRow.modelData.h
-
-                                    GxField {
-                                        x: 5
-                                        width: 100
-                                        height: previousRow.modelData.h
-                                        controller: root.controller
-                                        field: previousRow.modelData.date
-                                        type: "date"
-                                        labelPosition: previousRow.index === 0 ? "above" : "left"
-                                        labelText: previousRow.index === 0 ? qsTr("Date:") : ""
-                                    }
-                                    GxField {
-                                        x: 111
-                                        width: 179
-                                        height: previousRow.modelData.h
-                                        controller: root.controller
-                                        field: previousRow.modelData.medication
-                                        labelPosition: previousRow.index === 0 ? "above" : "left"
-                                        labelText: previousRow.index === 0 ? qsTr("Medication:") : ""
-                                        maxLength: 100
-                                    }
-                                    GxField {
-                                        x: 296
-                                        width: 183
-                                        height: previousRow.modelData.h
-                                        controller: root.controller
-                                        field: previousRow.modelData.dose
-                                        labelPosition: previousRow.index === 0 ? "above" : "left"
-                                        labelText: previousRow.index === 0 ? qsTr("Dose:") : ""
-                                        maxLength: 100
-                                    }
-                                }
-                            }
+                        GxField {
+                            x: 5
+                            width: 100
+                            height: previousRow.modelData.h
+                            controller: root.controller
+                            field: previousRow.modelData.date
+                            type: "date"
                         }
-
-                        // Current treatments: seven rows of dose, medication and
-                        // next dose; the caption sits on the left of the row.
-                        Item {
-                            objectName: "currentTreatmentPage"
-
-                            Repeater {
-                                model: root.currentRows
-                                delegate: Item {
-                                    id: currentRow
-                                    required property var modelData
-                                    required property int index
-                                    x: 0
-                                    y: 0
-                                    width: parent ? parent.width : 0
-                                    height: parent ? parent.height : 0
-
-                                    GxLabel {
-                                        x: currentRow.modelData.labelX
-                                        y: currentRow.modelData.labelY
-                                        width: currentRow.modelData.labelW
-                                        height: 17
-                                        text: currentRow.modelData.caption
-                                    }
-                                    GxField {
-                                        x: 141
-                                        y: currentRow.modelData.fieldY
-                                        width: 100
-                                        height: currentRow.modelData.fieldH
-                                        controller: root.controller
-                                        field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[0]
-                                        staticText: currentRow.modelData.fixed ? currentRow.modelData.values[0] : ""
-                                        readOnly: currentRow.modelData.fixed
-                                        labelPosition: currentRow.index === 0 ? "above" : "left"
-                                        labelText: currentRow.index === 0 ? qsTr("Dose:") : ""
-                                        maxLength: 50
-                                    }
-                                    GxField {
-                                        x: 240
-                                        y: currentRow.modelData.fieldY
-                                        width: 109
-                                        height: currentRow.modelData.fieldH
-                                        controller: root.controller
-                                        field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[1]
-                                        staticText: currentRow.modelData.fixed ? currentRow.modelData.values[1] : ""
-                                        readOnly: currentRow.modelData.fixed
-                                        labelPosition: currentRow.index === 0 ? "above" : "left"
-                                        labelText: currentRow.index === 0 ? qsTr("Medication:") : ""
-                                        maxLength: 50
-                                    }
-                                    GxField {
-                                        x: 348
-                                        y: currentRow.modelData.fieldY
-                                        width: 127
-                                        height: currentRow.modelData.fieldH
-                                        controller: root.controller
-                                        field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[2]
-                                        staticText: currentRow.modelData.fixed ? currentRow.modelData.values[2] : ""
-                                        readOnly: currentRow.modelData.fixed
-                                        labelPosition: currentRow.index === 0 ? "above" : "left"
-                                        labelText: currentRow.index === 0 ? qsTr("Next dose:") : ""
-                                        maxLength: 50
-                                    }
-                                }
-                            }
+                        GxField {
+                            x: 111
+                            width: 179
+                            height: previousRow.modelData.h
+                            controller: root.controller
+                            field: previousRow.modelData.medication
+                            maxLength: 100
+                        }
+                        GxField {
+                            x: 296
+                            width: 183
+                            height: previousRow.modelData.h
+                            controller: root.controller
+                            field: previousRow.modelData.dose
+                            maxLength: 100
                         }
                     }
                 }
             }
-        }
-    }
 
-    component TreatmentTab: TabButton {
-        id: tabButton
-        required property int index
-        width: implicitWidth
-        height: 25
-        z: checked ? 1 : 0
-        checked: treatmentTabs.currentIndex === index
-        leftPadding: 13
-        rightPadding: 13
-        topPadding: 0
-        bottomPadding: 1
-        onClicked: treatmentTabs.currentIndex = index
-        // Painted by a plain child rather than the background: the
-        // control re-positions its background item on state changes.
-        background: null
-        Item {
-            z: -1
-            width: tabButton.width
-            height: tabButton.height
-            Rectangle {
-                y: tabButton.checked ? 0 : 2
-                width: parent.width
-                height: tabButton.checked ? parent.height : parent.height - 3
-                gradient: Gradient {
-                    GradientStop {
-                        position: 0.0
-                        color: tabButton.checked ? Theme.tabTop : Theme.tabInactiveTop
+            // Current treatments: seven rows of dose, medication and
+            // next dose; the caption sits on the left of the row.
+            Item {
+                objectName: "currentTreatmentPage"
+
+                // Column captions above the first row.
+                Repeater {
+                    model: [
+                        {
+                            "x": 141,
+                            "w": 100,
+                            "caption": qsTr("Dose:")
+                        },
+                        {
+                            "x": 240,
+                            "w": 109,
+                            "caption": qsTr("Medication:")
+                        },
+                        {
+                            "x": 348,
+                            "w": 127,
+                            "caption": qsTr("Next dose:")
+                        }
+                    ]
+                    delegate: GxLabel {
+                        required property var modelData
+                        x: modelData.x
+                        y: 11
+                        width: modelData.w
+                        height: 17
+                        text: modelData.caption
                     }
-                    GradientStop {
-                        position: 1.0
-                        color: tabButton.checked ? Theme.tabPage : Theme.tabInactiveBottom
+                }
+                Repeater {
+                    model: root.currentRows
+                    delegate: Item {
+                        id: currentRow
+                        required property var modelData
+                        required property int index
+                        x: 0
+                        y: 0
+                        width: parent ? parent.width : 0
+                        height: parent ? parent.height : 0
+
+                        GxLabel {
+                            x: currentRow.modelData.labelX
+                            y: currentRow.modelData.labelY
+                            width: currentRow.modelData.labelW
+                            height: 17
+                            text: currentRow.modelData.caption
+                        }
+                        GxField {
+                            x: 141
+                            y: currentRow.modelData.fieldY
+                            width: 100
+                            height: currentRow.modelData.fieldH
+                            controller: root.controller
+                            field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[0]
+                            staticText: currentRow.modelData.fixed ? currentRow.modelData.values[0] : ""
+                            readOnly: currentRow.modelData.fixed
+                            maxLength: 50
+                        }
+                        GxField {
+                            x: 240
+                            y: currentRow.modelData.fieldY
+                            width: 109
+                            height: currentRow.modelData.fieldH
+                            controller: root.controller
+                            field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[1]
+                            staticText: currentRow.modelData.fixed ? currentRow.modelData.values[1] : ""
+                            readOnly: currentRow.modelData.fixed
+                            maxLength: 50
+                        }
+                        GxField {
+                            x: 348
+                            y: currentRow.modelData.fieldY
+                            width: 127
+                            height: currentRow.modelData.fieldH
+                            controller: root.controller
+                            field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[2]
+                            staticText: currentRow.modelData.fixed ? currentRow.modelData.values[2] : ""
+                            readOnly: currentRow.modelData.fixed
+                            maxLength: 50
+                        }
                     }
                 }
             }
-            Rectangle {
-                y: tabButton.checked ? 0 : 2
-                width: parent.width
-                height: 1
-                color: tabButton.checked ? Theme.inputBorder : Theme.checkBorder
-            }
-            Rectangle {
-                x: 1
-                y: tabButton.checked ? 1 : 3
-                width: parent.width - 2
-                height: 1
-                color: tabButton.checked ? Theme.tabTopLine : Theme.tabInactiveTopLine
-            }
-            Rectangle {
-                y: tabButton.checked ? 0 : 2
-                width: 1
-                height: tabButton.checked ? parent.height : parent.height - 3
-                color: tabButton.checked ? Theme.inputBorder : Theme.checkBorder
-            }
-            Rectangle {
-                anchors.right: parent.right
-                y: tabButton.checked ? 0 : 2
-                width: 1
-                height: tabButton.checked ? parent.height : parent.height - 3
-                color: tabButton.checked ? Theme.inputBorder : Theme.checkBorder
-            }
-        }
-        contentItem: Text {
-            // Unselected captions follow their tab 2 px down.
-            topPadding: tabButton.checked ? 1 : 3
-            text: tabButton.text
-            color: Theme.windowText
-            font: tabButton.font
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
         }
     }
 }

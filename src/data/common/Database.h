@@ -1,11 +1,16 @@
 #pragma once
 
+#include <QDateTime>
+#include <QList>
 #include <QString>
 #include <QSqlDatabase>
 
 #include <data/model/Patient.h>
+#include <data/model/AdultConsultation.h>
 #include <data/model/AdultHistory.h>
+#include <data/model/PediatricConsultation.h>
 #include <data/model/PediatricHistory.h>
+#include <data/model/PregnancyConsultation.h>
 #include <data/model/PregnancyHistory.h>
 
 namespace gambasse {
@@ -51,6 +56,31 @@ public:
     bool insertPregnancyHistory(const PregnancyHistory& history);
     bool updatePregnancyHistory(const PregnancyHistory& history);
     bool removePregnancyHistory(qlonglong patientId);
+
+    // Consultations (b06_adult_consultation, b07_pregnancy_consultation,
+    // b08_pediatric_consultation), keyed by patient and timestamp. M is one of
+    // AdultConsultation, PregnancyConsultation or PediatricConsultation; only
+    // the columns its window manages are read and written (see
+    // ConsultationTable). Updates and deletes locate the row by the stored
+    // key text (Consultation::originalKey).
+    // Consultations of the patient, the most recent first.
+    template <typename M>
+    bool listConsultations(qlonglong patientId, QList<M>& consultations) const;
+    template <typename M>
+    bool hasConsultation(qlonglong patientId, const QString& key) const;
+    // Inserts with key timestampText(date) and sets originalKey to it.
+    template <typename M>
+    bool insertConsultation(M& consultation);
+    template <typename M>
+    bool updateConsultation(const M& consultation);
+    template <typename M>
+    bool removeConsultation(const M& consultation);
+
+    // Timestamp text written to the consultation keys (the format of the
+    // schema default) and its tolerant reader, which also accepts the legacy
+    // variants (fractional seconds, "T" separator, date only).
+    static QString timestampText(const QDateTime& timestamp);
+    static QDateTime parseTimestamp(const QString& text);
 
     // Write operations on b01_patient.
     qlonglong nextId() const;

@@ -10,5 +10,6 @@
     <file alias="sun.svg">img/sun.svg</file>
     <file alias="moon.svg">img/moon.svg</file>
     <file alias="github.svg">img/github.svg</file>
+    <file alias="body-regions.jpg">img/body-regions.jpg</file>
   </qresource>
 </RCC>

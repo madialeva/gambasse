@@ -13,6 +13,8 @@ Item {
     id: root
 
     property PatientController controller: null
+    // A history or consultation window is open in front of this screen.
+    readonly property bool formWindowOpen: historyWindow.visible || consultationWindow.visible
     // User-typed filter per column (survives language-driven rebuilds).
     property var filterTexts: ["", "", "", "", "", "", "", ""]
     // Fixed column widths (identifier column narrow); the last stretches.
@@ -153,6 +155,12 @@ Item {
             historyWindow.controller = historyController;
             historyWindow.present();
         }
+        function onOpenConsultationScreen(screen, consultationController) {
+            consultationWindow.screenId = screen;
+            consultationWindow.screenTitle = screen === "adult" ? qsTr("Adult Consultation") : screen === "pediatric" ? qsTr("Pediatric Consultation") : qsTr("Pregnancy Consultation");
+            consultationWindow.controller = consultationController;
+            consultationWindow.present();
+        }
         function onEditingChanged() {
             // Saving or cancelling gives the keyboard back to the grid.
             if (!root.controller.editing)
@@ -215,7 +223,7 @@ Item {
                 objectName: "entryPediatricConsultation"
                 visible: root.hasController() && root.controller.showPediatric
                 text: qsTr("Pediatric consultation")
-                onClicked: messageDialog.showInfo(qsTr("Unavailable"), qsTr("This feature is not implemented in this phase yet."))
+                onClicked: root.controller.openPediatricConsultation()
             }
             ActionButton {
                 objectName: "entryAdultHistory"
@@ -227,7 +235,7 @@ Item {
                 objectName: "entryAdultConsultation"
                 visible: root.hasController() && root.controller.showAdult
                 text: qsTr("Adult consultation")
-                onClicked: messageDialog.showInfo(qsTr("Unavailable"), qsTr("This feature is not implemented in this phase yet."))
+                onClicked: root.controller.openAdultConsultation()
             }
             ActionButton {
                 objectName: "entryPregnancyHistory"
@@ -239,7 +247,7 @@ Item {
                 objectName: "entryPregnancyConsultation"
                 visible: root.hasController() && root.controller.showPregnancy
                 text: qsTr("Pregnancy consultation")
-                onClicked: messageDialog.showInfo(qsTr("Unavailable"), qsTr("This feature is not implemented in this phase yet."))
+                onClicked: root.controller.openPregnancyConsultation()
             }
         }
 
@@ -712,6 +720,29 @@ Item {
     Component {
         id: pregnancyForm
         PregnancyHistoryForm {
+        }
+    }
+
+    // Consultation screen: same pattern as the history screen. Consultations
+    // do not change what the patient screen offers, so nothing is refreshed.
+    ConsultationWindow {
+        id: consultationWindow
+        objectName: "consultationWindow"
+        formComponent: consultationWindow.screenId === "pediatric" ? pediatricConsultationForm : consultationWindow.screenId === "pregnancy" ? pregnancyConsultationForm : adultConsultationForm
+    }
+    Component {
+        id: adultConsultationForm
+        AdultConsultationForm {
+        }
+    }
+    Component {
+        id: pregnancyConsultationForm
+        PregnancyConsultationForm {
+        }
+    }
+    Component {
+        id: pediatricConsultationForm
+        PediatricConsultationForm {
         }
     }
 
