@@ -752,18 +752,15 @@ Item {
     }
     Component {
         id: adultForm
-        AdultHistoryForm {
-        }
+        AdultHistoryForm {}
     }
     Component {
         id: pediatricForm
-        PediatricHistoryForm {
-        }
+        PediatricHistoryForm {}
     }
     Component {
         id: pregnancyForm
-        PregnancyHistoryForm {
-        }
+        PregnancyHistoryForm {}
     }
 
     // Consultation screen: same pattern as the history screen. Consultations
@@ -775,18 +772,15 @@ Item {
     }
     Component {
         id: adultConsultationForm
-        AdultConsultationForm {
-        }
+        AdultConsultationForm {}
     }
     Component {
         id: pregnancyConsultationForm
-        PregnancyConsultationForm {
-        }
+        PregnancyConsultationForm {}
     }
     Component {
         id: pediatricConsultationForm
-        PediatricConsultationForm {
-        }
+        PediatricConsultationForm {}
     }
 
     GxDialog {

@@ -9,16 +9,18 @@ ColumnFilterProxy::ColumnFilterProxy(QObject* parent)
     : QSortFilterProxyModel(parent) {}
 
 void ColumnFilterProxy::setColumnFilter(int column, const QString& text) {
+    beginFilterChange();
     if (text.isEmpty())
         m_filters.remove(column);
     else
         m_filters.insert(column, text);
-    invalidateFilter();
+    endFilterChange();
 }
 
 void ColumnFilterProxy::clearFilters() {
+    beginFilterChange();
     m_filters.clear();
-    invalidateFilter();
+    endFilterChange();
 }
 
 bool ColumnFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const {

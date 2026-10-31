@@ -7,10 +7,10 @@
 <p align="center">
   <a href="https://github.com/madialeva/gambasse/actions/workflows/ci-linux.yml"><img src="https://github.com/madialeva/gambasse/actions/workflows/ci-linux.yml/badge.svg" alt="ci-linux" /></a>
   <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/c%2B%2B-17-00599C?logo=cplusplus&logoColor=white" alt="C++17" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/Qt-6-41CD52?logo=qt&logoColor=white" alt="Qt 6" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/CMake-3.21-064F8C?logo=cmake&logoColor=white" alt="CMake" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/GCC-11-003057?logo=gcc&logoColor=white" alt="GCC 11" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/c%2B%2B-26-00599C?logo=cplusplus&logoColor=white" alt="C++26" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/Qt-6.12-41CD52?logo=qt&logoColor=white" alt="Qt 6.12" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/CMake-3.25-064F8C?logo=cmake&logoColor=white" alt="CMake" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/GCC-16-003057?logo=gcc&logoColor=white" alt="GCC 16" /></a>
   <a href="#"><img src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white" alt="SQLite" /></a>
 </p>
 
@@ -73,23 +73,36 @@ baselined without re-running the initial schema, so its data is preserved.
 
 ## Requirements
 
-- GCC 11+ (C++17).
-- Qt 6.6 (the CI builds with 6.6.2): Core, Gui, Sql with the SQLite driver,
-  Qml, Quick and QuickControls2, plus the `qmllint`/`qmlformat` tools.
-- CMake 3.21+ and Ninja.
-- Windows deployment: a Qt MinGW kit, `windeployqt`, and MinGW runtime DLLs.
-- Linux deployment: `patchelf` and `ldd` besides the tools above.
+- GCC 16.2.0 built from the GNU sources (C++26): `scripts/build-gcc.sh`
+  installs it, without root, in `~/software/gcc-16.2.0` (it needs the system
+  compiler, about 10 GB of free disk and from half an hour to an hour).
+- Qt 6.12.0 desktop: `scripts/setup-qt.sh` installs it, without root, in
+  `~/software/Qt/6.12.0/gcc_64` through aqtinstall (it needs `python3` with
+  `venv`). The base kit has all the project uses, including the
+  `qmllint`/`qmlformat` tools.
+- CMake 3.25+ and Ninja.
+- Linux deployment: `patchelf`, `ldd` and `objdump` besides the tools above.
+- Windows deployment: pending on the move to GCC 16.2 and Qt 6.12 (issue
+  #60); until then the configure step rejects the MinGW of the Qt kits.
+
+Both scripts do nothing when the toolchain is already installed, so several
+projects can share it. The CI builds with the same GCC (the `gcc:16.2.0-trixie`
+image, checked against `scripts/build-gcc.sh`) and the same Qt.
 
 ## Linux development
 
 ```sh
-cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build-linux
+scripts/build-gcc.sh && scripts/setup-qt.sh   # once
+cmake --preset native
+cmake --build --preset native
+ctest --preset native
 ./build-linux/Gambasse
 ```
 
-When Qt is not discoverable, add
-`-DCMAKE_PREFIX_PATH=/path/to/Qt/6.x/gcc_64`. The executable uses `config.ini`
+The `native` preset (`CMakePresets.json`) builds in Release in `build-linux`
+with the toolchain in `~/software`; the configure step stops at once with any
+compiler older than GCC 16. The executables find GCC 16's `libstdc++` through
+their run path, with no `LD_LIBRARY_PATH`. The executable uses `config.ini`
 and `database.db` beside itself by default; `--base <directory>` overrides it.
 The database file is created and migrated on first run.
 
@@ -104,8 +117,8 @@ controllers in `src/ui/`, registered in the same module (`QML_ELEMENT`,
 typed QML types. Keep every file formatted and lint-clean:
 
 ```sh
-qmlformat -i qml/<file>.qml
-qmllint -i build-linux/qml/Gambasse/qmldir qml/<file>.qml   # needs a configured build
+~/software/Qt/6.12.0/gcc_64/bin/qmlformat -i qml/<file>.qml
+cmake --build --preset native --target all_qmllint   # must print no warning
 ```
 
 Windows deployment adds the QML runtime with
@@ -113,6 +126,11 @@ Windows deployment adds the QML runtime with
 requirements above; the Qt VS Code extension covers editing and previewing.
 
 ## Windows development and deployment
+
+> The Windows build has not moved to GCC 16.2 and Qt 6.12 yet (issue #60): the
+> configure step rejects the MinGW of the Qt kits. The instructions below
+> describe the previous toolchain, and Windows packages come from releases
+> before that move.
 
 Use a shell where Qt MinGW, Ninja, CMake, and the Qt `bin` directory are on
 `PATH`, then configure as above with `-DCMAKE_PREFIX_PATH="<Qt-prefix>"`.
@@ -137,11 +155,12 @@ beside the application while data remains at the distribution root.
 
 ## Linux deployment
 
-`deploy-linux.sh` builds in Release and creates
+`deploy-linux.sh` builds with the `release` preset (GCC 16.2 and Qt 6.12 from
+`~/software`, see Requirements) and creates
 `deploy-linux/gambasse-<version>-linux-x86_64.tar.gz` (the version comes from
-`CMakeLists.txt`) plus the extracted directory beside it. Set
-`QT_PREFIX=/path/to/Qt/6.x/gcc_64` to use a Qt kit other than the system one.
-It needs `cmake`, `ninja`, `patchelf` and `ldd`.
+`CMakeLists.txt`) plus the extracted directory beside it. The plugins and QML
+modules come from the same Qt the build used. It needs `cmake`, `ninja`,
+`patchelf`, `ldd` and `objdump`.
 
 ```text
 gambasse-<version>-linux-x86_64/
@@ -163,10 +182,11 @@ application creates and migrates the database on first run. The archive keeps
 the executable bit, so users only extract it and double-click `Gambasse`.
 
 The graphics stack (OpenGL/EGL, X11/xcb core, fontconfig, FreeType, HarfBuzz,
-GLib, D-Bus) and the C/C++ runtime are not bundled; every desktop provides
-them. The minimum target system is set by the glibc of the build machine: the
-script prints it at the end (glibc 2.34 when built on Oracle Linux 9, which
-covers Ubuntu 22.04+, Debian 12+, Fedora 35+ and RHEL 9+).
+GLib, D-Bus), glibc and `libgcc_s` are not bundled; every desktop provides
+them. GCC 16's `libstdc++` is bundled in `lib/`, because the systems' is older.
+The minimum target system is set by the highest glibc version the package
+needs: the script prints it at the end (glibc 2.34, which covers Ubuntu 22.04+,
+Debian 12+, Fedora 35+ and RHEL 9+).
 
 ## Diagnostics
 

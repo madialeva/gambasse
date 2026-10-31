@@ -9,12 +9,10 @@ GxCheck {
 
     property FormController controller: null
     property string field: ""
-    property bool readOnly: false
 
     readonly property var stored: controller && field !== "" ? controller.values[field] : undefined
 
-    // readOnly keeps the look but ignores the toggles, like UxCheck.
-    enabled: !readOnly
+    // readOnly (from GxCheck) keeps the look but ignores the toggles, like UxCheck.
     checked: stored === undefined ? false : stored === true || stored === "true"
 
     onToggled: {
