@@ -1,3 +1,5 @@
+#include <QDir>
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QImage>
@@ -166,6 +168,11 @@ private slots:
     void detailGroupsAreSections();
     void gridHeadersFitAndNumbersAreCentred();
     void filterRowSitsInsideTheGrid();
+    void photoButtonsFitBesideTheActions();
+    void photoButtonsFollowThePatient();
+    void editPhotoOpensTheFileDialog();
+    void deletePhotoAsksForConfirmation();
+    void photoButtonsFollowTheLanguage();
 };
 
 void TestQmlMainWindow::initTestCase() {
@@ -178,6 +185,9 @@ void TestQmlMainWindow::initTestCase() {
 void TestQmlMainWindow::init() {
     QSqlQuery erase(Database::instance().connection());
     QVERIFY2(erase.exec(QStringLiteral("DELETE FROM b01_patient")), qPrintable(erase.lastError().text()));
+    // Codes restart at MAX(id)+1 once the table is empty: no photo may survive
+    // from another slot.
+    QVERIFY(QDir(m_dir.filePath(QStringLiteral("fotos"))).removeRecursively());
 }
 
 void TestQmlMainWindow::cleanupTestCase() {
@@ -713,13 +723,16 @@ void TestQmlMainWindow::photoKeepsTheOriginalSize() {
     QVERIFY(photo != nullptr);
     // pbxFotoPaciente of the original application.
     QCOMPARE(QSizeF(frame->width(), frame->height()), QSizeF(240, 204));
-    // Its top lines up with the grid frame's, and the history buttons follow
-    // right below it, 6 px apart.
+    // Its top lines up with the grid frame's; the photo buttons follow right
+    // below it and the history buttons below them, 6 px apart.
     auto* grid = m_window->findChild<QQuickItem*>(QStringLiteral("gridBorder"));
     QVERIFY(grid != nullptr);
     const auto top = [](QQuickItem* it) { return it->mapToScene(QPointF(0, 0)).y(); };
     QCOMPARE(top(frame), top(grid));
-    QCOMPARE(top(item(QStringLiteral("createPediatricButton"))), top(frame) + frame->height() + 6);
+    auto* photoRow = item(QStringLiteral("photoActions"));
+    QVERIFY(photoRow != nullptr);
+    QCOMPARE(top(photoRow), top(frame) + frame->height() + 6);
+    QCOMPARE(top(item(QStringLiteral("createPediatricButton"))), top(photoRow) + photoRow->height() + 6);
 
     const auto shownAt = [&](const QString& file, QSize expected) {
         photo->setProperty("source", QUrl::fromLocalFile(file));
@@ -856,6 +869,154 @@ void TestQmlMainWindow::filterRowSitsInsideTheGrid() {
         QCOMPARE(box.left(), headers.at(i)->mapToScene(QPointF(0, 0)).x());
         QCOMPARE(box.width(), headers.at(i)->width());
     }
+}
+
+void TestQmlMainWindow::photoButtonsFitBesideTheActions() {
+    seedPatients();
+    openScreen();
+    QCOMPARE(m_window->size(), QSize(1008, 561));
+    const auto rect = [](QQuickItem* it) {
+        return it->mapRectToScene(QRectF(0, 0, it->width(), it->height()));
+    };
+    auto* edit = item(QStringLiteral("editPhotoButton"));
+    auto* remove = item(QStringLiteral("deletePhotoButton"));
+    auto* create = item(QStringLiteral("createPediatricButton"));
+    QVERIFY(edit != nullptr && remove != nullptr && create != nullptr);
+
+    // Side by side, equally wide and together as wide as a history button.
+    QCOMPARE(create->width(), 240.0);
+    QCOMPARE(edit->width(), remove->width());
+    QCOMPARE(edit->width() + 6 + remove->width(), create->width());
+    QCOMPARE(rect(edit).left(), rect(create).left());
+    QCOMPARE(rect(remove).right(), rect(create).right());
+    QCOMPARE(rect(edit).top(), rect(remove).top());
+
+    // Nothing is compacted: the column buttons keep the height of the others.
+    const qreal buttonHeight = item(QStringLiteral("addButton"))->height();
+    for (const char* name : {"editPhotoButton", "deletePhotoButton", "createPediatricButton",
+                             "createAdultButton", "createPregnancyButton"})
+        QCOMPARE(item(QLatin1String(name))->height(), buttonHeight);
+
+    // The column ends above the Address section, with the photo at its size.
+    auto* frame = item(QStringLiteral("photoFrame"));
+    QCOMPARE(QSizeF(frame->width(), frame->height()), QSizeF(240, 204));
+    auto* addressCard =
+        item(QStringLiteral("addressGroup"))->findChild<QQuickItem*>(QStringLiteral("groupFrame"));
+    QVERIFY(addressCard != nullptr);
+    QVERIFY2(rect(item(QStringLiteral("createPregnancyButton"))).bottom() <= rect(addressCard).top(),
+             "the last history button overlaps the Address section");
+
+    // The record actions stay right under the grid frame, on its left.
+    auto* grid = m_window->findChild<QQuickItem*>(QStringLiteral("gridBorder"));
+    auto* actions = item(QStringLiteral("detailActions"));
+    QCOMPARE(rect(actions).top(), rect(grid).bottom() + 4);
+    QCOMPARE(rect(actions).left(), rect(grid).left());
+}
+
+void TestQmlMainWindow::photoButtonsFollowThePatient() {
+    seedPatients();
+    openScreen();
+    auto* edit = item(QStringLiteral("editPhotoButton"));
+    auto* remove = item(QStringLiteral("deletePhotoButton"));
+    auto* photo = item(QStringLiteral("photoImage"));
+
+    // A patient without photo: it can only be added.
+    QVERIFY(edit->isEnabled());
+    QVERIFY(!remove->isEnabled());
+
+    const QString source = m_dir.filePath(QStringLiteral("in/photo.png"));
+    QDir().mkpath(QFileInfo(source).absolutePath());
+    QVERIFY(QImage(QSize(300, 200), QImage::Format_RGB32).save(source));
+    QCOMPARE(m_controller->importPhoto(QUrl::fromLocalFile(source)), 0);
+    QTRY_VERIFY(remove->isEnabled());
+    QVERIFY(edit->isEnabled());
+    // The frame shows the stored photo (reduced to 240x160) right away.
+    QTRY_COMPARE(photo->property("status").toInt(), 1); // Image.Ready
+    QCOMPARE(QSizeF(photo->width(), photo->height()), QSizeF(240, 160));
+
+    // Neither while a patient is being edited.
+    clickIn(m_window, item(QStringLiteral("editButton")));
+    QTRY_VERIFY(m_controller->editing());
+    QVERIFY(!edit->isEnabled());
+    QVERIFY(!remove->isEnabled());
+    clickIn(m_window, item(QStringLiteral("cancelButton")));
+    QTRY_VERIFY(!m_controller->editing());
+    QVERIFY(edit->isEnabled());
+    QVERIFY(remove->isEnabled());
+}
+
+void TestQmlMainWindow::editPhotoOpensTheFileDialog() {
+    seedPatients();
+    openScreen();
+    auto* photo = item(QStringLiteral("photoImage"));
+    const QUrl before = photo->property("source").toUrl();
+    auto* dialog = m_screen->findChild<QObject*>(QStringLiteral("photoDialog"));
+    QVERIFY(dialog != nullptr);
+    QCOMPARE(dialog->property("currentFolder").toUrl(), m_controller->photoFolder());
+
+    clickIn(m_window, item(QStringLiteral("editPhotoButton")));
+    QTRY_VERIFY(dialog->property("visible").toBool());
+    // Closing it without a file leaves the photo as it was.
+    QVERIFY(QMetaObject::invokeMethod(dialog, "reject"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+    QVERIFY(!m_controller->hasPhoto());
+    QCOMPARE(photo->property("source").toUrl(), before);
+}
+
+void TestQmlMainWindow::deletePhotoAsksForConfirmation() {
+    seedPatients();
+    openScreen();
+    const QString source = m_dir.filePath(QStringLiteral("in/photo.png"));
+    QDir().mkpath(QFileInfo(source).absolutePath());
+    QVERIFY(QImage(QSize(100, 80), QImage::Format_RGB32).save(source));
+    QCOMPARE(m_controller->importPhoto(QUrl::fromLocalFile(source)), 0);
+    const QString stored = QUrl(m_controller->photoSource()).toLocalFile();
+    QVERIFY(QFileInfo::exists(stored));
+
+    auto* remove = item(QStringLiteral("deletePhotoButton"));
+    auto* confirm = m_screen->findChild<QObject*>(QStringLiteral("photoDeleteConfirm"));
+    QVERIFY(confirm != nullptr);
+    QTRY_VERIFY(remove->isEnabled());
+    const auto answer = [&](const char* button) {
+        clickIn(m_window, remove);
+        QTRY_VERIFY(confirm->property("visible").toBool());
+        QVERIFY(confirm->property("messageText").toString().contains(m_controller->patientName()));
+        auto* choice = confirm->findChild<QQuickItem*>(QLatin1String(button));
+        QVERIFY(choice != nullptr && choice->isVisible());
+        QTest::qWait(200); // let the modal overlay settle before aiming at the button
+        clickIn(m_window, choice);
+        QTRY_VERIFY(!confirm->property("visible").toBool());
+    };
+
+    // Declining keeps the photo.
+    answer("dialogNoButton");
+    QVERIFY(m_controller->hasPhoto());
+    QVERIFY(QFileInfo::exists(stored));
+
+    // Confirming deletes it and the frame falls back to the default picture.
+    answer("dialogYesButton");
+    QTRY_VERIFY(!m_controller->hasPhoto());
+    QVERIFY(!QFileInfo::exists(stored));
+    QTRY_VERIFY(!remove->isEnabled());
+    QCOMPARE(item(QStringLiteral("photoImage"))->property("source").toUrl().scheme(),
+             QStringLiteral("qrc"));
+}
+
+void TestQmlMainWindow::photoButtonsFollowTheLanguage() {
+    seedPatients();
+    openScreen();
+    auto* edit = item(QStringLiteral("editPhotoButton"));
+    auto* remove = item(QStringLiteral("deletePhotoButton"));
+    const auto texts = [&] {
+        return QStringList{edit->property("text").toString(), remove->property("text").toString()};
+    };
+    QCOMPARE(texts(), (QStringList{QStringLiteral("Edit photo"), QStringLiteral("Delete photo")}));
+    m_settings->setLanguage(QStringLiteral("es"));
+    QCOMPARE(texts(), (QStringList{QStringLiteral("Editar foto"), QStringLiteral("Borrar foto")}));
+    m_settings->setLanguage(QStringLiteral("pt"));
+    QCOMPARE(texts(), (QStringList{QStringLiteral("Editar foto"), QStringLiteral("Apagar foto")}));
+    m_settings->setLanguage(QStringLiteral("en"));
+    QCOMPARE(texts(), (QStringList{QStringLiteral("Edit photo"), QStringLiteral("Delete photo")}));
 }
 
 } // namespace gambasse

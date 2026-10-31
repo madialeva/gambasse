@@ -121,7 +121,7 @@ Item {
             y: 113
             controller: root.controller
             field: "historyHiv"
-            text: "HIV"
+            text: qsTr("HIV")
         }
         GxField {
             x: 99

@@ -550,7 +550,7 @@ void TestQmlConsultations::pediatricCoughAndCodesPersist() {
     QTRY_COMPARE(combo->property("stored").toInt(), 1001);
     QQuickItem* shown = visualChild(combo, QStringLiteral("comboText"));
     QVERIFY(shown != nullptr);
-    QTRY_COMPARE(shown->property("text").toString(), QStringLiteral("Desinfectante:"));
+    QTRY_COMPARE(shown->property("text").toString(), QStringLiteral("Desinfetante:"));
     settings->setLanguage(QStringLiteral("en"));
 }
 

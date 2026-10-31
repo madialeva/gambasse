@@ -6,8 +6,8 @@ import QtQml.Models
 import Gambasse
 
 // Patient master-detail screen (mirrors the Widgets MainWindow): entry
-// toolbar, filterable grid, photo with history creation buttons, detail
-// panel with in-place CRUD. Clinical logic lives in PatientController;
+// toolbar, filterable grid, photo with its buttons and the history creation
+// buttons, detail panel with in-place CRUD. Clinical logic lives in PatientController;
 // this view only renders values, gathers the draft and shows messages.
 Item {
     id: root
@@ -260,192 +260,246 @@ Item {
             Layout.fillHeight: true
             spacing: 8
 
-            // Patient list with live column filters.
+            // The grid with the record actions right below it. The bar only
+            // takes the left, so the photo column beside them reaches down to
+            // the detail groups. It stays outside the list, which is disabled
+            // while editing, so Save and Cancel keep working.
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 2
-                enabled: root.hasController() && !root.controller.editing
-
-                Item {
-                    id: listArea
+                spacing: 4
+                // Patient list with live column filters.
+                ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    clip: true
+                    spacing: 2
+                    enabled: root.hasController() && !root.controller.editing
 
-                    ColumnLayout {
-                        anchors.fill: parent
-                        spacing: 2
+                    Item {
+                        id: listArea
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
 
-                        // Header, filter row and rows inside a 1 px frame, like the grid
-                        // of the original application.
-                        Item {
-                            objectName: "gridFrame"
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: 2
 
-                            ColumnLayout {
-                                anchors.fill: parent
-                                anchors.margins: 1
-                                spacing: 2
+                            // Header, filter row and rows inside a 1 px frame, like the grid
+                            // of the original application.
+                            Item {
+                                objectName: "gridFrame"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
 
-                                // Header row with sort indicators.
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: 28
-                                    clip: true
-                                    RowLayout {
-                                        x: -gridTable.contentX
-                                        anchors.top: parent.top
-                                        anchors.bottom: parent.bottom
-                                        spacing: 0
-                                        Repeater {
-                                            objectName: "headerRow"
-                                            model: root.hasController() ? root.controller.columnNames : []
-                                            Button {
-                                                id: headerButton
-                                                required property int index
-                                                required property string modelData
-                                                objectName: "headerCell"
-                                                Layout.preferredWidth: root.columnWidth(index)
-                                                Layout.preferredHeight: 28
-                                                flat: true
-                                                // 6 px each side, the 12 px headerWidth() reserves.
-                                                leftPadding: 6
-                                                rightPadding: 6
-                                                font.bold: true
-                                                text: modelData + (root.hasController() && root.controller.sortColumn === index ? (root.controller.sortOrder === 0 ? " \u25B2" : " \u25BC") : "")
-                                                contentItem: Text {
-                                                    horizontalAlignment: root.columnAlignment(headerButton.index)
-                                                    text: headerButton.text
-                                                    color: Theme.windowText
-                                                    font: headerButton.font
-                                                    elide: Text.ElideRight
-                                                }
-                                                background: Rectangle {
-                                                    color: Theme.windowBackground
-                                                }
-                                                onClicked: root.controller.sortByColumn(index)
-                                            }
-                                        }
-                                    }
-                                }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    spacing: 2
 
-                                // Filter row inside the grid, between the header and the
-                                // first row: one box per column, aligned with it.
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: 26
-                                    clip: true
-                                    RowLayout {
-                                        x: -gridTable.contentX
-                                        anchors.top: parent.top
-                                        anchors.bottom: parent.bottom
-                                        spacing: 0
-                                        Repeater {
-                                            objectName: "filterBoxes"
-                                            model: root.hasController() ? root.controller.columnNames : []
-                                            GxTextInput {
-                                                required property int index
-                                                required property string modelData
-                                                objectName: "filterBox"
-                                                Layout.preferredWidth: root.columnWidth(index)
-                                                Layout.preferredHeight: 26
-                                                placeholderText: modelData
-                                                text: root.filterTexts[index]
-                                                onTextEdited: {
-                                                    root.filterTexts[index] = text;
-                                                    root.controller.setColumnFilter(index, text);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                TableView {
-                                    id: gridTable
-                                    objectName: "gridTable"
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    clip: true
-                                    // The grid takes the focus when the screen opens, so
-                                    // the arrow keys and the wheel work right away.
-                                    focus: true
-                                    keyNavigationEnabled: true
-                                    // A data grid must stop at the ends: the default
-                                    // overscroll left a blank band above the first row
-                                    // that sprang back on its own.
-                                    boundsBehavior: Flickable.StopAtBounds
-                                    model: root.hasController() ? root.controller.gridModel : null
-                                    selectionModel: ItemSelectionModel {
-                                        id: gridSelection
-                                        model: root.hasController() ? root.controller.gridModel : null
-                                        // The model can arrive after the controller (it is
-                                        // injected from C++), so the grid selection is
-                                        // (re)applied whenever the model is set.
-                                        onModelChanged: root.syncSelection()
-                                        onCurrentChanged: (current, previous) => {
-                                            if (root.hasController() && current.row !== root.controller.currentRow)
-                                                root.controller.selectRow(current.row);
-                                        }
-                                    }
-                                    selectionBehavior: TableView.SelectRows
-                                    selectionMode: TableView.SingleSelection
-                                    columnWidthProvider: function (col) {
-                                        return root.columnWidth(col);
-                                    }
-                                    rowHeightProvider: function (row) {
-                                        return 24;
-                                    }
-                                    ScrollBar.vertical: ScrollBar {
-                                        policy: ScrollBar.AlwaysOn
-                                    }
-                                    ScrollBar.horizontal: ScrollBar {
-                                        policy: ScrollBar.AsNeeded
-                                    }
-                                    delegate: Rectangle {
-                                        id: cell
-                                        objectName: "gridCell"
-                                        required property string display
-                                        required property int row
-                                        required property int column
-                                        readonly property bool current: root.isCurrentRow(cell.row)
-                                        color: cell.current ? Theme.highlight : (cell.row % 2 ? Theme.alternateRowBackground : Theme.fieldBackground)
-                                        Rectangle {
+                                    // Header row with sort indicators.
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 28
+                                        clip: true
+                                        RowLayout {
+                                            x: -gridTable.contentX
+                                            anchors.top: parent.top
                                             anchors.bottom: parent.bottom
-                                            width: parent.width
-                                            height: 1
-                                            color: Theme.fieldBorder
+                                            spacing: 0
+                                            Repeater {
+                                                objectName: "headerRow"
+                                                model: root.hasController() ? root.controller.columnNames : []
+                                                Button {
+                                                    id: headerButton
+                                                    required property int index
+                                                    required property string modelData
+                                                    objectName: "headerCell"
+                                                    Layout.preferredWidth: root.columnWidth(index)
+                                                    Layout.preferredHeight: 28
+                                                    flat: true
+                                                    // 6 px each side, the 12 px headerWidth() reserves.
+                                                    leftPadding: 6
+                                                    rightPadding: 6
+                                                    font.bold: true
+                                                    text: modelData + (root.hasController() && root.controller.sortColumn === index ? (root.controller.sortOrder === 0 ? " \u25B2" : " \u25BC") : "")
+                                                    contentItem: Text {
+                                                        horizontalAlignment: root.columnAlignment(headerButton.index)
+                                                        text: headerButton.text
+                                                        color: Theme.windowText
+                                                        font: headerButton.font
+                                                        elide: Text.ElideRight
+                                                    }
+                                                    background: Rectangle {
+                                                        color: Theme.windowBackground
+                                                    }
+                                                    onClicked: root.controller.sortByColumn(index)
+                                                }
+                                            }
                                         }
-                                        Text {
-                                            anchors.fill: parent
-                                            anchors.leftMargin: 4
-                                            anchors.rightMargin: 4
-                                            horizontalAlignment: root.columnAlignment(cell.column)
-                                            verticalAlignment: Text.AlignVCenter
-                                            elide: Text.ElideRight
-                                            color: cell.current ? Theme.highlightedText : Theme.windowText
-                                            text: cell.display
+                                    }
+
+                                    // Filter row inside the grid, between the header and the
+                                    // first row: one box per column, aligned with it.
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 26
+                                        clip: true
+                                        RowLayout {
+                                            x: -gridTable.contentX
+                                            anchors.top: parent.top
+                                            anchors.bottom: parent.bottom
+                                            spacing: 0
+                                            Repeater {
+                                                objectName: "filterBoxes"
+                                                model: root.hasController() ? root.controller.columnNames : []
+                                                GxTextInput {
+                                                    required property int index
+                                                    required property string modelData
+                                                    objectName: "filterBox"
+                                                    Layout.preferredWidth: root.columnWidth(index)
+                                                    Layout.preferredHeight: 26
+                                                    placeholderText: modelData
+                                                    text: root.filterTexts[index]
+                                                    onTextEdited: {
+                                                        root.filterTexts[index] = text;
+                                                        root.controller.setColumnFilter(index, text);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    TableView {
+                                        id: gridTable
+                                        objectName: "gridTable"
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        clip: true
+                                        // The grid takes the focus when the screen opens, so
+                                        // the arrow keys and the wheel work right away.
+                                        focus: true
+                                        keyNavigationEnabled: true
+                                        // A data grid must stop at the ends: the default
+                                        // overscroll left a blank band above the first row
+                                        // that sprang back on its own.
+                                        boundsBehavior: Flickable.StopAtBounds
+                                        model: root.hasController() ? root.controller.gridModel : null
+                                        selectionModel: ItemSelectionModel {
+                                            id: gridSelection
+                                            model: root.hasController() ? root.controller.gridModel : null
+                                            // The model can arrive after the controller (it is
+                                            // injected from C++), so the grid selection is
+                                            // (re)applied whenever the model is set.
+                                            onModelChanged: root.syncSelection()
+                                            onCurrentChanged: (current, previous) => {
+                                                if (root.hasController() && current.row !== root.controller.currentRow)
+                                                    root.controller.selectRow(current.row);
+                                            }
+                                        }
+                                        selectionBehavior: TableView.SelectRows
+                                        selectionMode: TableView.SingleSelection
+                                        columnWidthProvider: function (col) {
+                                            return root.columnWidth(col);
+                                        }
+                                        rowHeightProvider: function (row) {
+                                            return 24;
+                                        }
+                                        ScrollBar.vertical: ScrollBar {
+                                            policy: ScrollBar.AlwaysOn
+                                        }
+                                        ScrollBar.horizontal: ScrollBar {
+                                            policy: ScrollBar.AsNeeded
+                                        }
+                                        delegate: Rectangle {
+                                            id: cell
+                                            objectName: "gridCell"
+                                            required property string display
+                                            required property int row
+                                            required property int column
+                                            readonly property bool current: root.isCurrentRow(cell.row)
+                                            color: cell.current ? Theme.highlight : (cell.row % 2 ? Theme.alternateRowBackground : Theme.fieldBackground)
+                                            Rectangle {
+                                                anchors.bottom: parent.bottom
+                                                width: parent.width
+                                                height: 1
+                                                color: Theme.fieldBorder
+                                            }
+                                            Text {
+                                                anchors.fill: parent
+                                                anchors.leftMargin: 4
+                                                anchors.rightMargin: 4
+                                                horizontalAlignment: root.columnAlignment(cell.column)
+                                                verticalAlignment: Text.AlignVCenter
+                                                elide: Text.ElideRight
+                                                color: cell.current ? Theme.highlightedText : Theme.windowText
+                                                text: cell.display
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            // Drawn above the cells so a scrolled row never covers it.
-                            Rectangle {
-                                objectName: "gridBorder"
-                                anchors.fill: parent
-                                z: 1
-                                color: "transparent"
-                                border.color: Theme.inputBorder
-                                border.width: 1
+                                // Drawn above the cells so a scrolled row never covers it.
+                                Rectangle {
+                                    objectName: "gridBorder"
+                                    anchors.fill: parent
+                                    z: 1
+                                    color: "transparent"
+                                    border.color: Theme.inputBorder
+                                    border.width: 1
+                                }
                             }
                         }
                     }
                 }
+                Row {
+                    objectName: "detailActions"
+                    spacing: 6
+                    ActionButton {
+                        objectName: "addButton"
+                        text: qsTr("Add")
+                        enabled: root.hasController() && !root.controller.editing
+                        onClicked: {
+                            root.controller.startAdd();
+                            nameInput.focusField();
+                        }
+                    }
+                    ActionButton {
+                        objectName: "editButton"
+                        text: qsTr("Edit")
+                        enabled: root.hasController() && !root.controller.editing
+                        onClicked: {
+                            root.controller.startEdit();
+                            nameInput.focusField();
+                        }
+                    }
+                    ActionButton {
+                        objectName: "deleteButton"
+                        text: qsTr("Delete")
+                        enabled: root.hasController() && !root.controller.editing
+                        onClicked: {
+                            deleteConfirm.messageText = qsTr("Delete patient \"%1\" and all their histories and consultations?").arg(root.controller.patientName);
+                            deleteConfirm.yesNo = true;
+                            deleteConfirm.titleText = qsTr("Delete patient");
+                            deleteConfirm.open();
+                        }
+                    }
+                    ActionButton {
+                        objectName: "saveButton"
+                        text: qsTr("Save")
+                        enabled: root.hasController() && root.controller.editing
+                        onClicked: root.gatherSave()
+                    }
+                    ActionButton {
+                        objectName: "cancelButton"
+                        text: qsTr("Cancel")
+                        enabled: root.hasController() && root.controller.editing
+                        onClicked: root.controller.cancelEdit()
+                    }
+                }
             }
 
-            // Photo with history creation buttons below.
+            // Photo with its buttons and the history creation buttons below.
             ColumnLayout {
                 Layout.preferredWidth: 240
                 Layout.fillHeight: true
@@ -478,6 +532,36 @@ Item {
                         border.width: 1
                     }
                 }
+                // Edit and delete the photo, side by side and together as wide
+                // as a history button. A nested layout fills by default and
+                // would widen the column, so this one keeps its width.
+                RowLayout {
+                    objectName: "photoActions"
+                    Layout.fillWidth: false
+                    Layout.preferredWidth: 240
+                    spacing: 6
+                    ActionButton {
+                        objectName: "editPhotoButton"
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 0
+                        text: qsTr("Edit photo")
+                        enabled: root.hasController() && root.controller.canEditPhoto
+                        onClicked: photoDialog.open()
+                    }
+                    ActionButton {
+                        objectName: "deletePhotoButton"
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 0
+                        text: qsTr("Delete photo")
+                        enabled: root.hasController() && root.controller.canDeletePhoto
+                        onClicked: {
+                            photoDeleteConfirm.messageText = qsTr("Delete the photo of patient \"%1\"?").arg(root.controller.patientName);
+                            photoDeleteConfirm.yesNo = true;
+                            photoDeleteConfirm.titleText = qsTr("Delete photo");
+                            photoDeleteConfirm.open();
+                        }
+                    }
+                }
                 ActionButton {
                     objectName: "createPediatricButton"
                     Layout.preferredWidth: 240
@@ -507,60 +591,15 @@ Item {
             }
         }
 
-        // Detail panel: the action row on top and both groups side by side
-        // below, the same structure as the Widgets window, so the two boxes
-        // share the same height and vertical position. Half the width each:
-        // zero preferred width makes the layout share the extra space evenly
-        // instead of following their implicit widths.
+        // Detail panel: both groups side by side (the action row sits under
+        // the grid), so the two boxes share the same height and vertical
+        // position. Half the width each: zero preferred width makes the layout
+        // share the extra space evenly instead of following their implicit
+        // widths.
         ColumnLayout {
             objectName: "detailPanel"
             Layout.fillWidth: true
             spacing: 4
-            Row {
-                objectName: "detailActions"
-                spacing: 6
-                ActionButton {
-                    objectName: "addButton"
-                    text: qsTr("Add")
-                    enabled: root.hasController() && !root.controller.editing
-                    onClicked: {
-                        root.controller.startAdd();
-                        nameInput.focusField();
-                    }
-                }
-                ActionButton {
-                    objectName: "editButton"
-                    text: qsTr("Edit")
-                    enabled: root.hasController() && !root.controller.editing
-                    onClicked: {
-                        root.controller.startEdit();
-                        nameInput.focusField();
-                    }
-                }
-                ActionButton {
-                    objectName: "deleteButton"
-                    text: qsTr("Delete")
-                    enabled: root.hasController() && !root.controller.editing
-                    onClicked: {
-                        deleteConfirm.messageText = qsTr("Delete patient \"%1\" and all their histories and consultations?").arg(root.controller.patientName);
-                        deleteConfirm.yesNo = true;
-                        deleteConfirm.titleText = qsTr("Delete patient");
-                        deleteConfirm.open();
-                    }
-                }
-                ActionButton {
-                    objectName: "saveButton"
-                    text: qsTr("Save")
-                    enabled: root.hasController() && root.controller.editing
-                    onClicked: root.gatherSave()
-                }
-                ActionButton {
-                    objectName: "cancelButton"
-                    text: qsTr("Cancel")
-                    enabled: root.hasController() && root.controller.editing
-                    onClicked: root.controller.cancelEdit()
-                }
-            }
             RowLayout {
                 objectName: "detailGroups"
                 Layout.fillWidth: true
@@ -754,6 +793,33 @@ Item {
         id: messageDialog
         objectName: "messageDialog"
         parent: Overlay.overlay
+    }
+    // Picture for the selected patient; PatientController stores it as the
+    // photo.
+    PhotoDialog {
+        id: photoDialog
+        objectName: "photoDialog"
+        currentFolder: root.hasController() ? root.controller.photoFolder : ""
+        onAccepted: {
+            const result = root.controller.importPhoto(photoDialog.selectedFile);
+            if (result === 1)
+                messageDialog.showInfo(qsTr("Invalid image"), qsTr("The selected file is not a readable image."));
+            else if (result === 2)
+                messageDialog.showInfo(qsTr("Error"), qsTr("Could not save the photo."));
+            gridTable.forceActiveFocus();
+        }
+        onRejected: gridTable.forceActiveFocus()
+    }
+    GxDialog {
+        id: photoDeleteConfirm
+        objectName: "photoDeleteConfirm"
+        parent: Overlay.overlay
+        onAccepted: {
+            if (!root.controller.removePhoto())
+                messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the photo."));
+            gridTable.forceActiveFocus();
+        }
+        onRejected: gridTable.forceActiveFocus()
     }
     GxDialog {
         id: deleteConfirm

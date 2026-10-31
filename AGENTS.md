@@ -44,14 +44,16 @@ qml/
 └── windows/                 screens
 ```
 
-Dependencies flow `qml -> ui -> logic -> data`; `logic/` uses only QtCore and
-`data/`, never Qt Quick or `ui/`, so it can be tested without a GUI. QML only
+Dependencies flow `qml -> ui -> logic -> data`; `logic/` uses only QtCore, the
+QtGui image classes (`QImage`, `QImageReader`, `QImageWriter`, painting on a
+`QImage`; never windows) and `data/`, never Qt Quick or `ui/`, so it can be
+tested without a GUI. QML only
 presents: business rules (patient writes, photo files, clinical availability,
 language/theme persistence) live in `logic/`, and the `ui/` controllers expose
 them to the views.
 
-CMake mirrors the layers: `GambasseCore` (static, `data/` + `logic/`, QtCore
-and QtSql only), `GambasseQml` (the `Gambasse` QML module: the `qml/` views plus
+CMake mirrors the layers: `GambasseCore` (static, `data/` + `logic/`, QtCore,
+QtSql and QtGui for the image classes only), `GambasseQml` (the `Gambasse` QML module: the `qml/` views plus
 the `ui/` C++ types) and the `Gambasse` executable (`main.cpp` + resources).
 Tests link the layer they exercise through `gambasse_add_test()` in
 `tests/CMakeLists.txt` instead of listing sources.
@@ -111,8 +113,11 @@ Use English for source, identifiers, comments, CMake, scripts, technical docs,
 commits, and pull requests. GitHub issues and milestones: titles and
 descriptions always in English. OpenSpec artifacts and user conversation remain in
 Spanish. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
-source language and the Spanish and Portuguese catalogs must preserve their
-current displayed text. Text uses LF;
+source language and the Spanish catalog must preserve its current displayed
+text. The Portuguese catalog is European Portuguese (the norm used in
+Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
+drop-down options in capitals as in the other languages; never carry over the
+Brazilian, Spanish or Galician forms of the original application. Text uses LF;
 never line-ending-normalize binaries such as `.qm`, images, or databases.
 
 ## C++ includes

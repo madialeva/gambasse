@@ -44,7 +44,7 @@
 | ✅ | Automatic database creation and schema migration |
 | ✅ | Histories |
 | ✅ | Consultations |
-| ⬜ | Interactive photo management |
+| ✅ | Interactive photo management |
 | ⬜ | USB backup |
 
 ## Branching and versioning
@@ -152,7 +152,8 @@ gambasse-<version>-linux-x86_64/
 └── lib/
     ├── Qt libraries and their third-party dependencies
     ├── plugins/       xcb, offscreen, SQLite, JPEG/SVG, input contexts
-    └── qml/           QtQml and the QtQuick modules the views import
+    └── qml/           QtQml, the QtQuick modules the views import and
+                       Qt.labs.folderlistmodel (photo file chooser)
 ```
 
 There is no launcher: the executable sits at the root, so the base path is

@@ -1,4 +1,8 @@
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QGuiApplication>
+#include <QImage>
 #include <QSignalSpy>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -11,6 +15,7 @@
 #include <data/model/Patient.h>
 #include <logic/ConsultationService.h>
 #include <logic/PatientService.h>
+#include <logic/PhotoManager.h>
 #include <ui/controller/PatientController.h>
 #include <ui/controller/PediatricConsultationController.h>
 
@@ -82,6 +87,8 @@ private slots:
     void editingLocksTheSelection();
     void adultConsultationOpensWithTheList();
     void pediatricOptionsFollowTheLanguage();
+    void photoStateFollowsTheSession();
+    void importAndRemovePhoto();
 };
 
 void TestPatientController::initTestCase() {
@@ -97,6 +104,9 @@ void TestPatientController::init() {
     QSqlQuery erase(Database::instance().connection());
     QVERIFY2(erase.exec(QStringLiteral("DELETE FROM b01_patient")), qPrintable(erase.lastError().text()));
     QCOMPARE(storedCount(), 0);
+    // Codes restart at MAX(id)+1 once the table is empty: no photo may survive
+    // from another slot.
+    QVERIFY(QDir(m_dir.filePath(QStringLiteral("fotos"))).removeRecursively());
 }
 
 void TestPatientController::cleanupTestCase() {
@@ -528,12 +538,116 @@ void TestPatientController::pediatricOptionsFollowTheLanguage() {
     QSignalSpy optionsSpy(consultation, &PediatricConsultationController::domainOptionsChanged);
     consultation->refreshLanguage();
     QCOMPARE(optionsSpy.count(), 1);
-    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Desinfectante:"));
+    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Desinfetante:"));
     QCOMPARE(consultation->value(QStringLiteral("treatmentMedication1")).toInt(), 1001);
     QCOMPARE(consultation->value(QStringLiteral("treatmentMedication2")).toInt(), 0);
     QCoreApplication::removeTranslator(&portuguese);
     consultation->refreshLanguage();
     QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Disinfectant:"));
+}
+
+void TestPatientController::photoStateFollowsTheSession() {
+    QVERIFY(createPatient(m_service, QStringLiteral("PCONTROL_PHOTO_A")));
+    Patient withPhoto = makePatient(QStringLiteral("PCONTROL_PHOTO_B"));
+    QCOMPARE(static_cast<int>(m_service.create(withPhoto)), kSaved);
+    // A legacy fotos/<id>.jpg counts as the patient's photo.
+    const QString legacy = PhotoManager().legacyPhotoPath(withPhoto);
+    QDir().mkpath(QFileInfo(legacy).absolutePath());
+    QVERIFY(QImage(QSize(20, 20), QImage::Format_RGB32).save(legacy, "JPEG"));
+
+    PatientController controller;
+    QVERIFY(controller.load());
+    QVERIFY(controller.photoFolder().isLocalFile());
+    QVERIFY(!controller.photoFolder().toLocalFile().isEmpty());
+
+    // First row: no photo, so only the photo can be added.
+    QCOMPARE(controller.patientName(), QStringLiteral("PCONTROL_PHOTO_A"));
+    QVERIFY(!controller.hasPhoto());
+    QVERIFY(controller.canEditPhoto());
+    QVERIFY(!controller.canDeletePhoto());
+    QVERIFY(controller.photoSource().startsWith(QStringLiteral("qrc:")));
+
+    controller.selectRow(1);
+    QVERIFY(controller.hasPhoto());
+    QVERIFY(controller.canEditPhoto());
+    QVERIFY(controller.canDeletePhoto());
+    QCOMPARE(QUrl(controller.photoSource()).toLocalFile(), legacy);
+
+    // Never during an edit session.
+    controller.startEdit();
+    QVERIFY(!controller.canEditPhoto());
+    QVERIFY(!controller.canDeletePhoto());
+    controller.cancelEdit();
+    QVERIFY(controller.canDeletePhoto());
+    controller.startAdd();
+    QVERIFY(!controller.canEditPhoto());
+    QVERIFY(!controller.canDeletePhoto());
+    controller.cancelEdit();
+    QVERIFY(controller.canEditPhoto());
+
+    // Nor without a selected patient.
+    controller.setColumnFilter(PatientsModel::ColumnName, QStringLiteral("NOBODY"));
+    QVERIFY(!controller.hasSelection());
+    QVERIFY(!controller.canEditPhoto());
+    QVERIFY(!controller.canDeletePhoto());
+}
+
+void TestPatientController::importAndRemovePhoto() {
+    Patient patient = makePatient(QStringLiteral("PCONTROL_IMPORT"));
+    QCOMPARE(static_cast<int>(m_service.create(patient)), kSaved);
+    const QString stored = PhotoManager().photoPath(patient);
+    const QString source = m_dir.filePath(QStringLiteral("in/photo.png"));
+    QDir().mkpath(QFileInfo(source).absolutePath());
+    QVERIFY(QImage(QSize(600, 300), QImage::Format_RGB32).save(source));
+
+    PatientController controller;
+    QVERIFY(controller.load());
+    QSignalSpy detailSpy(&controller, &PatientController::detailChanged);
+    QCOMPARE(controller.importPhoto(QUrl::fromLocalFile(source)), 0);
+    QCOMPARE(detailSpy.count(), 1);
+    QVERIFY(controller.hasPhoto());
+    QVERIFY(controller.canDeletePhoto());
+    QCOMPARE(QUrl(controller.photoSource()).toLocalFile(), stored);
+    QCOMPARE(QImage(stored).size(), QSize(240, 120));
+
+    // An unreadable file changes nothing. The stored photo is dated back, so
+    // the next import surely gets another modification time.
+    {
+        QFile file(stored);
+        QVERIFY(file.open(QIODevice::ReadWrite));
+        QVERIFY(file.setFileTime(QDateTime::currentDateTime().addSecs(-60),
+                                 QFileDevice::FileModificationTime));
+    }
+    const QString notes = m_dir.filePath(QStringLiteral("in/notes.txt"));
+    {
+        QFile file(notes);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write("not a picture");
+    }
+    QCOMPARE(controller.importPhoto(QUrl::fromLocalFile(notes)), 1);
+    QVERIFY(controller.hasPhoto());
+    QCOMPARE(QImage(stored).size(), QSize(240, 120));
+
+    // Same file, new picture: another URL, so the view reloads it.
+    const QString before = controller.photoSource();
+    QVERIFY(QImage(QSize(100, 80), QImage::Format_RGB32).save(source));
+    QCOMPARE(controller.importPhoto(QUrl::fromLocalFile(source)), 0);
+    QCOMPARE(QUrl(controller.photoSource()).toLocalFile(), stored);
+    QVERIFY(controller.photoSource() != before);
+    QCOMPARE(QImage(stored).size(), QSize(100, 80));
+
+    // Neither operation applies during an edit session.
+    controller.startEdit();
+    QCOMPARE(controller.importPhoto(QUrl::fromLocalFile(source)), 2);
+    QVERIFY(!controller.removePhoto());
+    controller.cancelEdit();
+
+    QVERIFY(controller.removePhoto());
+    QVERIFY(!QFileInfo::exists(stored));
+    QVERIFY(!controller.hasPhoto());
+    QVERIFY(!controller.canDeletePhoto());
+    QVERIFY(controller.canEditPhoto());
+    QVERIFY(controller.photoSource().startsWith(QStringLiteral("qrc:")));
 }
 
 } // namespace gambasse

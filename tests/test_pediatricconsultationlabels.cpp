@@ -85,10 +85,10 @@ void TestPediatricConsultationLabels::labelsFollowTheTranslator() {
     QTranslator portuguese;
     QVERIFY(portuguese.load(QStringLiteral("gambasse_pt"), QStringLiteral(":/i18n")));
     QCoreApplication::installTranslator(&portuguese);
-    // Portuguese keeps the text the VB.NET form showed.
-    QCOMPARE(label("severity", 1), QStringLiteral("SERIO"));
-    QCOMPARE(label("armColor", 1), QStringLiteral("VERMELLO"));
-    QCOMPARE(label("activeIngredient", 151), QStringLiteral("Desinfectante:"));
+    // Portuguese shows its European Portuguese labels.
+    QCOMPARE(label("severity", 1), QStringLiteral("GRAVE"));
+    QCOMPARE(label("armColor", 1), QStringLiteral("VERMELHO"));
+    QCOMPARE(label("activeIngredient", 151), QStringLiteral("Desinfetante:"));
     QCoreApplication::removeTranslator(&portuguese);
 
     QTranslator spanish;

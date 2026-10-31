@@ -1,4 +1,7 @@
 #include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QSqlQuery>
 #include <QTemporaryDir>
 #include <QtTest>
@@ -7,6 +10,7 @@
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
+#include <logic/PhotoManager.h>
 
 namespace gambasse {
 namespace {
@@ -53,6 +57,7 @@ private slots:
     void duplicateIsRejected();
     void createThenUpdate();
     void removeDeletesPatient();
+    void removeDeletesBothPhotoFiles();
 };
 
 void TestPatientService::initTestCase() {
@@ -101,6 +106,25 @@ void TestPatientService::removeDeletesPatient() {
     const int before = patientCount();
     QVERIFY(service.remove(p));
     QCOMPARE(patientCount(), before - 1);
+}
+
+void TestPatientService::removeDeletesBothPhotoFiles() {
+    PatientService service;
+    Patient p = makePatient(QStringLiteral("PSERVICE_PHOTO"));
+    QCOMPARE(service.create(p), PatientService::SaveResult::Saved);
+    // The legacy fotos/<id>.jpg goes too: left behind, a new patient reusing
+    // the code (MAX(id)+1) would show it.
+    const PhotoManager photos;
+    for (const QString& path : {photos.photoPath(p), photos.legacyPhotoPath(p)}) {
+        QDir().mkpath(QFileInfo(path).absolutePath());
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write("x");
+    }
+
+    QVERIFY(service.remove(p));
+    QVERIFY(!QFileInfo::exists(photos.photoPath(p)));
+    QVERIFY(!QFileInfo::exists(photos.legacyPhotoPath(p)));
 }
 
 } // namespace gambasse

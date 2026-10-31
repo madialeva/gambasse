@@ -11,7 +11,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="214"/>
         <source>ACUTE PAIN</source>
-        <translation>DOLOR AGUDO</translation>
+        <translation>DOR AGUDA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="215"/>
@@ -21,22 +21,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="216"/>
         <source>ABDOMINAL GUARDING</source>
-        <translation>DEFENSA ABDOMINAL</translation>
+        <translation>DEFESA ABDOMINAL</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="217"/>
         <source>BLUMBERG SIGN</source>
-        <translation>SIGNO DE BLUMBERG</translation>
+        <translation>SINAL DE BLUMBERG</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="218"/>
         <source>RENAL FOSSA PAIN</source>
-        <translation>DOLOR FOSA RENAL</translation>
+        <translation>DOR NA FOSSA RENAL</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="219"/>
         <source>FIST PERCUSSION SIGN</source>
-        <translation>SIGNO PUÑO/PERCUSION</translation>
+        <translation>SINAL DE PUNHO-PERCUSSÃO</translation>
     </message>
 </context>
 <context>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="241"/>
         <source>Acetylcysteine</source>
-        <translation>Acetilcisteina</translation>
+        <translation>Acetilcisteína</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="242"/>
@@ -64,12 +64,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="244"/>
         <source>Fatty acids</source>
-        <translation>Ácidos grasos</translation>
+        <translation>Ácidos gordos</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="245"/>
         <source>Tranexamic acid</source>
-        <translation>Ácido tranexámico</translation>
+        <translation>Ácido tranexâmico</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="246"/>
@@ -89,7 +89,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="249"/>
         <source>Almagate (Almax)</source>
-        <translation>Almagato (almax)</translation>
+        <translation>Almagato (Almax)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="250"/>
@@ -104,12 +104,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="252"/>
         <source>Amitriptyline (Tryptizol)</source>
-        <translation>Amitriptilina (triptizol)</translation>
+        <translation>Amitriptilina (Tryptizol)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="253"/>
         <source>Amlodipine</source>
-        <translation>Amlodipino</translation>
+        <translation>Amlodipina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="254"/>
@@ -119,7 +119,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="255"/>
         <source>Amoxicillin/clavulanic acid</source>
-        <translation>Amoxiclavulánico</translation>
+        <translation>Amoxicilina/ácido clavulânico</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="256"/>
@@ -134,12 +134,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="258"/>
         <source>Artemether</source>
-        <translation>Artemether</translation>
+        <translation>Arteméter</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="259"/>
         <source>Artemether + lumefantrine</source>
-        <translation>Artemisina + lumefantrina</translation>
+        <translation>Arteméter + lumefantrina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="260"/>
@@ -159,12 +159,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="263"/>
         <source>Benzathine benzylpenicillin</source>
-        <translation>Benzaticina penicilina</translation>
+        <translation>Benzilpenicilina benzatínica</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="264"/>
         <source>Betahistine (Serc)</source>
-        <translation>Betahistina (serc)</translation>
+        <translation>Betaistina (Serc)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="265"/>
@@ -174,7 +174,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="266"/>
         <source>Bromazepam</source>
-        <translation>Bromozepam</translation>
+        <translation>Bromazepam</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="267"/>
@@ -184,12 +184,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="268"/>
         <source>Hyoscine butylbromide (Buscopan)</source>
-        <translation>Buscapina</translation>
+        <translation>Butilescopolamina (Buscopan)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="269"/>
         <source>Calcium</source>
-        <translation>Calcio</translation>
+        <translation>Cálcio</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="270"/>
@@ -234,12 +234,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="278"/>
         <source>Cinitapride (Cidine)</source>
-        <translation>Cinitaprida (cidine)</translation>
+        <translation>Cinitaprida (Cidine)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="279"/>
         <source>Ciprofloxacin</source>
-        <translation>Ciprofloxacino</translation>
+        <translation>Ciprofloxacina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="280"/>
@@ -254,7 +254,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="282"/>
         <source>Clebopride (Flatoril)</source>
-        <translation>Cleboprida (flatoril)</translation>
+        <translation>Cleboprida (Flatoril)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="283"/>
@@ -264,7 +264,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="284"/>
         <source>Clonazepam (Rivotril)</source>
-        <translation>Clonazepam (rivotril)</translation>
+        <translation>Clonazepam (Rivotril)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="285"/>
@@ -279,12 +279,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="287"/>
         <source>Vitamin B complex</source>
-        <translation>Complejo B vitamínico</translation>
+        <translation>Complexo vitamínico B</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="288"/>
         <source>Co-trimoxazole: sulfamethoxazole + trimethoprim (Bactrim)</source>
-        <translation>Co-trimoxazol: sulfametoxazol + trimetoprim (bactrim)</translation>
+        <translation>Cotrimoxazol: sulfametoxazol + trimetoprim (Bactrim)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="289"/>
@@ -299,7 +299,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="291"/>
         <source>Diethylcarbamazine</source>
-        <translation>Dietilcarbamacina</translation>
+        <translation>Dietilcarbamazina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="292"/>
@@ -314,7 +314,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="294"/>
         <source>Domperidone (Motilium)</source>
-        <translation>Domperidona (motilium)</translation>
+        <translation>Domperidona (Motilium)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="295"/>
@@ -324,7 +324,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="296"/>
         <source>Dexketoprofen (Enantyum)</source>
-        <translation>Enantyum</translation>
+        <translation>Dexcetoprofeno (Enantyum)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="297"/>
@@ -334,7 +334,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="298"/>
         <source>Spironolactone (Aldactone)</source>
-        <translation>Espironolactona (aldactone)</translation>
+        <translation>Espironolactona (Aldactone)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="299"/>
@@ -344,7 +344,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="300"/>
         <source>Etoricoxib (Arcoxia)</source>
-        <translation>Etoricoxib (arcoxia)</translation>
+        <translation>Etoricoxib (Arcoxia)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="301"/>
@@ -364,7 +364,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="304"/>
         <source>Fluorescein, eye drops</source>
-        <translation>Fluoresceína, colirio</translation>
+        <translation>Fluoresceína, colírio</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="305"/>
@@ -399,17 +399,17 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="311"/>
         <source>Gliclazide (Diamicron)</source>
-        <translation>Gliclazida (diamicron)</translation>
+        <translation>Gliclazida (Diamicron)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="312"/>
         <source>Griseofulvin</source>
-        <translation>Gliseofulvina</translation>
+        <translation>Griseofulvina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="313"/>
         <source>Glucose 50%</source>
-        <translation>Glucosa 50%</translation>
+        <translation>Glicose 50%</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="314"/>
@@ -419,7 +419,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="315"/>
         <source>Hydralazine</source>
-        <translation>Hidrazalina</translation>
+        <translation>Hidralazina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="316"/>
@@ -439,12 +439,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="319"/>
         <source>Ipratropium</source>
-        <translation>Ipratropio</translation>
+        <translation>Ipratrópio</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="320"/>
         <source>Irbesartan</source>
-        <translation>Irbesartán</translation>
+        <translation>Irbesartan</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="321"/>
@@ -464,42 +464,42 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="324"/>
         <source>Ketoconazole</source>
-        <translation>Ketoconazol</translation>
+        <translation>Cetoconazol</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="325"/>
         <source>Labetalol (Trandate)</source>
-        <translation>Labetalol (trandate)</translation>
+        <translation>Labetalol (Trandate)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="326"/>
         <source>Lactulose (Duphalac)</source>
-        <translation>Lactulosa (duphalac)</translation>
+        <translation>Lactulose (Duphalac)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="327"/>
         <source>Levetiracetam (Keppra)</source>
-        <translation>Levetiracetam (keppra)</translation>
+        <translation>Levetiracetam (Keppra)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="328"/>
         <source>Levofloxacin</source>
-        <translation>Levofloxacino</translation>
+        <translation>Levofloxacina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="329"/>
         <source>Levothyroxine (Eutirox)</source>
-        <translation>Levotiroxina (eutirox)</translation>
+        <translation>Levotiroxina (Eutirox)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="330"/>
         <source>Loperamide (Fortasec)</source>
-        <translation>Loperamida (fortasec)</translation>
+        <translation>Loperamida (Fortasec)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="331"/>
         <source>Loratadine (Clarityne)</source>
-        <translation>Loratadina (clarytine)</translation>
+        <translation>Loratadina (Clarityne)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="332"/>
@@ -509,12 +509,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="333"/>
         <source>Lormetazepam (Noctamid)</source>
-        <translation>Lormetazepam (noctamid)</translation>
+        <translation>Lormetazepam (Noctamid)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="334"/>
         <source>Macrogol (Movicol)</source>
-        <translation>Macrogol (movicol)</translation>
+        <translation>Macrogol (Movicol)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="335"/>
@@ -524,7 +524,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="336"/>
         <source>Metformin</source>
-        <translation>Melformina</translation>
+        <translation>Metformina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="337"/>
@@ -539,17 +539,17 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="339"/>
         <source>Metoclopramide</source>
-        <translation>Metroclopramida</translation>
+        <translation>Metoclopramida</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="340"/>
         <source>Metronidazole (Flagyl)</source>
-        <translation>Metronidazol (fragyl)</translation>
+        <translation>Metronidazol (Flagyl)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="341"/>
         <source>Metronidazole + spiramycin (Rhodogil)</source>
-        <translation>Metronidazol + espiramicina (rhodogil)</translation>
+        <translation>Metronidazol + espiramicina (Rhodogil)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="342"/>
@@ -579,12 +579,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="347"/>
         <source>Multivitamins</source>
-        <translation>Multivitaminas</translation>
+        <translation>Multivitamínicos</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="348"/>
         <source>Mupirocin, cream</source>
-        <translation>Mupirocina, crema</translation>
+        <translation>Mupirocina, creme</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="349"/>
@@ -594,12 +594,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="350"/>
         <source>Neomycin + bacitracin</source>
-        <translation>Neomycina + batricina</translation>
+        <translation>Neomicina + bacitracina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="351"/>
         <source>Nifedipine (Adalat)</source>
-        <translation>Nifedipino (adalat)</translation>
+        <translation>Nifedipina (Adalat)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="352"/>
@@ -609,7 +609,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="353"/>
         <source>Nitrofural (Furacin)</source>
-        <translation>Nitrofural (furacin)</translation>
+        <translation>Nitrofural (Furacin)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="354"/>
@@ -619,7 +619,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="355"/>
         <source>Olmesartan</source>
-        <translation>Olmesartán</translation>
+        <translation>Olmesartan</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="356"/>
@@ -629,7 +629,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="357"/>
         <source>Ondansetron (Zofran)</source>
-        <translation>Ondasetrón (zofrán)</translation>
+        <translation>Ondansetrom (Zofran)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="358"/>
@@ -644,12 +644,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="360"/>
         <source>Risperidone (Risperdal)</source>
-        <translation>Risperidona (risperdal)</translation>
+        <translation>Risperidona (Risperdal)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="361"/>
         <source>Praziquantel</source>
-        <translation>Prazicuantel</translation>
+        <translation>Praziquantel</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="362"/>
@@ -674,7 +674,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="366"/>
         <source>Propranolol</source>
-        <translation>Propanolol</translation>
+        <translation>Propranolol</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="367"/>
@@ -689,37 +689,37 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="369"/>
         <source>Simeticone (Aero Red)</source>
-        <translation>Simeticona (aerored)</translation>
+        <translation>Simeticone (Aero Red)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="370"/>
         <source>Oral rehydration salts</source>
-        <translation>Suero de rehidratación oral</translation>
+        <translation>Sais de reidratação oral</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="371"/>
         <source>Lactated Ringer&apos;s solution</source>
-        <translation>Suero Ringer Lactato</translation>
+        <translation>Soro de Ringer lactato</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="372"/>
         <source>Normal saline 0.9%</source>
-        <translation>Suero Fisiológico 0,9%</translation>
+        <translation>Soro fisiológico 0,9%</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="373"/>
         <source>Glucose 5% solution</source>
-        <translation>Suero Glucosado 5%</translation>
+        <translation>Soro glicosado 5%</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="374"/>
         <source>Silver sulfadiazine ointment</source>
-        <translation>Sulfadiazina argéntica pomada</translation>
+        <translation>Sulfadiazina de prata, pomada</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="375"/>
         <source>Sulfadoxine/pyrimethamine</source>
-        <translation>sulfadoxina/pirimetamina</translation>
+        <translation>Sulfadoxina/pirimetamina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="376"/>
@@ -734,7 +734,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="378"/>
         <source>Tetracycline eye ointment</source>
-        <translation>Tetraciclina oftámica</translation>
+        <translation>Tetraciclina, pomada oftálmica</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="379"/>
@@ -749,12 +749,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="381"/>
         <source>Clorazepate (Tranxilium)</source>
-        <translation>Tranxilium</translation>
+        <translation>Clorazepato (Tranxilium)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="382"/>
         <source>Sodium valproate, valproic acid (Depakine)</source>
-        <translation>Valproato de sodio, ácido valproico (depakine)</translation>
+        <translation>Valproato de sódio, ácido valproico (Depakine)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="383"/>
@@ -769,7 +769,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="385"/>
         <source>Vitamin C</source>
-        <translation>vitamina C</translation>
+        <translation>Vitamina C</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="386"/>
@@ -789,22 +789,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="389"/>
         <source>Zinc</source>
-        <translation>Zinc</translation>
+        <translation>Zinco</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="390"/>
         <source>OTHERS:</source>
-        <translation>OTROS:</translation>
+        <translation>OUTROS:</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="391"/>
         <source>Disinfectant:</source>
-        <translation>Desinfectante:</translation>
+        <translation>Desinfetante:</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="392"/>
         <source>Local treatment:</source>
-        <translation>Tratamiento local:</translation>
+        <translation>Tratamento local:</translation>
     </message>
 </context>
 <context>
@@ -892,7 +892,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="431"/>
         <source>1 MONTH</source>
-        <translation>1 MES</translation>
+        <translation>1 MÊS</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="432"/>
@@ -910,7 +910,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="397"/>
         <source>RECTAL</source>
-        <translation>RECTAL</translation>
+        <translation>RETAL</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="398"/>
@@ -930,7 +930,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="401"/>
         <source>DERMAL</source>
-        <translation>DERMICO</translation>
+        <translation>DÉRMICO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="402"/>
@@ -950,12 +950,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="405"/>
         <source>INFUSION</source>
-        <translation>PERFUSION</translation>
+        <translation>PERFUSÃO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="406"/>
         <source>INHALED</source>
-        <translation>INHALADO</translation>
+        <translation>INALADO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="407"/>
@@ -980,7 +980,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="411"/>
         <source>SYRUP</source>
-        <translation>JARABE</translation>
+        <translation>XAROPE</translation>
     </message>
 </context>
 <context>
@@ -988,7 +988,7 @@
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="60"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="69"/>
@@ -1003,17 +1003,17 @@
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="92"/>
         <source>Consultation list</source>
-        <translation>LISTA DE CONSULTAS</translation>
+        <translation>Lista de consultas</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="113"/>
         <source>Reason for consultation</source>
-        <translation>MOTIVO DA CONSULTA</translation>
+        <translation>Motivo da consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="135"/>
         <source>Lesion</source>
-        <translation>LESAO</translation>
+        <translation>Lesão</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="180"/>
@@ -1026,162 +1026,162 @@
         <translation>Prejuízo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="203"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="208"/>
         <source>Physical examination</source>
-        <translation>EXPLORAÇÃO FÍSICA</translation>
+        <translation>Exploração física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="211"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="217"/>
         <source>Respiratory</source>
-        <translation>RESPIRATÓRIO</translation>
+        <translation>Respiratório</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="218"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="224"/>
         <source>Nasal flaring</source>
-        <translation>Agitação nasal</translation>
+        <translation>Adejo nasal</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="225"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="231"/>
         <source>Stridor</source>
         <translation>Estridor</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="232"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="238"/>
         <source>Wheezing</source>
         <translation>Sibilos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="239"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="245"/>
         <source>Retraction</source>
-        <translation>Tiraje</translation>
+        <translation>Tiragem</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="249"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="255"/>
         <source>Circulatory</source>
-        <translation>CIRCULATÓRIO</translation>
+        <translation>Circulatório</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="256"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="262"/>
         <source>Arrhythmia</source>
         <translation>Arritmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="263"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="269"/>
         <source>Capillary refill</source>
         <translation>Enchimento capilar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="270"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="276"/>
         <source>No radial pulse</source>
         <translation>Ausência pulso rad.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="277"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="283"/>
         <source>Edema</source>
-        <translation>Edemas</translation>
+        <translation>Edema</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="287"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="293"/>
         <source>Skin and mucosa</source>
-        <translation>PELE E MUCOSAS</translation>
+        <translation>Pele e mucosas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="294"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="300"/>
         <source>Skin fold &gt; 2&quot;</source>
         <translation>Prega da pele ˃2&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="301"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="307"/>
         <source>Pale mucosa</source>
         <translation>Mucosas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="308"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="314"/>
         <source>Enophthalmos</source>
         <translation>Enoftalmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="315"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="321"/>
         <source>Pale palms</source>
-        <translation>Palma da mão branca</translation>
+        <translation>Palmas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="325"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="331"/>
         <source>Endocrine-metabolic</source>
-        <translation>ENDÓCRINO-METABÓLICO</translation>
+        <translation>Endócrino-metabólico</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="332"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="338"/>
         <source>Organomegaly</source>
-        <translation>Megalia</translation>
+        <translation>Organomegalia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="348"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="354"/>
         <source>Lymphadenopathy</source>
-        <translation>Adenopatías</translation>
+        <translation>Adenopatias</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="367"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="373"/>
         <source>Elimination</source>
-        <translation>ELIMINAÇAO</translation>
+        <translation>Eliminação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="374"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="380"/>
         <source>Secretion</source>
         <translation>Secreção</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="381"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="387"/>
         <source>Stool changes</source>
-        <translation>Alteração heces</translation>
+        <translation>Alteração fezes</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="388"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="394"/>
         <source>Cough</source>
         <translation>Tosse</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="404"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="410"/>
         <source>Urine changes</source>
         <translation>Alteração urina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="420"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="426"/>
         <source>Vomiting</source>
-        <translation>Vômitos</translation>
+        <translation>Vómitos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="430"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="436"/>
         <source>Health disorders</source>
-        <translation>DISTURBIOS DA SAUDE</translation>
+        <translation>Distúrbios da saúde</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="440"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="446"/>
         <source>Dehydration degree:</source>
-        <translation>Desidratação.Grado:</translation>
+        <translation>Desidratação. Grau:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="451"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="457"/>
         <source>Malnutrition degree:</source>
-        <translation>Subnutrição.Grado:</translation>
+        <translation>Desnutrição. Grau:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="462"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="468"/>
         <source>Others:</source>
         <translation>Outros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="473"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="479"/>
         <source>Conduct</source>
-        <translation>CONDUTA</translation>
+        <translation>Conduta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="480"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="486"/>
         <source>Irritable</source>
-        <translation>Irritâvel</translation>
+        <translation>Irritável</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="489"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="495"/>
         <source>Other:</source>
         <translation>Outro:</translation>
     </message>
@@ -1191,7 +1191,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="22"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="31"/>
@@ -1201,27 +1201,27 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="45"/>
         <source>Opening date:</source>
-        <translation>Data Abertura:</translation>
+        <translation>Data abertura:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="54"/>
         <source>Allergies:</source>
-        <translation>ALERGIAS:</translation>
+        <translation>Alergias:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="66"/>
         <source>Adult history</source>
-        <translation>HISTÓRIA DO ADULTO</translation>
+        <translation>História do adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="73"/>
         <source>Chronic diseases</source>
-        <translation>DOENÇAS CRÔNICAS</translation>
+        <translation>Doenças crónicas</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="80"/>
         <source>Diabetes</source>
-        <translation>Diabete</translation>
+        <translation>Diabetes</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="89"/>
@@ -1241,6 +1241,11 @@
         <translation>Tipo:</translation>
     </message>
     <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="124"/>
+        <source>HIV</source>
+        <translation>VIH</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="143"/>
         <source>Other diseases:</source>
         <translation>Outras doenças:</translation>
@@ -1253,7 +1258,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="164"/>
         <source>Number of children:</source>
-        <translation>Número de filios:</translation>
+        <translation>Nº de filhos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="174"/>
@@ -1268,22 +1273,22 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="198"/>
         <source>Housing</source>
-        <translation>VIVENDA</translation>
+        <translation>Habitação</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="205"/>
         <source>Potable water</source>
-        <translation>Auga Potavel</translation>
+        <translation>Água potável</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="212"/>
         <source>Mosquito net</source>
-        <translation>Mosquiteira</translation>
+        <translation>Mosquiteiro</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="219"/>
         <source>Net use</source>
-        <translation>Usana</translation>
+        <translation>Usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="226"/>
@@ -1293,22 +1298,22 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="244"/>
         <source>Domestic hygiene</source>
-        <translation>Higiene Domestica</translation>
+        <translation>Higiene doméstica</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="251"/>
         <source>Sanitary control</source>
-        <translation>Control sanitário</translation>
+        <translation>Controlo sanitário</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="236"/>
         <source>Domestic animals:</source>
-        <translation>Animais Domesticos:</translation>
+        <translation>Animais domésticos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="262"/>
         <source>Vital signs</source>
-        <translation>SINAIS VITAIS</translation>
+        <translation>Sinais vitais</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="272"/>
@@ -1338,7 +1343,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="329"/>
         <source>Consciousness:</source>
-        <translation>Consciencia:</translation>
+        <translation>Consciência:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="339"/>
@@ -1353,7 +1358,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="359"/>
         <source>Capillary glucose:</source>
-        <translation>Glucemia capilar:</translation>
+        <translation>Glicemia capilar:</translation>
     </message>
 </context>
 <context>
@@ -1366,7 +1371,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="61"/>
         <source>RED</source>
-        <translation>VERMELLO</translation>
+        <translation>VERMELHO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="62"/>
@@ -1412,67 +1417,67 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="224"/>
         <source>Danger signs for the mother to return to a health centre at once</source>
-        <translation>Signos de alarma que ha de detectar la madre para regresar de inmediato a un centro sanitaria</translation>
+        <translation>Sinais de alarme que a mãe deve detetar para regressar de imediato a um centro de saúde</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="225"/>
         <source>Advice for the mother on giving oral medicines at home</source>
-        <translation>Recomendaciones para la madre para administrar medicamentos vía oral en casa</translation>
+        <translation>Recomendações à mãe para administrar medicamentos por via oral em casa</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="226"/>
         <source>Home advice for patients with cough and breathing difficulty</source>
-        <translation>Recomendaciones para casa a pacientes con tos y dificultad respiratoria</translation>
+        <translation>Recomendações para casa a doentes com tosse e dificuldade respiratória</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="227"/>
         <source>Advice for treating diarrhea at home</source>
-        <translation>Recomendaciones para tratar la diarrea en casa</translation>
+        <translation>Recomendações para tratar a diarreia em casa</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="228"/>
         <source>Malaria prevention measures</source>
-        <translation>Medidas preventivas ante la malaria</translation>
+        <translation>Medidas preventivas contra a malária</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="229"/>
         <source>Home advice in case of fever</source>
-        <translation>Recomendaciones para casa en caso de fiebre</translation>
+        <translation>Recomendações para casa em caso de febre</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="230"/>
         <source>Home advice on feeding</source>
-        <translation>Recomendaciones para casa sobre alimentación</translation>
+        <translation>Recomendações para casa sobre alimentação</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="231"/>
         <source>Food hygiene prevention measures</source>
-        <translation>Medidas preventivas de higiene alimentaria</translation>
+        <translation>Medidas preventivas de higiene alimentar</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="232"/>
         <source>Household hygiene prevention measures</source>
-        <translation>Medidas preventivas de higiene de la vivienda</translation>
+        <translation>Medidas preventivas de higiene da habitação</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="233"/>
         <source>Advice for the child with diabetes mellitus</source>
-        <translation>Recomendaciones para el niño con diabetes mellitus</translation>
+        <translation>Recomendações para a criança com diabetes mellitus</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="234"/>
         <source>Early stimulation guide for developmental problems in the child</source>
-        <translation>Guía de estimulación temprana para problemas de desarrollo en el niño</translation>
+        <translation>Guia de estimulação precoce para problemas de desenvolvimento na criança</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="235"/>
         <source>Instructions on the child&apos;s vaccination with the country&apos;s vaccination card</source>
-        <translation>Instruir para la vacunación de niño mediante cartilla de vacunas establecidas por el país</translation>
+        <translation>Instruir sobre a vacinação da criança com o boletim de vacinas do país</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="236"/>
         <source>Plan A: home treatment advice for dehydration</source>
-        <translation>Plan A: Recomendaciones de tratamiento en casa para la deshidratación</translation>
+        <translation>Plano A: recomendações de tratamento em casa para a desidratação</translation>
     </message>
 </context>
 <context>
@@ -1527,7 +1532,7 @@
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="90"/>
         <source>Could not save the consultation.</source>
-        <translation>¡ Erro ao gravar a consulta !</translation>
+        <translation>Não foi possível guardar a consulta.</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="103"/>
@@ -1538,27 +1543,27 @@
         <location filename="../qml/windows/ConsultationWindow.qml" line="104"/>
         <location filename="../qml/windows/ConsultationWindow.qml" line="186"/>
         <source>Delete consultation</source>
-        <translation>Borrar Consulta</translation>
+        <translation>Apagar consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="156"/>
         <source>Exit</source>
-        <translation>Salir</translation>
+        <translation>Sair</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="165"/>
         <source>Save consultation</source>
-        <translation>Grabar Consulta</translation>
+        <translation>Guardar consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="175"/>
         <source>New consultation</source>
-        <translation>Nueva Consulta</translation>
+        <translation>Nova consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="204"/>
         <source>Could not delete the consultation.</source>
-        <translation>¡ Erro ao apagar a consulta !</translation>
+        <translation>Não foi possível apagar a consulta.</translation>
     </message>
 </context>
 <context>
@@ -1576,7 +1581,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="143"/>
         <source>PERIPHERAL</source>
-        <translation>PERIFERICA</translation>
+        <translation>PERIFÉRICA</translation>
     </message>
 </context>
 <context>
@@ -1584,22 +1589,22 @@
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="10"/>
         <source>In stable</source>
-        <translation>En Estabulo</translation>
+        <translation>No estábulo</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="12"/>
         <source>In dwelling</source>
-        <translation>Na Vivenda</translation>
+        <translation>Na habitação</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="14"/>
         <source>In stable and dwelling</source>
-        <translation>En Estabulo e Vivenda</translation>
+        <translation>No estábulo e na habitação</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="17"/>
         <source>None</source>
-        <translation>Non</translation>
+        <translation>Nenhum</translation>
     </message>
 </context>
 <context>
@@ -1640,12 +1645,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="174"/>
         <source>VERY SEVERE</source>
-        <translation>MOI SERIO</translation>
+        <translation>MUITO GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="175"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="176"/>
@@ -1673,12 +1678,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="149"/>
         <source>FADES WITH PRESSURE</source>
-        <translation>DIMINUE COM A PRESSAO</translation>
+        <translation>DESAPARECE À PRESSÃO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="150"/>
         <source>DOES NOT FADE WITH PRESSURE</source>
-        <translation>NON DIMINUE COM A PRESSAO</translation>
+        <translation>NÃO DESAPARECE À PRESSÃO</translation>
     </message>
 </context>
 <context>
@@ -1691,7 +1696,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="167"/>
         <source>SEVERE PURULENT</source>
-        <translation>PURULENTA SERIA</translation>
+        <translation>PURULENTA GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="168"/>
@@ -1701,7 +1706,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="169"/>
         <source>WATERY</source>
-        <translation>ACUOSA</translation>
+        <translation>AQUOSA</translation>
     </message>
 </context>
 <context>
@@ -1732,12 +1737,12 @@
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="28"/>
         <source>Delete the pregnancy history of &quot;%1&quot;?</source>
-        <translation>Apagar a história grávida de &quot;%1&quot;?</translation>
+        <translation>Apagar a história de gravidez de &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="29"/>
         <source>Delete the adult history of &quot;%1&quot;?</source>
-        <translation>Apagar a história adulto de &quot;%1&quot;?</translation>
+        <translation>Apagar a história de adulto de &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="87"/>
@@ -1748,23 +1753,23 @@
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="87"/>
         <source>Could not save the history.</source>
-        <translation>Não foi possível gravar a história.</translation>
+        <translation>Não foi possível guardar a história.</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="98"/>
         <location filename="../qml/windows/HistoryWindow.qml" line="152"/>
         <source>Delete history</source>
-        <translation>Borrar Historia</translation>
+        <translation>Apagar história</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="163"/>
         <source>Save history</source>
-        <translation>Grabar Historia</translation>
+        <translation>Guardar história</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="173"/>
         <source>Exit</source>
-        <translation>Salir</translation>
+        <translation>Sair</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="189"/>
@@ -1775,203 +1780,241 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="102"/>
+        <location filename="../qml/windows/MainWindow.qml" line="104"/>
         <source>Code:</source>
         <translation type="unfinished">Código:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="139"/>
+        <location filename="../qml/windows/MainWindow.qml" line="141"/>
         <source>Incomplete data</source>
         <translation type="unfinished">Dados incompletos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="139"/>
+        <location filename="../qml/windows/MainWindow.qml" line="141"/>
         <source>Name is required.</source>
         <translation type="unfinished">O nome é obrigatório.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="142"/>
+        <location filename="../qml/windows/MainWindow.qml" line="144"/>
         <source>Duplicate patient</source>
         <translation type="unfinished">Paciente duplicado</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="142"/>
+        <location filename="../qml/windows/MainWindow.qml" line="144"/>
         <source>A patient with the same name, birth date, sex, and age already exists.</source>
         <translation type="unfinished">Já existe um paciente com o mesmo nome, data de nascimento, sexo e idade.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
-        <location filename="../qml/windows/MainWindow.qml" line="758"/>
+        <location filename="../qml/windows/MainWindow.qml" line="146"/>
+        <location filename="../qml/windows/MainWindow.qml" line="808"/>
+        <location filename="../qml/windows/MainWindow.qml" line="819"/>
+        <location filename="../qml/windows/MainWindow.qml" line="830"/>
         <source>Error</source>
         <translation type="unfinished">Erro</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
+        <location filename="../qml/windows/MainWindow.qml" line="146"/>
         <source>Could not save the patient.</source>
         <translation type="unfinished">Não foi possível guardar o paciente.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="152"/>
+        <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Adult History</source>
-        <translation>História Adulto</translation>
+        <translation>História de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="152"/>
+        <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Pediatric History</source>
-        <translation>História Pediátrica</translation>
+        <translation>História pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="152"/>
+        <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Pregnancy History</source>
-        <translation>História Grávida</translation>
+        <translation>História de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="158"/>
+        <location filename="../qml/windows/MainWindow.qml" line="164"/>
         <source>Adult Consultation</source>
-        <translation>CONSULTA ADULTO</translation>
+        <translation>Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="158"/>
+        <location filename="../qml/windows/MainWindow.qml" line="164"/>
         <source>Pediatric Consultation</source>
-        <translation>CONSULTA PEDIATRICA</translation>
+        <translation>Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="158"/>
+        <location filename="../qml/windows/MainWindow.qml" line="164"/>
         <source>Pregnancy Consultation</source>
-        <translation>CONSULTA MULLER GRAVIDA</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/MainWindow.qml" line="217"/>
-        <source>Pediatric history</source>
-        <translation>História da criança</translation>
+        <translation>Consulta de gravidez</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="223"/>
+        <source>Pediatric history</source>
+        <translation>História pediátrica</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="229"/>
         <source>Pediatric consultation</source>
         <translation type="unfinished">Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="229"/>
+        <location filename="../qml/windows/MainWindow.qml" line="235"/>
         <source>Adult history</source>
-        <translation type="unfinished">História do adulto</translation>
+        <translation type="unfinished">História de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="235"/>
+        <location filename="../qml/windows/MainWindow.qml" line="241"/>
         <source>Adult consultation</source>
         <translation type="unfinished">Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="241"/>
+        <location filename="../qml/windows/MainWindow.qml" line="247"/>
         <source>Pregnancy history</source>
-        <translation type="unfinished">História do embarazo</translation>
+        <translation type="unfinished">História de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="247"/>
+        <location filename="../qml/windows/MainWindow.qml" line="253"/>
         <source>Pregnancy consultation</source>
         <translation type="unfinished">Consulta de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="478"/>
+        <location filename="../qml/windows/MainWindow.qml" line="547"/>
+        <source>Edit photo</source>
+        <translation>Editar foto</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="555"/>
+        <location filename="../qml/windows/MainWindow.qml" line="560"/>
+        <source>Delete photo</source>
+        <translation>Apagar foto</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="558"/>
+        <source>Delete the photo of patient &quot;%1&quot;?</source>
+        <translation>Apagar a foto do paciente &quot;%1&quot;?</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="568"/>
         <source>Create pediatric history</source>
         <translation type="unfinished">Criar história pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="485"/>
+        <location filename="../qml/windows/MainWindow.qml" line="575"/>
         <source>Create adult history</source>
         <translation type="unfinished">Criar história de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="492"/>
+        <location filename="../qml/windows/MainWindow.qml" line="582"/>
         <source>Create pregnancy history</source>
         <translation type="unfinished">Criar história de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="518"/>
+        <location filename="../qml/windows/MainWindow.qml" line="460"/>
         <source>Add</source>
         <translation type="unfinished">Adicionar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="527"/>
+        <location filename="../qml/windows/MainWindow.qml" line="469"/>
         <source>Edit</source>
         <translation type="unfinished">Modificar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="536"/>
+        <location filename="../qml/windows/MainWindow.qml" line="478"/>
         <source>Delete</source>
         <translation type="unfinished">Apagar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="539"/>
+        <location filename="../qml/windows/MainWindow.qml" line="481"/>
         <source>Delete patient &quot;%1&quot; and all their histories and consultations?</source>
         <translation type="unfinished">Apagar o paciente &quot;%1&quot; e todas as suas histórias e consultas?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="541"/>
+        <location filename="../qml/windows/MainWindow.qml" line="483"/>
         <source>Delete patient</source>
         <translation type="unfinished">Apagar paciente</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="547"/>
+        <location filename="../qml/windows/MainWindow.qml" line="489"/>
         <source>Save</source>
-        <translation type="unfinished">Gravar</translation>
+        <translation>Guardar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="553"/>
+        <location filename="../qml/windows/MainWindow.qml" line="495"/>
         <source>Cancel</source>
         <translation type="unfinished">Cancelar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="565"/>
+        <location filename="../qml/windows/MainWindow.qml" line="610"/>
         <source>Basic data</source>
         <translation type="unfinished">Dados básicos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="587"/>
+        <location filename="../qml/windows/MainWindow.qml" line="632"/>
         <source>Name:</source>
         <translation type="unfinished">Nome:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="622"/>
+        <location filename="../qml/windows/MainWindow.qml" line="667"/>
         <source>Sex:</source>
         <translation type="unfinished">Sexo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="614"/>
+        <location filename="../qml/windows/MainWindow.qml" line="659"/>
         <source>Birth date:</source>
         <translation type="unfinished">Data nasc.:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="605"/>
+        <location filename="../qml/windows/MainWindow.qml" line="650"/>
         <source>Age:</source>
         <translation type="unfinished">Idade:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="634"/>
+        <location filename="../qml/windows/MainWindow.qml" line="679"/>
         <source>Address</source>
-        <translation type="unfinished">Endereço</translation>
+        <translation>Morada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="648"/>
+        <location filename="../qml/windows/MainWindow.qml" line="693"/>
         <source>Address:</source>
-        <translation type="unfinished">Endereço:</translation>
+        <translation>Morada:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="663"/>
+        <location filename="../qml/windows/MainWindow.qml" line="708"/>
         <source>Cohabitants:</source>
         <translation type="unfinished">Coabitantes:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="672"/>
+        <location filename="../qml/windows/MainWindow.qml" line="717"/>
         <source>Contact:</source>
         <translation type="unfinished">Contacto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="683"/>
+        <location filename="../qml/windows/MainWindow.qml" line="728"/>
         <source>Siblings:</source>
         <translation type="unfinished">Nº irmãos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="758"/>
+        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <source>Invalid image</source>
+        <translation>Imagem inválida</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <source>The selected file is not a readable image.</source>
+        <translation>O ficheiro escolhido não é uma imagem legível.</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="808"/>
+        <source>Could not save the photo.</source>
+        <translation>Não foi possível guardar a foto.</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="819"/>
+        <source>Could not delete the photo.</source>
+        <translation>Não foi possível apagar a foto.</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/MainWindow.qml" line="830"/>
         <source>Could not delete the patient.</source>
         <translation type="unfinished">Não foi possível apagar o paciente.</translation>
     </message>
@@ -1986,7 +2029,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="49"/>
         <source>LETHARGIC</source>
-        <translation>LETARGICO</translation>
+        <translation>LETÁRGICO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="50"/>
@@ -1996,7 +2039,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="51"/>
         <source>DROWSY</source>
-        <translation>SOMNOLIENTO</translation>
+        <translation>SONOLENTO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="52"/>
@@ -2006,12 +2049,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="53"/>
         <source>IRRITABLE</source>
-        <translation>IRRITABLE</translation>
+        <translation>IRRITÁVEL</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="54"/>
         <source>RESTLESS</source>
-        <translation>INTRANQUILO</translation>
+        <translation>INQUIETO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="55"/>
@@ -2021,7 +2064,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="56"/>
         <source>LOW ACTIVITY</source>
-        <translation>POCA ACTIVIDAD</translation>
+        <translation>POUCA ATIVIDADE</translation>
     </message>
 </context>
 <context>
@@ -2034,7 +2077,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="208"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="209"/>
@@ -2052,37 +2095,37 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="30"/>
         <source>SEVERE DEHYDRATION</source>
-        <translation>DESHIDRATACION SERIA</translation>
+        <translation>DESIDRATAÇÃO GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="31"/>
         <source>MODERATE DEHYDRATION</source>
-        <translation>DESHIDRATACION MODERADA</translation>
+        <translation>DESIDRATAÇÃO MODERADA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="32"/>
         <source>MILD DEHYDRATION</source>
-        <translation>DESHIDRATACION LEVE</translation>
+        <translation>DESIDRATAÇÃO LEVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="33"/>
         <source>SEVERE MALNUTRITION</source>
-        <translation>MALNUTRICION SERIA</translation>
+        <translation>DESNUTRIÇÃO GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="34"/>
         <source>MODERATE MALNUTRITION</source>
-        <translation>MALNUTRICION MODERADA</translation>
+        <translation>DESNUTRIÇÃO MODERADA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="35"/>
         <source>MILD MALNUTRITION</source>
-        <translation>MALNUTRICION LEVE</translation>
+        <translation>DESNUTRIÇÃO LEVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="36"/>
         <source>CHRONIC MALNUTRITION</source>
-        <translation>MALNUTRICION CRONICA</translation>
+        <translation>DESNUTRIÇÃO CRÓNICA</translation>
     </message>
 </context>
 <context>
@@ -2095,12 +2138,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="190"/>
         <source>RED</source>
-        <translation>ROJO</translation>
+        <translation>VERMELHO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="191"/>
         <source>YELLOW</source>
-        <translation>AMARILLO</translation>
+        <translation>AMARELO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="192"/>
@@ -2110,7 +2153,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="193"/>
         <source>BULGING</source>
-        <translation>ABOMBADO</translation>
+        <translation>ABAULADO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="194"/>
@@ -2121,546 +2164,546 @@
 <context>
     <name>PediatricConsultationForm</name>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="68"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="98"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="77"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="107"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="89"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="119"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="100"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="130"/>
         <source>Consultation list</source>
-        <translation>LISTA DE CONSULTAS</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="120"/>
-        <source>Reason for consultation</source>
-        <translation>MOTIVO DA CONSULTA</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="140"/>
-        <source>Nursing diagnosis:</source>
-        <translation>DIAGNOSTICO ENFERMERIA:</translation>
+        <translation>Lista de consultas</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="150"/>
+        <source>Reason for consultation</source>
+        <translation>Motivo da consulta</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="170"/>
+        <source>Nursing diagnosis:</source>
+        <translation>Diagnóstico de enfermagem:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="180"/>
         <source>Other diagnosis:</source>
-        <translation>OTRO DIAGNOSTICO:</translation>
+        <translation>Outro diagnóstico:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="161"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="191"/>
         <source>Physical examination</source>
-        <translation>EXPLORAÇÃO FÍSICA</translation>
+        <translation>Exploração física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Clinical signs</source>
-        <translation>SINAIS CLINICOS</translation>
+        <translation>Sinais clínicos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Respiratory</source>
-        <translation>RESPIRATÓRIO</translation>
+        <translation>Respiratório</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Elimination</source>
-        <translation>ELIMINAÇAO</translation>
+        <translation>Eliminação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Circulatory</source>
-        <translation>CIRCULATÓRIO</translation>
+        <translation>Circulatório</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Skin</source>
-        <translation>PELE</translation>
+        <translation>Pele</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Eye</source>
-        <translation>OLHO</translation>
+        <translation>Olho</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Ear</source>
-        <translation>OIDO</translation>
+        <translation>Ouvido</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Mouth</source>
-        <translation>BOCA</translation>
+        <translation>Boca</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Abdomen/pelvis</source>
-        <translation>ABDOMEN/PELVIS</translation>
+        <translation>Abdómen/pélvis</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Neurological</source>
-        <translation>NEUROLOGICO</translation>
+        <translation>Neurológico</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="169"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="202"/>
         <source>Endocrine</source>
-        <translation>ENDOCRINO</translation>
+        <translation>Endócrino</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="183"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="216"/>
         <source>Weight (Kg):</source>
         <translation>Peso (Kg):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="194"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="227"/>
         <source>Length (cm):</source>
-        <translation>Tamanho (cm):</translation>
+        <translation>Compr. (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="203"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="236"/>
         <source>Weight/Height:</source>
         <translation>Peso/Altura:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="212"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="245"/>
         <source>Height/Age:</source>
         <translation>Altura/Idade:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="222"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="255"/>
         <source>Temp. (ºC):</source>
         <translation>Temp (ºC):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="233"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="266"/>
         <source>Glucose mg/dl:</source>
         <translation>Glicose mg/dl:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="242"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="275"/>
         <source>Consciousness:</source>
         <translation>Consciência:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="251"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="284"/>
         <source>Mental status:</source>
-        <translation>Estado Mental:</translation>
+        <translation>Estado mental:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="260"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="293"/>
         <source>Arm circumference:</source>
-        <translation>Circunferência braço:</translation>
+        <translation>Perímetro braquial:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="269"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="302"/>
         <source>Appetite test:</source>
-        <translation>Teste Apetito:</translation>
+        <translation>Teste do apetite:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="278"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="311"/>
         <source>Malaria test:</source>
-        <translation>Teste Malaria:</translation>
+        <translation>Teste de malária:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="285"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="318"/>
         <source>Severe bradypnea/apnea</source>
-        <translation>Bradipnea severa/Apnea</translation>
+        <translation>Bradipneia grave/apneia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="291"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="324"/>
         <source>Convulsion</source>
         <translation>Convulsão</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="297"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="330"/>
         <source>Cannot drink or eat</source>
         <translation>Não pode beber ou comer</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="310"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="343"/>
         <source>Retraction:</source>
-        <translation>Tiraje:</translation>
+        <translation>Tiragem:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="327"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="360"/>
         <source>Tachypnea:</source>
         <translation>Taquipneia:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="334"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="367"/>
         <source>Nasal flaring</source>
-        <translation>Agitação nasal</translation>
+        <translation>Adejo nasal</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="340"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="373"/>
         <source>Expiratory grunting</source>
-        <translation>Grunhido expiratorio</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="346"/>
-        <source>Runny nose</source>
-        <translation>Nariz a pingar</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="354"/>
-        <source>Wheezing:</source>
-        <translation>Chiado:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="363"/>
-        <source>Secretions:</source>
-        <translation>Secreçoes:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="372"/>
-        <source>Inspiratory stridor:</source>
-        <translation>Estridor inalatorio:</translation>
+        <translation>Gemido expiratório</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="379"/>
+        <source>Runny nose</source>
+        <translation>Rinorreia</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="387"/>
+        <source>Wheezing:</source>
+        <translation>Sibilos:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="396"/>
+        <source>Secretions:</source>
+        <translation>Secreções:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="405"/>
+        <source>Inspiratory stridor:</source>
+        <translation>Estridor inspiratório:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="412"/>
         <source>Nasal congestion</source>
-        <translation>Congestionamento nasal</translation>
+        <translation>Congestão nasal</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="385"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="418"/>
         <source>Tearing</source>
-        <translation>Lagrimeo</translation>
+        <translation>Lacrimejo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="391"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="424"/>
         <source>Sore throat</source>
         <translation>Dor de garganta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="397"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="430"/>
         <source>Cough</source>
         <translation>Tosse</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="406"/>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="969"/>
-        <source>Days:</source>
-        <translation>Días:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="416"/>
-        <source>Oxygen saturation (%):</source>
-        <translation>Saturaçao de oxigênio (%):</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="430"/>
-        <source>Stool:</source>
-        <translation>Heces:</translation>
-    </message>
-    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="72"/>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="439"/>
+        <source>Days:</source>
+        <translation>Dias:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="449"/>
+        <source>Oxygen saturation (%):</source>
+        <translation>Saturação de oxigénio (%):</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="463"/>
+        <source>Stool:</source>
+        <translation>Fezes:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="472"/>
         <source>Bleeding:</source>
         <translation>Sangramento:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="448"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="481"/>
         <source>Urine:</source>
         <translation>Urina:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="457"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="490"/>
         <source>Vomiting:</source>
-        <translation>Vòmitos:</translation>
+        <translation>Vómitos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="471"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="504"/>
         <source>Capillary refill:</source>
         <translation>Enchimento capilar:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="478"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="511"/>
         <source>No radial pulse</source>
         <translation>Ausência pulso rad.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="486"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="519"/>
         <source>Cyanosis:</source>
         <translation>Cianose:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="495"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="528"/>
         <source>Edemas:</source>
         <translation>Edemas:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="505"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="538"/>
         <source>HR (bpm):</source>
-        <translation>FC (lx&apos;):</translation>
+        <translation>FC (bpm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="514"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="547"/>
         <source>Arrhythmia:</source>
         <translation>Arritmia:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="526"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="559"/>
         <source>Skin fold &gt; 2&quot;</source>
         <translation>Prega da pele ˃2&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="532"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="565"/>
         <source>Pale palms</source>
-        <translation>Palma da mão branca</translation>
+        <translation>Palmas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="538"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="571"/>
         <source>Dry skin</source>
-        <translation>Pel seca</translation>
+        <translation>Pele seca</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="548"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="581"/>
         <source>Body lesions:</source>
-        <translation>Lesiones no corpo:</translation>
+        <translation>Lesões no corpo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="555"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="588"/>
         <source>Petechiae/purpura</source>
-        <translation>Petequias/púrpura</translation>
+        <translation>Petéquias/púrpura</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="561"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="594"/>
         <source>Widespread pustules</source>
-        <translation>Pústulas diseminadas</translation>
+        <translation>Pústulas disseminadas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="567"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="600"/>
         <source>Jaundice</source>
-        <translation>Ictericia</translation>
+        <translation>Icterícia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="575"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="608"/>
         <source>Exanthema:</source>
         <translation>Exantema:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="584"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="617"/>
         <source>Infection:</source>
-        <translation>Infecçao:</translation>
+        <translation>Infeção:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="593"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="626"/>
         <source>Edema:</source>
         <translation>Edema:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="607"/>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="666"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="640"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="699"/>
         <source>Discharge:</source>
-        <translation>Secreçao:</translation>
+        <translation>Secreção:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="614"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="647"/>
         <source>Eyelid edema</source>
-        <translation>Edema párpado</translation>
+        <translation>Edema palpebral</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="620"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="653"/>
         <source>Stuck eyelids</source>
-        <translation>Párpados pegados</translation>
+        <translation>Pálpebras coladas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="626"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="659"/>
         <source>Red conjunctiva</source>
         <translation>Conjuntiva vermelha</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="632"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="665"/>
         <source>Pale conjunctiva</source>
-        <translation>Conjuntiva branca</translation>
+        <translation>Conjuntiva pálida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="638"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="671"/>
         <source>Enophthalmos</source>
         <translation>Enoftalmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="649"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="682"/>
         <source>Swelling behind the ear</source>
-        <translation>Inchaçao atrás da orelha</translation>
+        <translation>Inchaço atrás da orelha</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="657"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="690"/>
         <source>Pain:</source>
         <translation>Dor:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="673"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="706"/>
         <source>Itchy ear canal</source>
-        <translation>Prurito do conduto auditivo</translation>
+        <translation>Prurido do canal auditivo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="681"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="714"/>
         <source>Tympanic otoscopy:</source>
-        <translation>Otoscopia timpano:</translation>
+        <translation>Otoscopia timpânica:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="694"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="727"/>
         <source>Erythematous tonsils with</source>
-        <translation>Amigdalas eritematosas con</translation>
+        <translation>Amígdalas eritemat. com</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="710"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="743"/>
         <source>Sore throat:</source>
         <translation>Dor de garganta:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="719"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="752"/>
         <source>Lesion type:</source>
-        <translation>Lesoes tipo:</translation>
+        <translation>Tipo de lesões:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="726"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="759"/>
         <source>Koplik spots</source>
-        <translation>Manchas de Koplit</translation>
+        <translation>Manchas de Koplik</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="732"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="765"/>
         <source>White patches</source>
         <translation>Placas brancas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="738"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="771"/>
         <source>Red, swollen tongue</source>
-        <translation>Lingua roja e inchada</translation>
+        <translation>Língua vermelha e inchada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="744"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="777"/>
         <source>Palatal petechiae</source>
-        <translation>Petequias no paladar</translation>
+        <translation>Petéquias no palato</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="750"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="783"/>
         <source>Enlarged neck nodes</source>
-        <translation>Ganglios do pescoço amplos</translation>
+        <translation>Gânglios do pescoço aumentados</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="763"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="796"/>
         <source>Pathology signs:</source>
-        <translation>Signos de patología:</translation>
+        <translation>Sinais de patologia:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="775"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="808"/>
         <source>Severe headache</source>
-        <translation>Cefalea intensa</translation>
+        <translation>Cefaleia intensa</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="781"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="814"/>
         <source>Photophobia</source>
         <translation>Fotofobia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="787"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="820"/>
         <source>Brudzinski sign</source>
-        <translation>Signo de Brudzinski</translation>
+        <translation>Sinal de Brudzinski</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="793"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="826"/>
         <source>Kernig sign</source>
-        <translation>Signo de Kerning</translation>
+        <translation>Sinal de Kernig</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="799"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="832"/>
         <source>Neck stiffness</source>
         <translation>Nuca rígida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="805"/>
-        <source>Bulging fontanelle</source>
-        <translation>Fontanela abombada</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="811"/>
-        <source>Developmental problems</source>
-        <translation>Problemas de desarrollo</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="832"/>
-        <source>Excessive hunger</source>
-        <translation>Hambre exagerada</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="838"/>
-        <source>Excessive thirst</source>
-        <translation>Sed exagerada</translation>
+        <source>Bulging fontanelle</source>
+        <translation>Fontanela abaulada</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="844"/>
+        <source>Developmental problems</source>
+        <translation>Probl. desenvolvimento</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="865"/>
+        <source>Excessive hunger</source>
+        <translation>Fome excessiva</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="871"/>
+        <source>Excessive thirst</source>
+        <translation>Sede excessiva</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="877"/>
         <source>Asthenia</source>
         <translation>Astenia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="852"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="885"/>
         <source>Lymphadenopathy:</source>
         <translation>Adenopatias:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="861"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="894"/>
         <source>Rapid weight loss (days/kg):</source>
-        <translation>Perdidad de peso rápido (dias/Kg):</translation>
+        <translation>Perda de peso rápida (dias/kg):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="870"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="903"/>
         <source>Breath odor:</source>
-        <translation>Olor del aliento:</translation>
+        <translation>Odor do hálito:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="884"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="917"/>
         <source>Indicated treatments (1-5)</source>
-        <translation>TRATAMIENTOS INDICADOS (1-5)</translation>
+        <translation>Tratamentos indicados (1-5)</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="884"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="917"/>
         <source>Indicated treatments (6-10)</source>
-        <translation>TRATAMIENTOS INDICADOS (6-10)</translation>
+        <translation>Tratamentos indicados (6-10)</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="884"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="917"/>
         <source>Child care recommendations</source>
-        <translation>RECOMENDACIONES CUIDADO NIÑO</translation>
+        <translation>Recomendações de cuidados da criança</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="939"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="57"/>
         <source>Active ingredient:</source>
-        <translation>Principio Activo:</translation>
+        <translation>Princípio ativo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="949"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="62"/>
         <source>Description:</source>
-        <translation>Descripción:</translation>
+        <translation>Descrição:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="959"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="67"/>
         <source>Route:</source>
         <translation>Via:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="979"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="77"/>
         <source>Dose:</source>
         <translation>Dose:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="989"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="82"/>
         <source>Frequency:</source>
-        <translation>Frecuencia:</translation>
+        <translation>Frequência:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PediatricConsultationForm.qml" line="1000"/>
+        <location filename="../qml/windows/PediatricConsultationForm.qml" line="87"/>
         <source>Infusion ml/h:</source>
-        <translation>Perfusión ml/h:</translation>
+        <translation>Perfusão ml/h:</translation>
     </message>
 </context>
 <context>
@@ -2688,12 +2731,12 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="428"/>
         <source>9 months</source>
-        <translation>9 mês</translation>
+        <translation>9 meses</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="435"/>
         <source>10 months</source>
-        <translation>10 mês</translation>
+        <translation>10 meses</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="520"/>
@@ -2704,7 +2747,7 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="22"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="31"/>
@@ -2714,22 +2757,22 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="45"/>
         <source>Opening date:</source>
-        <translation>Data Abertura:</translation>
+        <translation>Data abertura:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="54"/>
         <source>Allergies:</source>
-        <translation>ALERGIAS:</translation>
+        <translation>Alergias:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="66"/>
         <source>Birth history</source>
-        <translation>HISTORIA DO NASCIMENTO</translation>
+        <translation>História do nascimento</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="76"/>
         <source>Weight (grams):</source>
-        <translation>Peso (gramos):</translation>
+        <translation>Peso (gramas):</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="87"/>
@@ -2744,17 +2787,17 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="107"/>
         <source>Malformations or disabilities:</source>
-        <translation>Malformãções ou deficiências:</translation>
+        <translation>Malformações ou deficiências:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="119"/>
         <source>Child history</source>
-        <translation>HISTÓRIA DA CRIANÇA</translation>
+        <translation>História da criança</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="126"/>
         <source>Chronic diseases</source>
-        <translation>DOENÇAS CRÔNICAS</translation>
+        <translation>Doenças crónicas</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="135"/>
@@ -2774,7 +2817,7 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="167"/>
         <source>Housing</source>
-        <translation>VIVENDA</translation>
+        <translation>Habitação</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="174"/>
@@ -2784,22 +2827,22 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="181"/>
         <source>Mosquito net</source>
-        <translation>Mosquiteira</translation>
+        <translation>Mosquiteiro</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="188"/>
         <source>Net use</source>
-        <translation>Usana</translation>
+        <translation>Usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="195"/>
         <source>Domestic hygiene</source>
-        <translation>Higiene Domestica</translation>
+        <translation>Higiene doméstica</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="205"/>
         <source>Domestic animals:</source>
-        <translation>Animais Domesticos:</translation>
+        <translation>Animais domésticos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="217"/>
@@ -2809,22 +2852,22 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="227"/>
         <source>Economic situation:</source>
-        <translation>Situación económica:</translation>
+        <translation>Situação económica:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="238"/>
         <source>Feeding</source>
-        <translation>ALIMENTAÇAO</translation>
+        <translation>Alimentação</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="245"/>
         <source>Breastfeeding</source>
-        <translation>Lactação maternal</translation>
+        <translation>Aleitamento materno</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="252"/>
         <source>Treated water WITH:</source>
-        <translation>Água tratada CON :</translation>
+        <translation>Água tratada COM:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="271"/>
@@ -2834,12 +2877,12 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="281"/>
         <source>Additional feeding:</source>
-        <translation>Alimentação complementaria:</translation>
+        <translation>Alimentação complementar:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="296"/>
         <source>Previous treatments</source>
-        <translation>TRATAMENTOS ANTERIORES</translation>
+        <translation>Tratamentos anteriores</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="307"/>
@@ -2854,7 +2897,25 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="393"/>
         <source>Vaccines</source>
-        <translation>VACINAS</translation>
+        <translation>Vacinas</translation>
+    </message>
+</context>
+<context>
+    <name>PhotoDialog</name>
+    <message>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="9"/>
+        <source>Choose the patient&apos;s photo</source>
+        <translation>Escolha a foto do paciente</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="11"/>
+        <source>Images (*.jpg *.jpeg *.png *.bmp)</source>
+        <translation>Imagens (*.jpg *.jpeg *.png *.bmp)</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="11"/>
+        <source>All files (*)</source>
+        <translation>Todos os ficheiros (*)</translation>
     </message>
 </context>
 <context>
@@ -2872,7 +2933,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="38"/>
         <source>60 mg a day</source>
-        <translation>60 mg. dia</translation>
+        <translation>60 mg/dia</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="38"/>
@@ -2882,17 +2943,17 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="38"/>
         <source>Until birth</source>
-        <translation>Até o nascimento</translation>
+        <translation>Até ao parto</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="41"/>
         <source>Folic acid</source>
-        <translation>Acido.Fólico</translation>
+        <translation>Ácido fólico</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
         <source>4 mg a day</source>
-        <translation>4 mg. dia</translation>
+        <translation>4 mg/dia</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
@@ -2902,7 +2963,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
         <source>Until the fifth month of pregnancy</source>
-        <translation>Até o quinto mês de gravidez</translation>
+        <translation>Até ao 5.º mês</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="51"/>
@@ -2912,7 +2973,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
         <source>2nd or 3rd trimester</source>
-        <translation>2º o 3º trimestre</translation>
+        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
@@ -2932,7 +2993,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="71"/>
         <source>Other vitamins</source>
-        <translation>Outras Vitaminas</translation>
+        <translation>Outras vitaminas</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="81"/>
@@ -2957,7 +3018,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="117"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="126"/>
@@ -2972,105 +3033,105 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="149"/>
         <source>Consultation list</source>
-        <translation>LISTA DE CONSULTAS</translation>
+        <translation>Lista de consultas</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="169"/>
         <source>Reason for consultation</source>
-        <translation>MOTIVO DA CONSULTA</translation>
+        <translation>Motivo da consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="191"/>
         <source>Treatments given now</source>
-        <translation>TRATAMENTOS DADOS AGORA</translation>
+        <translation>Tratamentos dados agora</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="245"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="256"/>
         <source>Physical examination</source>
-        <translation>EXPLORAÇÃO FÍSICA</translation>
+        <translation>Exploração física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="255"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="266"/>
         <source>Weight (Kg):</source>
         <translation>Peso (Kg):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="267"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="278"/>
         <source>T. (ºC):</source>
         <translation>Tª (ºC):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="279"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="290"/>
         <source>Height (cm):</source>
         <translation>Altura (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="290"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="301"/>
         <source>A. P. (cm):</source>
         <translation>P. A. (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="300"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="311"/>
         <source>Vomiting:</source>
-        <translation>Vòmitos:</translation>
+        <translation>Vómitos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="310"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="321"/>
         <source>Fetal auscultation:</source>
         <translation>Auscultação fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="320"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="331"/>
         <source>Fetal position:</source>
         <translation>Posição fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="331"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="342"/>
         <source>Uterine height</source>
-        <translation>ALTURA UTERINA</translation>
+        <translation>Altura uterina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="341"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="352"/>
         <source>Week:</source>
         <translation>Semana:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="352"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="363"/>
         <source>Centimeters:</source>
-        <translation>Cetimetros:</translation>
+        <translation>Centímetros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="364"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="375"/>
         <source>Urine</source>
-        <translation>URINA</translation>
+        <translation>Urina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="371"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="382"/>
         <source>Leukocytosis</source>
-        <translation>Leucocitosis</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="378"/>
-        <source>Proteinuria</source>
-        <translation>Proteinuria</translation>
+        <translation>Leucócitos</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="389"/>
-        <source>Edemas</source>
-        <translation>EDEMAS</translation>
+        <source>Proteinuria</source>
+        <translation>Proteinúria</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="396"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="400"/>
+        <source>Edemas</source>
+        <translation>Edemas</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="407"/>
         <source>MMI</source>
         <translation>MMI</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="403"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="414"/>
         <source>Face</source>
         <translation>Cara</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="410"/>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="421"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
@@ -3078,381 +3139,381 @@
 <context>
     <name>PregnancyHistoryForm</name>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="61"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="62"/>
         <source>Calcium</source>
         <translation>Ca</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="71"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="72"/>
         <source>Iron</source>
         <translation>Fe</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="78"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="79"/>
         <source>60 mg a day</source>
-        <translation>60 mg. dia</translation>
+        <translation>60 mg/dia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="78"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="79"/>
         <source>Ferrous sulfate</source>
         <translation>Sulfato ferroso</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="78"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="79"/>
         <source>Until birth</source>
-        <translation>Até o nascimento</translation>
+        <translation>Até ao parto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="81"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="82"/>
         <source>Folic acid</source>
-        <translation>Acido.Fólico</translation>
+        <translation>Ácido fólico</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="88"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
         <source>4 mg a day</source>
-        <translation>4 mg. dia</translation>
+        <translation>4 mg/dia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="88"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
         <source>Vitamin B9</source>
         <translation>Vitamina B9</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="88"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
         <source>Until the fifth month of pregnancy</source>
-        <translation>Até o quinto mês de gravidez</translation>
+        <translation>Até ao 5.º mês</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="91"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="92"/>
         <source>Deworming</source>
         <translation>Desparasitação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="98"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
         <source>2nd or 3rd trimester</source>
-        <translation>2º o 3º trimestre</translation>
+        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="98"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
         <source>Mebendazole</source>
         <translation>Mebendazol</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="98"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
         <source>Single dose</source>
         <translation>Dose única</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="101"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="102"/>
         <source>Vitamin C</source>
         <translation>Vitamina C</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="111"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="112"/>
         <source>Other vitamins</source>
-        <translation>Outras Vitaminas</translation>
+        <translation>Outras vitaminas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="121"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="122"/>
         <source>Malaria prophylaxis</source>
         <translation>Profilaxia malária</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="139"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="140"/>
         <source>Personal data</source>
-        <translation>DADOS PESSOAIS</translation>
+        <translation>Dados pessoais</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="148"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="149"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="162"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="163"/>
         <source>Opening date:</source>
-        <translation>Data Abertura:</translation>
+        <translation>Data abertura:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="171"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="172"/>
         <source>Allergies:</source>
-        <translation>ALERGIAS:</translation>
+        <translation>Alergias:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="183"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="184"/>
         <source>Pregnancy history</source>
-        <translation>HISTORIA DO EMBARAZO</translation>
+        <translation>História da gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="193"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="194"/>
         <source>Last menstruation date:</source>
-        <translation>Data da passada menstuação:</translation>
+        <translation>Data da última menstruação:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="203"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="204"/>
         <source>Deceased siblings at birth:</source>
-        <translation>Nº de irmãs mortas/parto:</translation>
+        <translation>Irmãos mortos/parto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="214"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="215"/>
         <source>Expected delivery date:</source>
         <translation>Data provável do parto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="224"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="225"/>
         <source>Delivery count:</source>
-        <translation>Nº de Parto:</translation>
+        <translation>Partos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="235"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="236"/>
         <source>Abortion count:</source>
-        <translation>Nº de abortos:</translation>
+        <translation>Abortos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="245"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="246"/>
         <source>Delivery problems:</source>
         <translation>Problemas no parto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="255"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="256"/>
         <source>Gynecological diseases:</source>
         <translation>Doenças ginecológicas:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="265"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="266"/>
         <source>Barrier methods:</source>
         <translation>Métodos barreira:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="273"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="274"/>
         <source>HIV (woman)</source>
-        <translation>HIV + Ela</translation>
+        <translation>VIH (mulher)</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="280"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="281"/>
         <source>HIV (man)</source>
-        <translation>HIV + Homem</translation>
+        <translation>VIH (homem)</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="289"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="290"/>
         <source>Serologies:</source>
-        <translation>Serologías +:</translation>
+        <translation>Serologias +:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="301"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="302"/>
         <source>Pregnant woman history</source>
-        <translation>HISTÓRIA DA MULLER GRAVIDA</translation>
+        <translation>História da grávida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="308"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="309"/>
         <source>Chronic diseases</source>
-        <translation>DOENÇAS CRÔNICAS</translation>
+        <translation>Doenças crónicas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="315"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="316"/>
         <source>Diabetes</source>
-        <translation>Diabete</translation>
+        <translation>Diabetes</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="324"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="351"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="368"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="325"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="352"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="369"/>
         <source>Treatment:</source>
         <translation>Tratamento:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="332"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="333"/>
         <source>Hepatitis</source>
         <translation>Hepatite</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="341"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="342"/>
         <source>Type:</source>
         <translation>Tipo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="378"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="379"/>
         <source>Other diseases:</source>
         <translation>Outras doenças:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="388"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="389"/>
         <source>Disabilities:</source>
         <translation>Deficiências:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="398"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="399"/>
         <source>Conflicts, relationships, family problems:</source>
         <translation>Conflitos, relações, problemas na família:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="410"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="411"/>
         <source>Housing</source>
-        <translation>VIVENDA</translation>
+        <translation>Habitação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="417"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="418"/>
         <source>Potable water</source>
-        <translation>Auga Potavel</translation>
+        <translation>Água potável</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="424"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="425"/>
         <source>Latrine</source>
         <translation>Latrina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="445"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="446"/>
         <source>Treated water</source>
-        <translation>Auga Tratada</translation>
+        <translation>Água tratada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="452"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="453"/>
         <source>Domestic hygiene</source>
-        <translation>Higiene Domestica</translation>
+        <translation>Higiene doméstica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="431"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="432"/>
         <source>Parents mosquito net</source>
-        <translation>Mosquiteira Pais</translation>
+        <translation>Mosquiteiro pais</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="438"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
         <source>Parents net use</source>
-        <translation>Usana</translation>
+        <translation>Usa</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="459"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="460"/>
         <source>Children mosquito net</source>
-        <translation>Mosquiteira Nenos</translation>
+        <translation>Mosquiteiro filhos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="466"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
         <source>Children net use</source>
-        <translation>Usana</translation>
+        <translation>Usa</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="476"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="477"/>
         <source>Domestic animals:</source>
-        <translation>Animais Domesticos:</translation>
+        <translation>Animais domésticos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="488"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="489"/>
         <source>Physical examination</source>
-        <translation>EXPLORAÇÃO FÍSICA</translation>
+        <translation>Exploração física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="498"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="499"/>
         <source>Weight (Kg):</source>
         <translation>Peso (Kg):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="510"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="511"/>
         <source>Temperature (ºC):</source>
-        <translation>Temperatura (ºC):</translation>
+        <translation>Tª (ºC):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="522"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="523"/>
         <source>Height (cm):</source>
         <translation>Altura (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="533"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="534"/>
         <source>Abdominal P. (cm):</source>
         <translation>P. A. (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="543"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="544"/>
         <source>Vomiting:</source>
-        <translation>Vòmitos:</translation>
+        <translation>Vómitos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="553"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="554"/>
         <source>Fetal auscultation:</source>
         <translation>Auscultação fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="563"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="564"/>
         <source>Fetal position:</source>
         <translation>Posição fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="575"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="576"/>
         <source>Uterine height</source>
-        <translation>ALTURA UTERINA</translation>
+        <translation>Altura uterina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="585"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="586"/>
         <source>Week:</source>
         <translation>Semana:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="596"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="597"/>
         <source>Centimeters:</source>
-        <translation>Cetimetros:</translation>
+        <translation>Centímetros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="607"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="608"/>
         <source>Urine</source>
-        <translation>URINA</translation>
+        <translation>Urina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="614"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="615"/>
         <source>Leukocytosis</source>
-        <translation>Leucocitosis</translation>
+        <translation>Leucócitos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="621"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="622"/>
         <source>Proteinuria</source>
-        <translation>Proteinuria</translation>
+        <translation>Proteinúria</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="631"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="632"/>
         <source>Edemas</source>
-        <translation>EDEMAS</translation>
+        <translation>Edemas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="645"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="646"/>
         <source>Face</source>
         <translation>Cara</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="652"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="653"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="673"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="674"/>
         <source>Previous treatment</source>
-        <translation>TRATAMENTO PREVIO</translation>
+        <translation>Tratamento prévio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="673"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="674"/>
         <source>Current treatments</source>
-        <translation>TRATAMENTOS DADOS AGORA</translation>
+        <translation>Tratamentos dados agora</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="684"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="685"/>
         <source>MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON</source>
-        <translation>PROFILAXIS DE LA MALARIA, DESPARASITASAO, VITAMINA A, ACIDO FOLICO, FERRO</translation>
+        <translation>PROFILAXIA DA MALÁRIA, DESPARASITAÇÃO, VITAMINA A, ÁCIDO FÓLICO, FERRO</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="705"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="693"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="714"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="777"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="698"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="770"/>
         <source>Medication:</source>
         <translation>Medicamento:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="724"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="764"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="703"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="765"/>
         <source>Dose:</source>
         <translation>Dose:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="790"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="775"/>
         <source>Next dose:</source>
         <translation>Próxima dose:</translation>
     </message>
@@ -3607,7 +3668,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="95"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="96"/>
@@ -3617,7 +3678,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="97"/>
         <source>MILD</source>
-        <translation>SUAVE</translation>
+        <translation>LEVE</translation>
     </message>
 </context>
 <context>
@@ -3687,22 +3748,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="109"/>
         <source>WATERY DIARRHEA</source>
-        <translation>DIARREA ACUOSA</translation>
+        <translation>DIARREIA AQUOSA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="110"/>
         <source>PERSISTENT DIARRHEA</source>
-        <translation>DIARREA PERSISTENTE</translation>
+        <translation>DIARREIA PERSISTENTE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="111"/>
         <source>BLOODY DIARRHEA</source>
-        <translation>DIARREA CON SANGRE</translation>
+        <translation>DIARREIA COM SANGUE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="112"/>
         <source>CONSTIPATION</source>
-        <translation>ESTREÑIMIENTO</translation>
+        <translation>OBSTIPAÇÃO</translation>
     </message>
 </context>
 <context>
@@ -3801,22 +3862,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="200"/>
         <source>WHITE-YELLOW EXUDATE</source>
-        <translation>EXUDADO BRANCO AMARELLO</translation>
+        <translation>EXSUDADO BRANCO-AMARELADO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="201"/>
         <source>THICK GRAY MEMBRANE</source>
-        <translation>MEMBRANA ESPESA GRIS</translation>
+        <translation>MEMBRANA ESPESSA CINZENTA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="202"/>
         <source>VESICLES</source>
-        <translation>VESICULAS</translation>
+        <translation>VESÍCULAS</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="203"/>
         <source>ULCERS</source>
-        <translation>ULCERAS</translation>
+        <translation>ÚLCERAS</translation>
     </message>
 </context>
 <context>
@@ -3849,12 +3910,12 @@
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="34"/>
         <source>Zinc</source>
-        <translation>ZINC</translation>
+        <translation>ZINCO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="36"/>
         <source>Ascorbic acid</source>
-        <translation>ACIDO ASCORBICO</translation>
+        <translation>ÁCIDO ASCÓRBICO</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricHistoryLabels.cpp" line="39"/>
@@ -3872,32 +3933,32 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="126"/>
         <source>NOCTURIA</source>
-        <translation>NICTURIA</translation>
+        <translation>NICTÚRIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="127"/>
         <source>HEMATURIA</source>
-        <translation>HEMATURIA</translation>
+        <translation>HEMATÚRIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="128"/>
         <source>DYSURIA</source>
-        <translation>DISURIA</translation>
+        <translation>DISÚRIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="129"/>
         <source>PYURIA</source>
-        <translation>PLAQUIURIA</translation>
+        <translation>PIÚRIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="130"/>
         <source>GLYCOSURIA</source>
-        <translation>GLUCOSURIA</translation>
+        <translation>GLICOSÚRIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="131"/>
         <source>KETONURIA</source>
-        <translation>CETONURIA</translation>
+        <translation>CETONÚRIA</translation>
     </message>
 </context>
 <context>
@@ -3915,22 +3976,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="118"/>
         <source>OCCASIONAL</source>
-        <translation>AISLADOS</translation>
+        <translation>OCASIONAIS</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="119"/>
         <source>WITH BLOOD</source>
-        <translation>CON SANGRE</translation>
+        <translation>COM SANGUE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="120"/>
         <source>FOOD</source>
-        <translation>ALIMENTICIO</translation>
+        <translation>ALIMENTARES</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="121"/>
         <source>OTHER</source>
-        <translation>OTRO</translation>
+        <translation>OUTRO</translation>
     </message>
 </context>
 <context>
@@ -4016,7 +4077,7 @@
     <message>
         <location filename="../src/data/model/PatientsModel.cpp" line="92"/>
         <source>Address</source>
-        <translation>Endereço</translation>
+        <translation>Morada</translation>
     </message>
     <message>
         <location filename="../src/data/model/PatientsModel.cpp" line="93"/>
