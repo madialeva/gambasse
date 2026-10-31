@@ -538,7 +538,7 @@ void TestPatientController::pediatricOptionsFollowTheLanguage() {
     QSignalSpy optionsSpy(consultation, &PediatricConsultationController::domainOptionsChanged);
     consultation->refreshLanguage();
     QCOMPARE(optionsSpy.count(), 1);
-    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Desinfectante:"));
+    QCOMPARE(labelOf("activeIngredient", 1001), QStringLiteral("Desinfetante:"));
     QCOMPARE(consultation->value(QStringLiteral("treatmentMedication1")).toInt(), 1001);
     QCOMPARE(consultation->value(QStringLiteral("treatmentMedication2")).toInt(), 0);
     QCoreApplication::removeTranslator(&portuguese);

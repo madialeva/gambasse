@@ -113,8 +113,11 @@ Use English for source, identifiers, comments, CMake, scripts, technical docs,
 commits, and pull requests. GitHub issues and milestones: titles and
 descriptions always in English. OpenSpec artifacts and user conversation remain in
 Spanish. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
-source language and the Spanish and Portuguese catalogs must preserve their
-current displayed text. Text uses LF;
+source language and the Spanish catalog must preserve its current displayed
+text. The Portuguese catalog is European Portuguese (the norm used in
+Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
+drop-down options in capitals as in the other languages; never carry over the
+Brazilian, Spanish or Galician forms of the original application. Text uses LF;
 never line-ending-normalize binaries such as `.qm`, images, or databases.
 
 ## C++ includes

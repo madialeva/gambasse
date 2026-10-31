@@ -168,7 +168,7 @@ void TestQmlFoundation::qmlLanguageSwitchesInHot() {
         &engine, QUrl::fromLocalFile(QStringLiteral(QML_FIXTURE_DIR "/LangProbe.qml")));
     QObject* item = probe.create();
     QVERIFY(item != nullptr);
-    QCOMPARE(item->property("probed").toString(), QStringLiteral("En Estabulo"));
+    QCOMPARE(item->property("probed").toString(), QStringLiteral("No estábulo"));
 
     // Every change reapplies the catalog and retranslates the engine itself.
     settings->setLanguage(QStringLiteral("es"));

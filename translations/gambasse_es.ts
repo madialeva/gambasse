@@ -1241,6 +1241,11 @@
         <translation>Tipo:</translation>
     </message>
     <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="124"/>
+        <source>HIV</source>
+        <translation>HIV</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="143"/>
         <source>Other diseases:</source>
         <translation>Otras enfermedades:</translation>
