@@ -3,5 +3,8 @@
   <qresource prefix="/i18n">
     <file alias="gambasse_pt.qm">gambasse_pt.qm</file>
     <file alias="gambasse_es.qm">gambasse_es.qm</file>
+    <file alias="qtstrings_es.qm">qtstrings_es.qm</file>
+    <file alias="qtstrings_pt.qm">qtstrings_pt.qm</file>
+    <file alias="qtstrings_en.qm">qtstrings_en.qm</file>
   </qresource>
 </RCC>

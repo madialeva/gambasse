@@ -16,6 +16,34 @@ Window {
     height: Theme.baseHeight
     title: "Gambasse"
     color: Theme.windowBackground
+    // The Gx controls take their colours from Theme; this palette is for the
+    // Qt Quick controls that read the palette, chiefly the Linux photo file
+    // chooser, which would otherwise keep the system's colours.
+    palette {
+        window: Theme.windowBackground
+        base: Theme.fieldBackground
+        alternateBase: Theme.buttonBottom
+        button: Theme.buttonTop
+        light: Theme.tabTop
+        midlight: Theme.buttonBottom
+        mid: Theme.inputBorder
+        dark: Theme.inputBorder
+        shadow: "black"
+        highlight: Theme.highlight
+        highlightedText: Theme.highlightedText
+        placeholderText: Theme.placeholderText
+        // The text roles per group: a role set for every group at once would
+        // win over its disabled value, and disabled buttons would not grey out.
+        active.windowText: Theme.windowText
+        active.text: Theme.windowText
+        active.buttonText: Theme.windowText
+        inactive.windowText: Theme.windowText
+        inactive.text: Theme.windowText
+        inactive.buttonText: Theme.windowText
+        disabled.windowText: Theme.disabledText
+        disabled.text: Theme.disabledText
+        disabled.buttonText: Theme.disabledText
+    }
 
     readonly property alias patientController: patients
 
