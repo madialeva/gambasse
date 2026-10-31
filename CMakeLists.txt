@@ -1,16 +1,44 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.25)
 
 project(Gambasse VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+# The compiler of the project: GCC 16 or later (scripts/build-gcc.sh, AGENTS.md),
+# checked before anything is searched or built. On Windows too: the MinGW of the
+# Qt kits is rejected until the Windows build moves to GCC 16 (issue #60).
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
+    if(WIN32)
+        set(_gambasse_compiler_hint
+            "The Windows build has not moved to GCC 16 yet: see issue #60")
+    else()
+        set(_gambasse_compiler_hint
+            "Build it with scripts/build-gcc.sh and configure with the native preset, which uses it")
+    endif()
+    message(FATAL_ERROR
+        "Found ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER}), "
+        "but the project needs GCC 16 or later. ${_gambasse_compiler_hint}.")
+endif()
+
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
-# Qt 6.6 everywhere (development machines, Windows kit and CI): no code paths
-# for other versions. The setup also enables AUTOMOC and every Qt policy up to
-# 6.6 (QTP0001: the QML module under the standard qrc:/qt/qml/ prefix).
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Sql Qml Quick QuickControls2)
-qt_standard_project_setup(REQUIRES 6.6)
+# GCC 16's libstdc++ is newer than the system's: the development executables and
+# the tests find it through their run path, and the Qt libraries they load share
+# it. The Linux package ships it instead (deploy-linux.sh).
+if(NOT WIN32)
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++.so
+        OUTPUT_VARIABLE _gambasse_libstdcxx OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND_ERROR_IS_FATAL ANY)
+    file(REAL_PATH "${_gambasse_libstdcxx}" _gambasse_libstdcxx)
+    cmake_path(GET _gambasse_libstdcxx PARENT_PATH _gambasse_libstdcxx_dir)
+    list(APPEND CMAKE_BUILD_RPATH ${_gambasse_libstdcxx_dir})
+endif()
+
+# Qt 6.12 everywhere (development machines, CI and the Linux package): no code
+# paths for other versions. The setup also enables AUTOMOC and every Qt policy
+# up to 6.12 (QTP0001: the QML module under the standard qrc:/qt/qml/ prefix).
+find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Sql Qml Quick QuickControls2)
+qt_standard_project_setup(REQUIRES 6.12)
 
 include(CTest)
 

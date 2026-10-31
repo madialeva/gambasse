@@ -8,8 +8,10 @@ set -euo pipefail
 # and QML modules in lib/, found through RUNPATH (no launcher needed). Data
 # (config.ini, database.db, fotos/) lives at the root, as in the Windows layout.
 #
-# Qt is taken from CMake's default search; set QT_PREFIX=/path/to/Qt/6.x/gcc_64
-# to use another kit. Requires cmake, ninja, patchelf and ldd.
+# It builds with the release preset (CMakePresets.json): GCC 16 and Qt 6.12 from
+# ~/software (scripts/build-gcc.sh, scripts/setup-qt.sh). The plugins and QML
+# modules come from the same Qt the build used, and GCC 16's libstdc++, newer than
+# the system's, travels in lib/. Requires cmake, ninja, patchelf, ldd and objdump.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -33,31 +35,29 @@ for tool in cmake ninja patchelf ldd objdump; do
   fi
 done
 
-QMAKE=""
-for candidate in ${QT_PREFIX:+"$QT_PREFIX/bin/qmake6" "$QT_PREFIX/bin/qmake"} qmake6 qmake-qt6 qmake; do
-  if command -v "$candidate" >/dev/null 2>&1; then
-    QMAKE="$(command -v "$candidate")"
-    break
-  fi
-done
-if [[ -z "$QMAKE" ]]; then
-  echo "[ERROR] qmake not found; set QT_PREFIX=<Qt>/gcc_64 or add <Qt>/bin to PATH"
+# System libraries that every desktop provides and that must not travel with
+# the package: they depend on the graphics driver or on the running system.
+# Everything else (Qt, ICU, xcb helpers, GCC 16's libstdc++, ...) is bundled.
+# libgcc_s stays out: GCC 16's needs glibc 2.35, and nothing shipped asks the
+# system's for more than GCC_4.3.0.
+SYSTEM_LIBS='^(ld-linux.*|libc|libm|libdl|libpthread|librt|libutil|libresolv|libanl|libnsl|libgcc_s|libGL|libGLX|libGLdispatch|libOpenGL|libEGL|libGLESv2|libgbm|libdrm|libX11|libX11-xcb|libxcb|libXau|libXdmcp|libfontconfig|libfreetype|libharfbuzz|libglib-2\.0|libgobject-2\.0|libgio-2\.0|libgmodule-2\.0|libdbus-1|libsystemd|libselinux|libudev|libasound)\.so'
+
+echo "[1/6] Configuring CMake (release preset)..."
+# --fresh: a cache from another compiler or Qt would win over the preset.
+(cd "$SCRIPT_DIR" && cmake --preset release --fresh)
+
+# The Qt the build found (Qt6_DIR is <prefix>/lib/cmake/Qt6).
+QT_CMAKE_DIR="$(sed -n 's/^Qt6_DIR:PATH=//p' "$BUILD_DIR/CMakeCache.txt")"
+QMAKE="$(cd "$QT_CMAKE_DIR/../../.." && pwd)/bin/qmake"
+if [[ ! -x "$QMAKE" ]]; then
+  echo "[ERROR] qmake not found next to the Qt of the build: $QMAKE"
   exit 1
 fi
 QT_PLUGINS="$("$QMAKE" -query QT_INSTALL_PLUGINS)"
 QT_QML="$("$QMAKE" -query QT_INSTALL_QML)"
 
-# System libraries that every desktop provides and that must not travel with
-# the package: they depend on the graphics driver or on the running system.
-# Everything else (Qt, ICU, xcb helpers, ...) is bundled.
-SYSTEM_LIBS='^(ld-linux.*|libc|libm|libdl|libpthread|librt|libutil|libresolv|libanl|libnsl|libstdc\+\+|libgcc_s|libGL|libGLX|libGLdispatch|libOpenGL|libEGL|libGLESv2|libgbm|libdrm|libX11|libX11-xcb|libxcb|libXau|libXdmcp|libfontconfig|libfreetype|libharfbuzz|libglib-2\.0|libgobject-2\.0|libgio-2\.0|libgmodule-2\.0|libdbus-1|libsystemd|libselinux|libudev|libasound)\.so'
-
-echo "[1/6] Configuring CMake (Release)..."
-cmake -S "$SCRIPT_DIR" -B "$BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
-  ${QT_PREFIX:+-DCMAKE_PREFIX_PATH="$QT_PREFIX"}
-
 echo "[2/6] Building project..."
-cmake --build "$BUILD_DIR"
+(cd "$SCRIPT_DIR" && cmake --build --preset release)
 
 if [[ ! -f "$BUILD_DIR/$APP" ]]; then
   echo "[ERROR] Executable not found: $BUILD_DIR/$APP"

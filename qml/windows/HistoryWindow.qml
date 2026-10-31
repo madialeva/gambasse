@@ -59,8 +59,6 @@ Window {
     readonly property rect saveButtonRect: root.screenId === "pediatric" ? Qt.rect(720, 524, 134, 32) : (root.screenId === "pregnancy" ? Qt.rect(716, 524, 137, 32) : Qt.rect(714, 348, 137, 32))
     readonly property rect exitButtonRect: root.screenId === "pediatric" ? Qt.rect(871, 524, 134, 32) : (root.screenId === "pregnancy" ? Qt.rect(867, 524, 137, 32) : Qt.rect(867, 348, 137, 32))
 
-    onControllerChanged: root.syncForm()
-
     onReadyChanged: {
         if (ready)
             root.present();
@@ -113,13 +111,6 @@ Window {
         closeOnly: true
     }
 
-    // The form is created by the Loader, so the controller is pushed into it
-    // whenever it is set or the form is (re)loaded.
-    function syncForm() {
-        if (formLoader.item)
-            formLoader.item.controller = root.controller;
-    }
-
     // The form owns the whole content area (1008 x contentHeight): it places
     // its groups and fields with the absolute coordinates of the .cpp files.
     Loader {
@@ -131,7 +122,15 @@ Window {
         height: root.contentHeight
         sourceComponent: root.formComponent
         visible: root.ready
-        onLoaded: root.syncForm()
+    }
+
+    // Each form types its controller property for its own screen, so the
+    // window pushes its controller into whichever form the Loader holds.
+    Binding {
+        target: formLoader.item
+        property: "controller"
+        value: root.controller
+        when: formLoader.item !== null
     }
 
     // The three buttons are children of the content area in Widgets, so they

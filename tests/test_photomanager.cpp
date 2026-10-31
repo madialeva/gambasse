@@ -28,13 +28,16 @@ Patient makePatient() {
 void writeFile(const QString& path, const QByteArray& content = "x") {
     QDir().mkpath(QFileInfo(path).absolutePath());
     QFile file(path);
-    file.open(QIODevice::WriteOnly);
+    QVERIFY2(file.open(QIODevice::WriteOnly), qPrintable(path));
     file.write(content);
 }
 
 QByteArray readFile(const QString& path) {
     QFile file(path);
-    file.open(QIODevice::ReadOnly);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QTest::qFail(qPrintable(QStringLiteral("cannot read ") + path), __FILE__, __LINE__);
+        return {};
+    }
     return file.readAll();
 }
 

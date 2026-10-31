@@ -16,10 +16,17 @@ developed: `src/Dispensario/Forms/` (including the six
 per area), and `src/Dispensario/Utilidades/` (shared framework, NOT to be
 ported: Qt covers those services natively).
 
-Use Qt Quick (QML), CMake, Ninja, and a MinGW/GCC Qt kit for Windows
-deployment. Qt is 6.6 everywhere (CMake requires it; the CI installs 6.6.2):
-never add code paths or workarounds for other Qt versions. Do not introduce Qt Widgets, MSVC, PostgreSQL, or new production
-dependencies without an approved OpenSpec change.
+Use Qt Quick (QML), CMake (3.25+) with the presets of `CMakePresets.json`,
+Ninja, C++26, GCC 16.2.0 built from the GNU sources and Qt 6.12.0, both in
+`~/software` (`scripts/build-gcc.sh`, `scripts/setup-qt.sh`). Qt is 6.12
+everywhere (CMake requires it; the CI installs it with the same script): never
+add code paths or workarounds for other Qt versions. The configure step rejects
+any compiler older than GCC 16, the Windows MinGW kits included: the Windows
+build moves to GCC 16.2 and Qt 6.12 in issue #60. The GCC version lives in
+`scripts/build-gcc.sh`, the presets, the CI image tag and the docs; change them
+together (the CI checks the image against the script). Do not introduce Qt
+Widgets, MSVC, PostgreSQL, or new production dependencies without an approved
+OpenSpec change.
 
 ## Source layout
 
@@ -73,6 +80,10 @@ by context properties or objects injected from `main.cpp`:
   never `var`, so `qmllint` checks every access.
 - `main.cpp` only opens the database, handles the diagnostic flags and loads
   `App`; no wiring between C++ objects and views lives there.
+- QML is lint-clean and formatted with the Qt 6.12 tools: `cmake --build
+  --preset native --target all_qmllint` must print no warning (the CI fails on
+  any), and `~/software/Qt/6.12.0/gcc_64/bin/qmlformat` must leave every file
+  unchanged.
 
 ## OpenSpec
 

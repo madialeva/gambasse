@@ -1,0 +1,44 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "native",
+      "displayName": "Linux (GCC 16.2, Qt 6.12 in ~/software)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-linux",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "$env{HOME}/software/gcc-16.2.0/bin/g++",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "$env{HOME}/software/Qt/6.12.0/gcc_64"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Linux package (deploy-linux.sh)",
+      "inherits": "native",
+      "binaryDir": "${sourceDir}/build-deploy",
+      "cacheVariables": {
+        "BUILD_TESTING": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "native",
+      "configurePreset": "native"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "native",
+      "configurePreset": "native",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

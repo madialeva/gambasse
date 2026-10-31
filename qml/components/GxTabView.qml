@@ -35,8 +35,7 @@ Item {
             spacing: -1
             Repeater {
                 model: root.titles
-                delegate: Tab {
-                }
+                delegate: Tab {}
             }
         }
     }
