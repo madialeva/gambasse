@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QUrl>
 #include <QtQml/qqmlregistration.h>
 
 #include <data/model/Patient.h>
@@ -28,6 +29,8 @@ namespace gambasse {
 //
 // SaveResult codes returned by saveDraft(): 0 Saved, 1 NameRequired,
 // 2 Duplicate, 3 Error (mirrors PatientService::SaveResult).
+// ImportResult codes returned by importPhoto(): 0 Imported, 1 UnreadableImage,
+// 2 WriteError (mirrors PhotoManager::ImportResult).
 class PatientController : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -49,6 +52,10 @@ class PatientController : public QObject {
     Q_PROPERTY(QString contactPerson READ contactPerson NOTIFY detailChanged)
     Q_PROPERTY(int siblingCount READ siblingCount NOTIFY detailChanged)
     Q_PROPERTY(QString photoSource READ photoSource NOTIFY detailChanged)
+    Q_PROPERTY(bool hasPhoto READ hasPhoto NOTIFY detailChanged)
+    Q_PROPERTY(bool canEditPhoto READ canEditPhoto NOTIFY detailChanged)
+    Q_PROPERTY(bool canDeletePhoto READ canDeletePhoto NOTIFY detailChanged)
+    Q_PROPERTY(QUrl photoFolder READ photoFolder CONSTANT)
     Q_PROPERTY(bool showPediatric READ showPediatric NOTIFY availabilityChanged)
     Q_PROPERTY(bool showAdult READ showAdult NOTIFY availabilityChanged)
     Q_PROPERTY(bool showPregnancy READ showPregnancy NOTIFY availabilityChanged)
@@ -82,7 +89,11 @@ public:
     QString cohabitants() const;
     QString contactPerson() const;
     int siblingCount() const;
-    QString photoSource() const; // file:// URL or qrc default
+    QString photoSource() const; // file:// URL (versioned) or qrc default
+    bool hasPhoto() const;
+    bool canEditPhoto() const; // a selected patient, outside the edit session
+    bool canDeletePhoto() const; // canEditPhoto() and the patient has a photo
+    QUrl photoFolder() const; // where the photo dialog starts: user pictures
 
     bool showPediatric() const;
     bool showAdult() const;
@@ -110,6 +121,10 @@ public:
                               int ageRange, const QString& address, const QString& cohabitants,
                               const QString& contactPerson, int siblingCount);
     Q_INVOKABLE bool removeCurrent();
+    // Photo of the selected patient (view mode only). importPhoto() returns an
+    // ImportResult code; removePhoto() whether the patient is left without one.
+    Q_INVOKABLE int importPhoto(const QUrl& file);
+    Q_INVOKABLE bool removePhoto();
     Q_INVOKABLE void refreshAvailability();
 
     // History screens. Each call loads the history of the selected patient and
@@ -176,6 +191,7 @@ private:
     QString m_contactPerson;
     int m_siblingCount = 0;
     QString m_photoSource;
+    bool m_hasPhoto = false;
 };
 
 } // namespace gambasse

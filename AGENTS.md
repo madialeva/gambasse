@@ -44,14 +44,16 @@ qml/
 └── windows/                 screens
 ```
 
-Dependencies flow `qml -> ui -> logic -> data`; `logic/` uses only QtCore and
-`data/`, never Qt Quick or `ui/`, so it can be tested without a GUI. QML only
+Dependencies flow `qml -> ui -> logic -> data`; `logic/` uses only QtCore, the
+QtGui image classes (`QImage`, `QImageReader`, `QImageWriter`, painting on a
+`QImage`; never windows) and `data/`, never Qt Quick or `ui/`, so it can be
+tested without a GUI. QML only
 presents: business rules (patient writes, photo files, clinical availability,
 language/theme persistence) live in `logic/`, and the `ui/` controllers expose
 them to the views.
 
-CMake mirrors the layers: `GambasseCore` (static, `data/` + `logic/`, QtCore
-and QtSql only), `GambasseQml` (the `Gambasse` QML module: the `qml/` views plus
+CMake mirrors the layers: `GambasseCore` (static, `data/` + `logic/`, QtCore,
+QtSql and QtGui for the image classes only), `GambasseQml` (the `Gambasse` QML module: the `qml/` views plus
 the `ui/` C++ types) and the `Gambasse` executable (`main.cpp` + resources).
 Tests link the layer they exercise through `gambasse_add_test()` in
 `tests/CMakeLists.txt` instead of listing sources.

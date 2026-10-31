@@ -88,16 +88,20 @@ cp -aL "$QT_PLUGINS/xcbglintegrations" "$LIB_DIR/plugins/"
 
 # QtQuick: root module files plus the sub-modules the views import (the
 # application selects the Basic style, so the other Controls styles stay out).
+# Dialogs brings the photo file chooser; without a platform theme it is the
+# Qt Quick one (Dialogs/quickimpl), which needs Qt.labs.folderlistmodel.
 cp -a "$QT_QML/QtQml" "$LIB_DIR/qml/"
 mkdir -p "$LIB_DIR/qml/QtQuick/Controls"
 find "$QT_QML/QtQuick" -maxdepth 1 -type f -exec cp -aL {} "$LIB_DIR/qml/QtQuick/" \;
-for sub in Layouts Templates Window; do
+for sub in Dialogs Layouts Templates Window; do
   cp -a "$QT_QML/QtQuick/$sub" "$LIB_DIR/qml/QtQuick/"
 done
 find "$QT_QML/QtQuick/Controls" -maxdepth 1 -type f -exec cp -aL {} "$LIB_DIR/qml/QtQuick/Controls/" \;
 for sub in Basic impl; do
   cp -a "$QT_QML/QtQuick/Controls/$sub" "$LIB_DIR/qml/QtQuick/Controls/"
 done
+mkdir -p "$LIB_DIR/qml/Qt/labs"
+cp -a "$QT_QML/Qt/labs/folderlistmodel" "$LIB_DIR/qml/Qt/labs/"
 
 cat > "$PKG_DIR/qt.conf" <<'EOF'
 [Paths]

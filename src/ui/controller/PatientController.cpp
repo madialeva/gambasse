@@ -1,8 +1,10 @@
 #include <ui/controller/PatientController.h>
 
 #include <QDate>
+#include <QDir>
 #include <QFileInfo>
 #include <QLocale>
+#include <QStandardPaths>
 #include <QUrl>
 
 #include <data/common/Database.h>
@@ -25,16 +27,15 @@ QString defaultPhotoUrl(const PhotoManager& photos) {
     return QStringLiteral("qrc") + photos.defaultPhotoResource();
 }
 
+// The QML Image caches pictures by URL, so a replaced file keeps showing the
+// old picture under the same URL: its modification time versions the URL.
 QString photoUrl(const PhotoManager& photos, const Patient* p) {
-    if (p == nullptr)
+    const QString path = p != nullptr ? photos.existingPhotoPath(*p) : QString();
+    if (path.isEmpty())
         return defaultPhotoUrl(photos);
-    const QString path = photos.photoPath(*p);
-    if (QFileInfo::exists(path))
-        return QUrl::fromLocalFile(path).toString();
-    const QString legacy = photos.legacyPhotoPath(*p);
-    if (QFileInfo::exists(legacy))
-        return QUrl::fromLocalFile(legacy).toString();
-    return defaultPhotoUrl(photos);
+    QUrl url = QUrl::fromLocalFile(path);
+    url.setQuery(QStringLiteral("v=%1").arg(QFileInfo(path).lastModified().toMSecsSinceEpoch()));
+    return url.toString();
 }
 
 } // namespace
@@ -129,6 +130,25 @@ int PatientController::siblingCount() const {
 
 QString PatientController::photoSource() const {
     return m_photoSource;
+}
+
+bool PatientController::hasPhoto() const {
+    return m_hasPhoto;
+}
+
+bool PatientController::canEditPhoto() const {
+    return !m_editing && selectedPatient() != nullptr;
+}
+
+bool PatientController::canDeletePhoto() const {
+    return canEditPhoto() && m_hasPhoto;
+}
+
+QUrl PatientController::photoFolder() const {
+    // The pictures folder may be reported without existing (no XDG user dirs).
+    const QString pictures = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    const bool usable = !pictures.isEmpty() && QDir(pictures).exists();
+    return QUrl::fromLocalFile(usable ? pictures : QDir::homePath());
 }
 
 bool PatientController::showPediatric() const {
@@ -304,6 +324,25 @@ bool PatientController::removeCurrent() {
     return true;
 }
 
+int PatientController::importPhoto(const QUrl& file) {
+    const Patient* p = selectedPatient();
+    if (!p || m_editing)
+        return static_cast<int>(PhotoManager::ImportResult::WriteError);
+    const QString source = file.isLocalFile() ? file.toLocalFile() : file.toString();
+    const PhotoManager::ImportResult result = m_photoManager.importFor(*p, source);
+    refreshDetail();
+    return static_cast<int>(result);
+}
+
+bool PatientController::removePhoto() {
+    const Patient* p = selectedPatient();
+    if (!p || m_editing)
+        return false;
+    const bool removed = m_photoManager.removeFor(*p);
+    refreshDetail();
+    return removed;
+}
+
 void PatientController::refreshAvailability() {
     updateAvailability();
 }
@@ -395,6 +434,7 @@ void PatientController::refreshDetail() {
         m_contactPerson.clear();
         m_siblingCount = 0;
         m_photoSource = photoUrl(m_photoManager, nullptr);
+        m_hasPhoto = false;
     } else {
         m_patientId = p->id;
         m_patientName = p->name;
@@ -407,6 +447,7 @@ void PatientController::refreshDetail() {
         m_contactPerson = p->contactPerson;
         m_siblingCount = p->siblingCount;
         m_photoSource = photoUrl(m_photoManager, p);
+        m_hasPhoto = m_photoManager.hasPhoto(*p);
     }
     emit detailChanged();
 }

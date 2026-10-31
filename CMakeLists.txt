@@ -15,7 +15,9 @@ qt_standard_project_setup(REQUIRES 6.6)
 include(CTest)
 
 # --- Core: data access and business rules -----------------------------------
-# QtCore/QtSql only, no UI: shared by the QML module and the GUI-less tests.
+# QtCore/QtSql plus the QtGui image classes (QImage, QImageReader/Writer) for
+# the patient photos; no windows or UI: shared by the QML module and the
+# GUI-less tests.
 qt_add_library(GambasseCore STATIC
     src/Paths.h
     src/data/common/Database.cpp
@@ -57,7 +59,7 @@ qt_add_library(GambasseCore STATIC
     src/logic/SexLabel.h
 )
 target_include_directories(GambasseCore PUBLIC src)
-target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Sql)
+target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Gui Qt6::Sql)
 
 # --- QML module `Gambasse` ----------------------------------------------------
 # Views (QML_FILES) plus the C++ types they use (SOURCES): the controllers and
@@ -124,6 +126,7 @@ qt_add_qml_module(GambasseQml
         qml/components/GxCheckField.qml
         qml/components/GxTabView.qml
         qml/components/GxActionButton.qml
+        qml/dialogs/PhotoDialog.qml
         qml/windows/HistoryWindow.qml
         qml/windows/ConsultationWindow.qml
         qml/windows/ConsultationList.qml
