@@ -128,7 +128,10 @@ source language and the Spanish catalog must preserve its current displayed
 text. The Portuguese catalog is European Portuguese (the norm used in
 Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
 drop-down options in capitals as in the other languages; never carry over the
-Brazilian, Spanish or Galician forms of the original application. Text uses LF;
+Brazilian, Spanish or Galician forms of the original application. Qt's own
+strings the interface shows (the Linux file chooser) are translated by hand in
+`translations/qtstrings_<es|pt|en>.ts`, English included so the system-language
+Qt catalog never answers; add any new one the views come to show. Text uses LF;
 never line-ending-normalize binaries such as `.qm`, images, or databases.
 
 ## C++ includes

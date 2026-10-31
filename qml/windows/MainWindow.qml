@@ -546,7 +546,7 @@ Item {
                         Layout.preferredWidth: 0
                         text: qsTr("Edit photo")
                         enabled: root.hasController() && root.controller.canEditPhoto
-                        onClicked: photoDialog.open()
+                        onClicked: root.photoDialog.open()
                     }
                     ActionButton {
                         objectName: "deletePhotoButton"
@@ -789,20 +789,32 @@ Item {
         parent: Overlay.overlay
     }
     // Picture for the selected patient; PatientController stores it as the
-    // photo.
-    PhotoDialog {
-        id: photoDialog
-        objectName: "photoDialog"
-        currentFolder: root.hasController() ? root.controller.photoFolder : ""
-        onAccepted: {
-            const result = root.controller.importPhoto(photoDialog.selectedFile);
-            if (result === 1)
-                messageDialog.showInfo(qsTr("Invalid image"), qsTr("The selected file is not a readable image."));
-            else if (result === 2)
-                messageDialog.showInfo(qsTr("Error"), qsTr("Could not save the photo."));
-            gridTable.forceActiveFocus();
+    // photo. Created again on every language change: Qt names the chooser's
+    // side bar places once, when it creates the dialog.
+    readonly property PhotoDialog photoDialog: photoDialogLoader.item as PhotoDialog
+    Loader {
+        id: photoDialogLoader
+        sourceComponent: PhotoDialog {
+            id: dialog
+            objectName: "photoDialog"
+            currentFolder: root.hasController() ? root.controller.photoFolder : ""
+            onAccepted: {
+                const result = root.controller.importPhoto(dialog.selectedFile);
+                if (result === 1)
+                    messageDialog.showInfo(qsTr("Invalid image"), qsTr("The selected file is not a readable image."));
+                else if (result === 2)
+                    messageDialog.showInfo(qsTr("Error"), qsTr("Could not save the photo."));
+                gridTable.forceActiveFocus();
+            }
+            onRejected: gridTable.forceActiveFocus()
         }
-        onRejected: gridTable.forceActiveFocus()
+    }
+    Connections {
+        target: InterfaceSettings
+        function onLanguageChanged() {
+            photoDialogLoader.active = false;
+            photoDialogLoader.active = true;
+        }
     }
     GxDialog {
         id: photoDeleteConfirm

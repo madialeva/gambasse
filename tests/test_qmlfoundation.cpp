@@ -6,6 +6,7 @@
 #include <QQuickWindow>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <QTranslator>
 #include <QtTest>
 
 #include <Paths.h>
@@ -71,6 +72,7 @@ private slots:
     void languagePersistsAndNotifies();
     void qmlShellFollowsThemeInHot();
     void qmlLanguageSwitchesInHot();
+    void qtStringsFollowTheLanguage();
     void splashSequence();
     void appOpensShellAfterSplash();
     void applicationIconIsTheLogo();
@@ -179,6 +181,47 @@ void TestQmlFoundation::qmlLanguageSwitchesInHot() {
     InterfaceSettings reloaded(nullptr); // persistence rode along
     QCOMPARE(reloaded.language(), QStringLiteral("en"));
     delete item;
+}
+
+// Qt's own strings the photo chooser shows follow the interface language, not
+// the system's: English answers with the sources even when a Qt catalog of
+// another language is installed (QQmlApplicationEngine loads the system's).
+void TestQmlFoundation::qtStringsFollowTheLanguage() {
+    persistInterface(QStringLiteral("claro"), QStringLiteral("pt"));
+    QQmlApplicationEngine engine;
+    InterfaceSettings* settings = settingsOf(engine);
+    QVERIFY(settings != nullptr);
+    const auto qt = [](const char* context, const char* source) {
+        return QCoreApplication::translate(context, source);
+    };
+    QCOMPARE(qt("FileDialog", "Filter"), QStringLiteral("Filtro"));
+    QCOMPARE(qt("QStandardPaths", "Downloads"), QStringLiteral("Transferências"));
+    QCOMPARE(qt("QPlatformTheme", "Open"), QStringLiteral("Abrir"));
+
+    settings->setLanguage(QStringLiteral("es"));
+    QCOMPARE(qt("QStandardPaths", "Downloads"), QStringLiteral("Descargas"));
+    QCOMPARE(qt("QStandardPaths", "Pictures"), QStringLiteral("Imágenes"));
+
+    // A Spanish Qt catalog installed first, like the system's on a Spanish
+    // desktop, must not answer while the interface is in English.
+    QTranslator system;
+    QVERIFY(system.load(QStringLiteral("qtstrings_es"), QStringLiteral(":/i18n")));
+    QCoreApplication::installTranslator(&system);
+    settings->setLanguage(QStringLiteral("en"));
+    QCOMPARE(qt("QStandardPaths", "Home"), QStringLiteral("Home"));
+    QCOMPARE(qt("FileDialog", "Filter"), QStringLiteral("Filter"));
+    QCoreApplication::removeTranslator(&system);
+
+    // The engine installs the system's Qt catalog when it loads its first
+    // view, after the singleton: loading a view puts the Qt strings back in
+    // front of it.
+    settings->setLanguage(QStringLiteral("pt"));
+    QVERIFY(system.load(QStringLiteral("qtstrings_es"), QStringLiteral(":/i18n")));
+    QCoreApplication::installTranslator(&system);
+    QCOMPARE(qt("QStandardPaths", "Home"), QStringLiteral("Carpeta personal"));
+    engine.loadData("import QtQuick\nItem {}");
+    QCOMPARE(qt("QStandardPaths", "Home"), QStringLiteral("Pasta pessoal"));
+    QCoreApplication::removeTranslator(&system);
 }
 
 void TestQmlFoundation::splashSequence() {

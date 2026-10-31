@@ -47,12 +47,18 @@ signals:
     void languageChanged();
 
 private:
-    // Installs the catalog for the current language (English needs none) and
-    // refreshes every QML-bound string of the bound engine.
+    // Installs the catalogs for the current language and refreshes every
+    // QML-bound string of the bound engine.
     void applyLanguage();
+    // Puts the Qt strings catalog back in front of the translators installed
+    // after it: QQmlApplicationEngine installs the system-language Qt catalog
+    // when it loads its first view, after the singleton is created.
+    void raiseQtCatalog();
 
     AppSettings m_store;
     QTranslator m_translator;
+    // Qt's own strings the application shows (translations/qtstrings_*.ts).
+    QTranslator m_qtTranslator;
     QPointer<QQmlEngine> m_engine;
     QString m_theme;
     QString m_language;

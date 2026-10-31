@@ -206,6 +206,13 @@ lrelease translations/gambasse_es.ts -qm translations/gambasse_es.qm
 lrelease translations/gambasse_pt.ts -qm translations/gambasse_pt.qm
 ```
 
+Qt's own strings that the interface shows, those of the Linux photo file
+chooser (side bar places, buttons, filter), follow the interface language
+too. They live in `translations/qtstrings_<es|pt|en>.ts`, written by hand
+because `lupdate` does not scan Qt, and are compiled and embedded like the
+others. Qt's own catalogs are not used: they leave the chooser untranslated in
+Spanish and are Brazilian in Portuguese.
+
 ## License
 
 Released under the **MIT License**. You are free to use, modify, and distribute

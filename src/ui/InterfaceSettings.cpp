@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QQmlApplicationEngine>
 #include <QQmlEngine>
 
 #include <Paths.h>
@@ -29,6 +30,9 @@ InterfaceSettings* InterfaceSettings::create(QQmlEngine* qmlEngine, QJSEngine* j
     Q_UNUSED(jsEngine);
     auto* settings = new InterfaceSettings(qmlEngine);
     settings->applyLanguage();
+    if (auto* appEngine = qobject_cast<QQmlApplicationEngine*>(qmlEngine))
+        connect(appEngine, &QQmlApplicationEngine::objectCreated, settings,
+                &InterfaceSettings::raiseQtCatalog);
     return settings;
 }
 
@@ -48,6 +52,12 @@ void InterfaceSettings::applyLanguage() {
     // instance (settings round trips in tests) just persists.
     if (!m_engine)
         return;
+    // Qt's own strings (the file chooser), English included: it repeats the
+    // sources so that the system-language catalog QQmlApplicationEngine loads
+    // by itself does not answer (raiseQtCatalog keeps it in front of that one).
+    qApp->removeTranslator(&m_qtTranslator);
+    if (m_qtTranslator.load(QStringLiteral("qtstrings_") + m_language, QStringLiteral(":/i18n")))
+        qApp->installTranslator(&m_qtTranslator);
     // Embedded resource first, <base>/translations as fallback; English needs
     // no catalog.
     qApp->removeTranslator(&m_translator);
@@ -61,6 +71,13 @@ void InterfaceSettings::applyLanguage() {
             qApp->installTranslator(&m_translator);
     }
     m_engine->retranslate();
+}
+
+void InterfaceSettings::raiseQtCatalog() {
+    if (m_qtTranslator.isEmpty())
+        return;
+    qApp->removeTranslator(&m_qtTranslator);
+    qApp->installTranslator(&m_qtTranslator);
 }
 
 } // namespace gambasse

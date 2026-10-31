@@ -3,6 +3,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QImage>
+#include <QPointer>
 #include <QSet>
 #include <functional>
 #include <QQuickItem>
@@ -173,6 +174,7 @@ private slots:
     void editPhotoOpensTheFileDialog();
     void deletePhotoAsksForConfirmation();
     void photoButtonsFollowTheLanguage();
+    void photoDialogIsRebuiltOnLanguageChange();
 };
 
 void TestQmlMainWindow::initTestCase() {
@@ -1017,6 +1019,25 @@ void TestQmlMainWindow::photoButtonsFollowTheLanguage() {
     QCOMPARE(texts(), (QStringList{QStringLiteral("Editar foto"), QStringLiteral("Apagar foto")}));
     m_settings->setLanguage(QStringLiteral("en"));
     QCOMPARE(texts(), (QStringList{QStringLiteral("Edit photo"), QStringLiteral("Delete photo")}));
+}
+
+// Qt names the chooser's side bar places once, when the dialog is created, so
+// a language change replaces the dialog; the new one opens and keeps the folder.
+void TestQmlMainWindow::photoDialogIsRebuiltOnLanguageChange() {
+    seedPatients();
+    openScreen();
+    QPointer<QObject> before = m_screen->findChild<QObject*>(QStringLiteral("photoDialog"));
+    QVERIFY(before != nullptr);
+    m_settings->setLanguage(QStringLiteral("pt"));
+    QTRY_VERIFY(before.isNull());
+    auto* dialog = m_screen->findChild<QObject*>(QStringLiteral("photoDialog"));
+    QVERIFY(dialog != nullptr);
+    QCOMPARE(dialog->property("currentFolder").toUrl(), m_controller->photoFolder());
+    clickIn(m_window, item(QStringLiteral("editPhotoButton")));
+    QTRY_VERIFY(dialog->property("visible").toBool());
+    QVERIFY(QMetaObject::invokeMethod(dialog, "reject"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+    m_settings->setLanguage(QStringLiteral("en"));
 }
 
 } // namespace gambasse
