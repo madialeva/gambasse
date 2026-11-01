@@ -82,6 +82,14 @@ baselined without re-running the initial schema, so its data is preserved.
   `qmllint`/`qmlformat` tools.
 - CMake 3.25+ and Ninja.
 - Linux deployment: `patchelf`, `ldd` and `objdump` besides the tools above.
+- Static build (optional, see Static build): a static Qt 6.12.0 that
+  `scripts/build-static-deps.sh` builds from the sources, without root, in
+  `~/software/Qt/6.12.0-static`. The kit is shared with the maintainer's other
+  Qt project, whose script builds the same one. It needs the development
+  packages of OpenSSL, libxcb and xcb-util (`-wm`, `-image`, `-keysyms`,
+  `-renderutil`, `-cursor`), libxkbcommon and libxkbcommon-x11, fontconfig,
+  freetype, Mesa (GL and EGL), X11 and zlib, about half an hour with 12 cores
+  and several GB of free disk while it builds.
 - Windows deployment: pending on the move to GCC 16.2 and Qt 6.12 (issue
   #60); until then the configure step rejects the MinGW of the Qt kits.
 
@@ -188,6 +196,48 @@ The minimum target system is set by the highest glibc version the package
 needs: the script prints it at the end (glibc 2.34, which covers Ubuntu 22.04+,
 Debian 12+, Fedora 35+ and RHEL 9+).
 
+## Static build
+
+`scripts/build-static.sh` builds a self-contained executable: a single file
+with Qt, its plugins (xcb, offscreen, SQLite, JPEG/SVG), the QML modules and
+GCC 16's C++ runtime linked statically. It can be copied to another Linux
+machine and run without installing Qt or anything from `~/software`. It is
+built on demand on the developer's machine only: the CI, the tests and the
+Linux package do not use it.
+
+```sh
+scripts/build-static-deps.sh   # once: the static Qt kit
+scripts/build-static.sh        # build-static/dist/Gambasse
+```
+
+The script builds with the `static` preset (`build-static`, Release, no
+tests), copies the executable without symbols to `build-static/dist/Gambasse`
+and fails if it carries a run path or needs a shared library of Qt or of the
+C++ runtime, or one from `~/software`. Then it tries a copy in an empty
+directory and environment: `--check-db` must create the database and
+`--svg2png` render the logo. `scripts/build-static.sh --check <executable>`
+runs only the check.
+
+Like the package, the executable keeps `config.ini`, `database.db` and
+`fotos/` beside itself, and it creates the database on first run. It takes
+50 MB without symbols. Only libraries of the operating system stay dynamic:
+glibc 2.34 or later, OpenGL/EGL, X11/xcb and xkbcommon, fontconfig, freetype
+and zlib. On a minimal Ubuntu 24.04 these packages are enough (Mesa renders in
+software when there is no GPU driver):
+
+```text
+libx11-6 libx11-xcb1 libxcb1 libxcb-glx0 libxcb-cursor0 libxcb-icccm4
+libxcb-util1 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0
+libxcb-shm0 libxcb-sync1 libxcb-xfixes0 libxcb-render0 libxcb-shape0
+libxcb-xkb1 libxkbcommon0 libxkbcommon-x11-0 libegl1 libglx0 libopengl0
+libgl1-mesa-dri libglx-mesa0 libegl-mesa0 libfreetype6 libfontconfig1 zlib1g
+fonts-dejavu-core
+```
+
+Built without ICU, the executable sorts the patient list with the C library's
+collation of the system locale, which gives the same order as the development
+build; it prints a notice about it on the standard error.
+
 ## Diagnostics
 
 - `--check-db` prints `PATIENTS=<count>`.
@@ -218,3 +268,8 @@ Spanish and are Brazilian in Portuguese.
 Released under the **MIT License**. You are free to use, modify, and distribute
 this software, including in proprietary projects, provided you retain the
 original copyright notice. See [LICENSE.md](LICENSE.md) for details.
+
+Qt is used under the LGPL v3. The static executable links it statically: anyone
+who receives it must be able to link it again against another Qt, which the
+public sources of this project and its build scripts allow. A distributed
+static executable must come with the text of the LGPL and Qt's notices.

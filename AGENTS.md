@@ -164,6 +164,18 @@ also be added to the QML copy list in the script (the Basic style is the only
 Controls style shipped). Verify a package with `--check-db` under
 `QT_QPA_PLATFORM=offscreen` and an empty environment (`env -i`).
 
+The self-contained executable (`scripts/build-static.sh`, the `static` preset
+and the `GAMBASSE_STATIC` option) is built on demand only, on the developer's
+machine. It is not part of the checks of every change, nor of the CI: a change
+is done without building it, unless it touches the static build itself. It
+links the static Qt kit in `~/software/Qt/6.12.0-static`, which
+`scripts/build-static-deps.sh` builds and which is shared with guita: the Qt
+block of that script (modules and options, between its markers) is the same in
+both repositories, and changes in both together. A Qt module or plugin the
+application starts using is added to that list in both scripts, and to the
+plugin list of `GAMBASSE_STATIC` in `CMakeLists.txt` (which, like the package,
+links no platform theme), without having to build the kit in the same change.
+
 ## Working preferences
 
 - Conversation with the user in Spanish.

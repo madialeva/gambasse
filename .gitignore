@@ -1,6 +1,7 @@
 # Build (CMake / Ninja)
 build/
 build-linux/
+build-static/
 out/
 cmake-build-*/
 
