@@ -22,10 +22,19 @@ set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
+# The self-contained Linux executable (static preset, scripts/build-static.sh): Qt
+# from the static kit of scripts/build-static-deps.sh and the C++ runtime linked
+# statically, with no run path. Off for every other build.
+option(GAMBASSE_STATIC "Build a self-contained executable with the static Qt kit" OFF)
+if(GAMBASSE_STATIC AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(FATAL_ERROR "GAMBASSE_STATIC is only supported on Linux.")
+endif()
+
 # GCC 16's libstdc++ is newer than the system's: the development executables and
 # the tests find it through their run path, and the Qt libraries they load share
-# it. The Linux package ships it instead (deploy-linux.sh).
-if(NOT WIN32)
+# it. The Linux package ships it instead (deploy-linux.sh), and the static
+# executable links it.
+if(NOT WIN32 AND NOT GAMBASSE_STATIC)
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++.so
         OUTPUT_VARIABLE _gambasse_libstdcxx OUTPUT_STRIP_TRAILING_WHITESPACE
         COMMAND_ERROR_IS_FATAL ANY)
@@ -39,6 +48,18 @@ endif()
 # up to 6.12 (QTP0001: the QML module under the standard qrc:/qt/qml/ prefix).
 find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Sql Qml Quick QuickControls2)
 qt_standard_project_setup(REQUIRES 6.12)
+
+# The static build needs the static kit: with the shared one it would build an
+# executable that still loads Qt from ~/software.
+if(GAMBASSE_STATIC)
+    get_target_property(_gambasse_qt_type Qt6::Core TYPE)
+    if(NOT _gambasse_qt_type STREQUAL "STATIC_LIBRARY")
+        message(FATAL_ERROR
+            "GAMBASSE_STATIC needs a static Qt, but the Qt found (${Qt6_DIR}) is not "
+            "static. The static Qt is expected in $ENV{HOME}/software/Qt/6.12.0-static: "
+            "build it with scripts/build-static-deps.sh and configure with the static preset.")
+    endif()
+endif()
 
 include(CTest)
 
@@ -194,6 +215,24 @@ target_link_libraries(Gambasse PRIVATE
     GambasseQml
     GambasseQmlplugin
 )
+
+# Static executable: the C++ runtime inside, and the Qt plugins the Linux package
+# ships (deploy-linux.sh): xcb (plus offscreen for the diagnostics), SQLite, JPEG
+# and SVG images, SVG icons and the input contexts. No platform theme, so the photo
+# chooser stays the Qt Quick one, in the application's language and theme.
+# qmlimportscanner adds the QML modules' plugins.
+if(GAMBASSE_STATIC)
+    target_link_options(Gambasse PRIVATE -static-libstdc++ -static-libgcc)
+    qt_import_plugins(Gambasse
+        INCLUDE_BY_TYPE platforms Qt6::QXcbIntegrationPlugin Qt6::QOffscreenIntegrationPlugin
+        INCLUDE_BY_TYPE xcbglintegrations Qt6::QXcbGlxIntegrationPlugin Qt6::QXcbEglIntegrationPlugin
+        INCLUDE_BY_TYPE platforminputcontexts
+            Qt6::QComposePlatformInputContextPlugin Qt6::QIbusPlatformInputContextPlugin
+        INCLUDE_BY_TYPE imageformats Qt6::QJpegPlugin Qt6::QSvgPlugin
+        INCLUDE_BY_TYPE iconengines Qt6::QSvgIconPlugin
+        INCLUDE_BY_TYPE sqldrivers Qt6::QSQLiteDriverPlugin
+        EXCLUDE_BY_TYPE platformthemes tls networkinformation generic qmltooling)
+endif()
 
 # After building, copy Qt DLLs and plugins next to the executable on Windows so
 # it can run from build/ without modifying the system PATH.

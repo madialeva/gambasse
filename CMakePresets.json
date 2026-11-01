@@ -20,6 +20,19 @@
       "cacheVariables": {
         "BUILD_TESTING": "OFF"
       }
+    },
+    {
+      "name": "static",
+      "displayName": "Self-contained Linux executable (GCC 16.2, static Qt 6.12 in ~/software)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-static",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "$env{HOME}/software/gcc-16.2.0/bin/g++",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "$env{HOME}/software/Qt/6.12.0-static",
+        "GAMBASSE_STATIC": "ON",
+        "BUILD_TESTING": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -30,6 +43,13 @@
     {
       "name": "release",
       "configurePreset": "release"
+    },
+    {
+      "name": "static",
+      "configurePreset": "static",
+      "targets": [
+        "Gambasse"
+      ]
     }
   ],
   "testPresets": [
