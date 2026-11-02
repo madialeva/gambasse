@@ -6,6 +6,18 @@ on:
     branches:
       - 'develop/**'
       - 'release/**'
+  # By hand on any branch (Actions -> Run workflow, or gh workflow run), so that
+  # a change branch can be checked before its pull request.
+  workflow_dispatch:
+
+# A new run of the same branch or pull request cancels the one in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# The job only reads the code: the token cannot write to the repository.
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
@@ -27,13 +39,13 @@ jobs:
         working-directory: gambasse
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: gambasse
 
       # The toolchain at the version gambasse pins.
       - name: Checkout toolchain-cpp
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: madialeva/toolchain-cpp
           ref: ${{ env.TOOLCHAIN_CPP_REF }}
@@ -44,6 +56,8 @@ jobs:
       - name: Trust the checkout
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE/gambasse"
 
+      # Only on pushes, which go to develop/** and release/**: pull requests and
+      # manual runs skip it.
       - name: Check branch name matches project version
         if: github.event_name == 'push'
         run: sh scripts/check-branch-version.sh "${GITHUB_REF_NAME}"
@@ -84,7 +98,7 @@ jobs:
       # after installing, so that a run with failing tests keeps it.
       - name: Restore the toolchain
         id: toolchain
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             toolchain-cpp/software
@@ -95,13 +109,14 @@ jobs:
       - name: Install the toolchain
         if: steps.toolchain.outputs.cache-hit != 'true'
         run: |
-          ../toolchain-cpp/install.sh $TOOLCHAIN_CPP_COMPONENTS
+          read -ra components <<<"$TOOLCHAIN_CPP_COMPONENTS"
+          ../toolchain-cpp/install.sh "${components[@]}"
           rm -rf ../toolchain-cpp/software/src ../toolchain-cpp/software/aqt-venv \
             ../toolchain-cpp/software/aqtinstall.log
 
       - name: Save the toolchain
         if: steps.toolchain.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             toolchain-cpp/software
@@ -123,9 +138,9 @@ jobs:
             echo "::error::qmllint reported warnings"
             exit 1
           fi
-          for f in $(find qml -name '*.qml'); do
+          while IFS= read -r -d '' f; do
             ../toolchain-cpp/software/Qt/6.12.0/gcc_64/bin/qmlformat "$f" | diff -u "$f" -
-          done
+          done < <(find qml -name '*.qml' -print0)
 
       - name: Test
         run: ctest --preset native
