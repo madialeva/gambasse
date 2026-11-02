@@ -1,6 +1,5 @@
 #include <QGuiApplication>
 #include <QObject>
-#include <QPixmap>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QSqlQuery>
@@ -53,38 +52,13 @@ int main(int argc, char** argv) {
     // generic default icon.
     QGuiApplication::setWindowIcon(gambasse::applicationIcon());
 
-    // Deployment base path (the root directory above lib/). The launcher passes
-    // it through --base; otherwise the executable directory is used.
+    // Base path of the data: the executable's directory, unless --base gives
+    // another one.
     {
         const QStringList args = app.arguments();
         const int bi = args.indexOf(QStringLiteral("--base"));
         if (bi >= 0 && bi + 1 < args.size())
             gambasse::setBasePath(args.at(bi + 1));
-    }
-
-    // Development utility: rasterizes an SVG to a PNG scaled to a given height,
-    // using Qt's qsvg image plugin. Usage: --svg2png <in.svg> <out.png> <height>
-    if (app.arguments().contains(QStringLiteral("--svg2png"))) {
-        attachConsoleIfNeeded();
-        const QStringList a = app.arguments();
-        const int i = a.indexOf(QStringLiteral("--svg2png"));
-        const QString in = a.value(i + 1);
-        const QString out = a.value(i + 2);
-        int height = a.value(i + 3).toInt();
-        if (height <= 0)
-            height = 96;
-        QPixmap pm(in);
-        if (pm.isNull()) {
-            std::fprintf(stderr, "svg2png: could not load %s\n", in.toUtf8().constData());
-            return 2;
-        }
-        const QPixmap scaled = pm.scaledToHeight(height, Qt::SmoothTransformation);
-        const bool ok = scaled.save(out, "PNG");
-        std::fprintf(stdout, "svg2png: %s -> %s (%dx%d) %s\n", in.toUtf8().constData(),
-                     out.toUtf8().constData(), scaled.width(), scaled.height(),
-                     ok ? "OK" : "FAILED");
-        std::fflush(stdout);
-        return ok ? 0 : 3;
     }
 
     // Open the SQLite database (path from config.ini, database.db by default).

@@ -2,6 +2,7 @@
 build/
 build-linux/
 build-static/
+build-windows/
 out/
 cmake-build-*/
 CMakeUserPresets.json

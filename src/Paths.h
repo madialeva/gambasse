@@ -6,8 +6,8 @@
 namespace gambasse {
 
 // Application base path: directory containing config.ini, the database, fotos/,
-// and translations/. The Windows launcher sets it with --base (the root directory
-// above lib/). Otherwise, the executable directory is used for development builds.
+// and translations/. It is the executable's directory, unless --base sets
+// another one.
 inline QString& baseDirRef() {
     static QString b;
     return b;

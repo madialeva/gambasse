@@ -21,14 +21,15 @@ Ninja, C++26, GCC 16.2.0 built from the GNU sources and Qt 6.12.0. The project
 builds none of its toolchain: it comes from
 [toolchain-cpp](https://github.com/madialeva/toolchain-cpp) `v0.2.0`, cloned
 next to the repository (`../toolchain-cpp`), with its components `gcc qt` (the
-native build, the tests, the Linux package and the CI) and `qt-static` (the
-self-contained executable), installed in `../toolchain-cpp/software`. The
-presets name them from `${sourceParentDir}` and `scripts/build-static.sh` from
-`SOFTWARE_DIR`, with no environment variables. Qt is 6.12 everywhere (CMake
+native build, the tests, the Linux package and the CI), `qt-static` (the
+self-contained Linux executable) and `gcc-mingw qt-mingw` (the cross compiler
+and the static Qt of the Windows executable), installed in
+`../toolchain-cpp/software`. The presets name them from `${sourceParentDir}`
+and the scripts from `SOFTWARE_DIR`, with no environment variables. Qt is 6.12 everywhere (CMake
 requires it; the CI installs it with the same component): never add code paths
 or workarounds for other Qt versions. The configure step rejects any compiler
-older than GCC 16, the Windows MinGW kits included: the Windows build moves to
-GCC 16.2 and Qt 6.12 in issue #60. Moving to another toolchain-cpp version
+older than GCC 16, the MinGW of the Qt kits included: Windows is only built
+from Linux, with the cross compiler. Moving to another toolchain-cpp version
 changes together `TOOLCHAIN_CPP_REF` in the CI, the prefixes of the presets if
 they change (a MAJOR version of toolchain-cpp), the CI image tag if it brings
 another GCC (the CI checks the image against toolchain-cpp's `versions.sh`),
@@ -158,13 +159,15 @@ include directories; project code never relies on them.
 
 ## Deployment notes
 
-Keep a 1008×561 base UI with elastic layouts. The Windows launcher starts the Qt
-application in `lib/` using `--base <root>`. `windeployqt` must get
-`--qmldir qml` so the Qt Quick modules ship. Windows GUI diagnostics must be piped
-or redirected because the process has no standard console.
+Keep a 1008×561 base UI with elastic layouts. On Windows the distribution is
+the self-contained `Gambasse.exe` alone, with `config.ini`, `database.db` and
+`fotos/` beside it: there is no launcher, `lib/` or `windeployqt`, and the
+Windows build without `GAMBASSE_STATIC` is rejected at configure time.
+`--base <directory>` stays as a general option. Windows GUI diagnostics must be
+piped or redirected because the process has no standard console.
 
-The Linux package (`deploy-linux.sh`, a tar.gz) has no launcher: the executable
-sits at the root with RUNPATH `$ORIGIN/lib`, and Qt libraries, plugins and QML
+In the Linux package (`deploy-linux.sh`, a tar.gz) the executable sits at the
+root with RUNPATH `$ORIGIN/lib`, and Qt libraries, plugins and QML
 modules live in `lib/`, so `basePath()` is the extracted directory. It must never
 ship a `database.db` or `config.ini`. A QML module the views start importing must
 also be added to the QML copy list in the script (the Basic style is the only
@@ -181,6 +184,26 @@ module or plugin the application starts using is added to the component's list
 in a change of toolchain-cpp, and to the plugin list of `GAMBASSE_STATIC` in
 `CMakeLists.txt` (which, like the package, links no platform theme), without
 having to build the kit in the same change.
+
+The Windows executable (`scripts/build-windows.sh`, the `windows` preset and
+`GAMBASSE_STATIC` with the cross compiler) is built on demand only too, under
+the same rule. It cross-builds `build-windows/dist/Gambasse.exe` with
+toolchain-cpp's `gcc-mingw` and `qt-mingw` (`Qt/6.12.0-mingw`, with the
+desktop kit as host) and checks that it imports only the DLLs of its list of
+Windows DLLs, the same list as guita's. A Qt module or plugin the application
+starts using also goes to `qt-mingw`'s list in toolchain-cpp and to the
+Windows plugin list of `GAMBASSE_STATIC`. The script's smoke test runs
+`--check-db` under Wine, offscreen, with a temporary prefix and home. For
+visual checks the executable runs under Wine on `Xvfb :99`, never on the
+user's desktop, with a temporary prefix (never `~/.wine`) without its colour
+profiles: Wine 10.6 lacks `mscms.dll.WcsCreateIccProfile`, and Qt aborts on
+start without that workaround. Wine writes a profile for the X display on each
+graphical run, so `windows/system32/spool/drivers/color/` of the prefix is
+emptied before every launch. With `QSG_RHI_BACKEND=opengl` the windows are
+repainted normally but the splash is never drawn; with Direct3D 11, Qt's
+default, the splash shows, but guita found that windows stop repainting after
+their first frame (Wine's presentation without a GPU, not the application):
+the splash and the rest are checked in separate runs, and on a real Windows.
 
 ## Working preferences
 

@@ -7,7 +7,7 @@
 # shared library of Qt or the C++ runtime, or one from the local dependencies or
 # this repository. Last, a smoke test in an empty directory and environment, with
 # no display: --check-db creates and migrates a database (the SQLite driver and the
-# embedded patches) and --svg2png renders the logo (the SVG plugin).
+# embedded patches).
 #
 #   scripts/build-static.sh                       build, copy, check and try it
 #   scripts/build-static.sh --check <executable>  only check <executable>
@@ -77,13 +77,7 @@ smoke_test() {
         sed 's/^/  /' <<<"$out" >&2
         return 1
     fi
-    out="$(env -i QT_QPA_PLATFORM=offscreen "$dir/Gambasse" --svg2png :/img/logo.svg "$dir/logo.png" 64 2>&1)" || true
-    if [[ ! -s "$dir/logo.png" ]]; then
-        echo "error: --svg2png did not render the logo:" >&2
-        sed 's/^/  /' <<<"$out" >&2
-        return 1
-    fi
-    echo ">> Smoke test passed: database created and migrated, SVG rendered"
+    echo ">> Smoke test passed: database created and migrated"
 }
 
 case "${1:-}" in
