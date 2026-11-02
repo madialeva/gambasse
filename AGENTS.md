@@ -195,9 +195,15 @@ starts using also goes to `qt-mingw`'s list in toolchain-cpp and to the
 Windows plugin list of `GAMBASSE_STATIC`. The script's smoke test runs
 `--check-db` under Wine, offscreen, with a temporary prefix and home. For
 visual checks the executable runs under Wine on `Xvfb :99`, never on the
-user's desktop, with a temporary prefix (never `~/.wine`) without its sRGB
-colour profile: Wine 10.6 lacks `mscms.dll.WcsCreateIccProfile`, and Qt aborts
-on start without that workaround.
+user's desktop, with a temporary prefix (never `~/.wine`) without its colour
+profiles: Wine 10.6 lacks `mscms.dll.WcsCreateIccProfile`, and Qt aborts on
+start without that workaround. Wine writes a profile for the X display on each
+graphical run, so `windows/system32/spool/drivers/color/` of the prefix is
+emptied before every launch. With `QSG_RHI_BACKEND=opengl` the windows are
+repainted normally but the splash is never drawn; with Direct3D 11, Qt's
+default, the splash shows, but guita found that windows stop repainting after
+their first frame (Wine's presentation without a GPU, not the application):
+the splash and the rest are checked in separate runs, and on a real Windows.
 
 ## Working preferences
 
