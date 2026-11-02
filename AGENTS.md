@@ -17,16 +17,23 @@ per area), and `src/Dispensario/Utilidades/` (shared framework, NOT to be
 ported: Qt covers those services natively).
 
 Use Qt Quick (QML), CMake (3.25+) with the presets of `CMakePresets.json`,
-Ninja, C++26, GCC 16.2.0 built from the GNU sources and Qt 6.12.0, both in
-`~/software` (`scripts/build-gcc.sh`, `scripts/setup-qt.sh`). Qt is 6.12
-everywhere (CMake requires it; the CI installs it with the same script): never
-add code paths or workarounds for other Qt versions. The configure step rejects
-any compiler older than GCC 16, the Windows MinGW kits included: the Windows
-build moves to GCC 16.2 and Qt 6.12 in issue #60. The GCC version lives in
-`scripts/build-gcc.sh`, the presets, the CI image tag and the docs; change them
-together (the CI checks the image against the script). Do not introduce Qt
-Widgets, MSVC, PostgreSQL, or new production dependencies without an approved
-OpenSpec change.
+Ninja, C++26, GCC 16.2.0 built from the GNU sources and Qt 6.12.0. The project
+builds none of its toolchain: it comes from
+[toolchain-cpp](https://github.com/madialeva/toolchain-cpp) `v0.2.0`, cloned
+next to the repository (`../toolchain-cpp`), with its components `gcc qt` (the
+native build, the tests, the Linux package and the CI) and `qt-static` (the
+self-contained executable), installed in `../toolchain-cpp/software`. The
+presets name them from `${sourceParentDir}` and `scripts/build-static.sh` from
+`SOFTWARE_DIR`, with no environment variables. Qt is 6.12 everywhere (CMake
+requires it; the CI installs it with the same component): never add code paths
+or workarounds for other Qt versions. The configure step rejects any compiler
+older than GCC 16, the Windows MinGW kits included: the Windows build moves to
+GCC 16.2 and Qt 6.12 in issue #60. Moving to another toolchain-cpp version
+changes together `TOOLCHAIN_CPP_REF` in the CI, the prefixes of the presets if
+they change (a MAJOR version of toolchain-cpp), the CI image tag if it brings
+another GCC (the CI checks the image against toolchain-cpp's `versions.sh`),
+the README and this file. Do not introduce Qt Widgets, MSVC, PostgreSQL, or
+new production dependencies without an approved OpenSpec change.
 
 ## Source layout
 
@@ -82,8 +89,8 @@ by context properties or objects injected from `main.cpp`:
   `App`; no wiring between C++ objects and views lives there.
 - QML is lint-clean and formatted with the Qt 6.12 tools: `cmake --build
   --preset native --target all_qmllint` must print no warning (the CI fails on
-  any), and `~/software/Qt/6.12.0/gcc_64/bin/qmlformat` must leave every file
-  unchanged.
+  any), and `../toolchain-cpp/software/Qt/6.12.0/gcc_64/bin/qmlformat` must
+  leave every file unchanged.
 
 ## OpenSpec
 
@@ -168,13 +175,12 @@ The self-contained executable (`scripts/build-static.sh`, the `static` preset
 and the `GAMBASSE_STATIC` option) is built on demand only, on the developer's
 machine. It is not part of the checks of every change, nor of the CI: a change
 is done without building it, unless it touches the static build itself. It
-links the static Qt kit in `~/software/Qt/6.12.0-static`, which
-`scripts/build-static-deps.sh` builds and which is shared with guita: the Qt
-block of that script (modules and options, between its markers) is the same in
-both repositories, and changes in both together. A Qt module or plugin the
-application starts using is added to that list in both scripts, and to the
-plugin list of `GAMBASSE_STATIC` in `CMakeLists.txt` (which, like the package,
-links no platform theme), without having to build the kit in the same change.
+links the static Qt kit of toolchain-cpp's `qt-static` component
+(`../toolchain-cpp/software/Qt/6.12.0-static`), one kit for every project. A Qt
+module or plugin the application starts using is added to the component's list
+in a change of toolchain-cpp, and to the plugin list of `GAMBASSE_STATIC` in
+`CMakeLists.txt` (which, like the package, links no platform theme), without
+having to build the kit in the same change.
 
 ## Working preferences
 

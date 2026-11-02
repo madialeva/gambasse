@@ -13,16 +13,19 @@
 #   scripts/build-static.sh --check <executable>  only check <executable>
 #
 # On demand only: the native build, the tests, the Linux package and the CI do not
-# need it. The static Qt comes from scripts/build-static-deps.sh, which runs first.
+# need it. The static Qt is toolchain-cpp's qt-static component, installed first
+# (../toolchain-cpp/install.sh qt-static).
 #
 # Variables:
-#   SOFTWARE_DIR   root of the local dependencies  [~/software]
-#   QT_VERSION     static Qt release               [6.12.0]
+#   SOFTWARE_DIR   toolchain-cpp's installation directory  [../toolchain-cpp/software]
+#   QT_VERSION     static Qt release                       [6.12.0]
 set -euo pipefail
 
-SOFTWARE_DIR="${SOFTWARE_DIR:-$HOME/software}"
-QT_VERSION="${QT_VERSION:-6.12.0}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Real, without "..": check() compares it with the paths ldd resolves
+SOFTWARE_DIR="${SOFTWARE_DIR:-$ROOT/../toolchain-cpp/software}"
+SOFTWARE_DIR="$(cd "$SOFTWARE_DIR" 2>/dev/null && pwd -P || echo "$SOFTWARE_DIR")"
+QT_VERSION="${QT_VERSION:-6.12.0}"
 
 usage() {
     echo "usage: $0 [--check <executable>]" >&2
@@ -89,12 +92,12 @@ case "${1:-}" in
     *) usage ;;
 esac
 
-# The modules Gambasse takes from the shared kit (scripts/build-static-deps.sh)
+# The modules Gambasse takes from the shared kit (toolchain-cpp's qt-static)
 qt_dir="$SOFTWARE_DIR/Qt/$QT_VERSION-static"
 for marker in lib/cmake/Qt6Sql plugins/sqldrivers/libqsqlite.a lib/cmake/Qt6Svg lib/cmake/Qt6Quick; do
     if [[ ! -e "$qt_dir/$marker" ]]; then
         echo "error: the static Qt in $qt_dir is missing or lacks $marker: run" \
-             "scripts/build-static-deps.sh first" >&2
+             "../toolchain-cpp/install.sh qt-static first" >&2
         exit 1
     fi
 done

@@ -9,9 +9,9 @@ set -euo pipefail
 # (config.ini, database.db, fotos/) lives at the root, as in the Windows layout.
 #
 # It builds with the release preset (CMakePresets.json): GCC 16 and Qt 6.12 from
-# ~/software (scripts/build-gcc.sh, scripts/setup-qt.sh). The plugins and QML
-# modules come from the same Qt the build used, and GCC 16's libstdc++, newer than
-# the system's, travels in lib/. Requires cmake, ninja, patchelf, ldd and objdump.
+# toolchain-cpp, next to the repository (its gcc and qt components). The plugins
+# and QML modules come from the same Qt the build used, and GCC 16's libstdc++,
+# newer than the system's, travels in lib/. Requires cmake, ninja, patchelf, ldd and objdump.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
