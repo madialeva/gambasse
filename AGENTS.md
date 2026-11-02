@@ -244,7 +244,10 @@ Each OpenSpec change is tracked on GitHub with this cycle:
    original Non-Goal.
 6. The user pushes and opens the PR toward `develop/vX.Y.Z` with `Closes #<n>`
    in the description → the Linux CI (`ci-linux.yml`) validates the PR → the
-   user reviews the diff.
+   user reviews the diff. Before the PR, the user can also run the CI by hand
+   on the branch (Actions → ci-linux → Run workflow, or `gh workflow run
+   ci-linux.yml --ref <branch>`); a manual run, like a PR, skips the version
+   check, which only runs on pushes.
 7. Merge commit as the norm (no squash): the per-group commits land on the
    development branch as they are, so its history keeps following the tasks
    of each change, and the merge commit marks where the change ends. Merged
