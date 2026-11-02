@@ -216,19 +216,36 @@ Each OpenSpec change is tracked on GitHub with this cycle:
 3. Branch created from the issue (Development panel → "Create a branch";
    name like `change/is<n>-<slug>`) starting from `develop/vX.Y.Z`.
 4. Implementation on the branch + push (pushes are done by the user; the
-   agent has no SSH access to `origin` from its shell). The agent never
-   commits on its own: work stays uncommitted on the branch until the user
-   validates it (including visual verification); commit only after the user
-   explicitly confirms.
-5. PR toward `develop/vX.Y.Z` with `Closes #<n>` in the description → the Linux
-   CI (`ci-linux.yml`) validates the PR → user reviews the diff.
-6. Squash merge as the norm (one change = one clean commit on the development
-   branch). Exception: PRs whose intermediate commits have standalone value
-   (e.g. massive deletions separated from new code) → normal merge.
-7. The last commit on the branch may be the archiving of the change (only
-   after user confirmation), so merged PR = closed issue (automatic via
-   `Closes`) = archived change.
-8. After archiving a change, always review its Non-Goals section. For each
-   line leaving useful pending work, create a follow-up issue explaining the
-   pending scope, linking the archived change, and keeping the relation to
-   the original Non-Goal.
+   agent has no SSH access to `origin` from its shell). Commits are partial,
+   one per task group of `tasks.md`, so that no commit is huge and the branch
+   history follows the tasks:
+   - The agent commits a group as soon as all its tasks are done and
+     `ctest --preset native` passes; the commit carries the group's code,
+     tests and documentation. `openspec/` is not versioned, so the planning
+     artifacts and the `tasks.md` checkboxes stay out of the commits.
+   - The title starts with the issue as `[is<n>]`, so the commits of an
+     issue are easy to follow later, then an English summary of the group
+     and its number, for example
+     `[is65] Take the toolchain from toolchain-cpp v0.2.0 (group 1)`.
+     The body ends with `Refs #<n>` so GitHub links the commit to the issue.
+   - Nothing outside the task groups is committed without the user's
+     confirmation, and the change is not archived nor sent to a PR until the
+     user validates it, including visual verification.
+   - Commits and PRs carry no co-authorship or AI attribution: no
+     `Co-Authored-By` trailers, no "Generated with" lines.
+5. Once the user validates the change, and before any PR, the agent archives
+   it on the same branch: syncs its delta specs into `openspec/specs/` and
+   moves it to `openspec/changes/archive/YYYY-MM-DD-is<n>-<slug>/`. Whatever
+   the archiving changes outside `openspec/` is the last commit of the branch
+   (`[is<n>] Archive the <slug> change`); when nothing does, there is no such
+   commit. Then it reviews the change's Non-Goals: for each line leaving
+   useful pending work, it creates a follow-up issue explaining the pending
+   scope, linking the archived change, and keeping the relation to the
+   original Non-Goal.
+6. The user pushes and opens the PR toward `develop/vX.Y.Z` with `Closes #<n>`
+   in the description → the Linux CI (`ci-linux.yml`) validates the PR → the
+   user reviews the diff.
+7. Merge commit as the norm (no squash): the per-group commits land on the
+   development branch as they are, so its history keeps following the tasks
+   of each change, and the merge commit marks where the change ends. Merged
+   PR = closed issue (automatic via `Closes`) = archived change.
