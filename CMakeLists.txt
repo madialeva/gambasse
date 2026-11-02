@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Gambasse VERSION 1.0.0 LANGUAGES CXX)
 
-# The compiler of the project: GCC 16 or later (toolchain-cpp's gcc, AGENTS.md),
-# checked before anything is searched or built. On Windows too: the MinGW of the
-# Qt kits is rejected until the Windows build moves to GCC 16 (issue #60).
+# The compiler of the project: GCC 16 or later (toolchain-cpp's gcc, and its
+# gcc-mingw cross compiler for Windows, AGENTS.md), checked before anything is
+# searched or built. The MinGW of the Qt kits is rejected too.
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
     if(WIN32)
         set(_gambasse_compiler_hint
-            "The Windows build has not moved to GCC 16 yet: see issue #60")
+            "Windows is built from Linux with toolchain-cpp's gcc-mingw cross compiler: configure with the windows preset, or run scripts/build-windows.sh")
     else()
         set(_gambasse_compiler_hint
             "Install it with ../toolchain-cpp/install.sh gcc and configure with the native preset, which uses it")
@@ -22,19 +22,28 @@ set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
-# The self-contained Linux executable (static preset, scripts/build-static.sh): Qt
-# from toolchain-cpp's static kit (qt-static) and the C++ runtime linked
-# statically, with no run path. Off for every other build.
+# The self-contained executables, Qt and the C++ runtime linked statically: for
+# Linux (static preset, scripts/build-static.sh) with toolchain-cpp's qt-static
+# kit and no run path, and for Windows (windows preset, scripts/build-windows.sh),
+# cross-built with its gcc-mingw and qt-mingw. Off for every other build.
 option(GAMBASSE_STATIC "Build a self-contained executable with the static Qt kit" OFF)
-if(GAMBASSE_STATIC AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    message(FATAL_ERROR "GAMBASSE_STATIC is only supported on Linux.")
+if(GAMBASSE_STATIC AND NOT CMAKE_SYSTEM_NAME MATCHES "^(Linux|Windows)$")
+    message(FATAL_ERROR "GAMBASSE_STATIC is only supported on Linux and Windows.")
+endif()
+# The Windows build is the self-contained executable only: there is no package
+# with the Qt DLLs beside it.
+if(WIN32 AND NOT GAMBASSE_STATIC)
+    message(FATAL_ERROR
+        "The Windows build is the self-contained executable, cross-built from Linux: "
+        "configure with the windows preset (GAMBASSE_STATIC=ON), or run "
+        "scripts/build-windows.sh.")
 endif()
 
 # GCC 16's libstdc++ is newer than the system's: the development executables and
 # the tests find it through their run path, and the Qt libraries they load share
 # it. The Linux package ships it instead (deploy-linux.sh), and the static
 # executable links it.
-if(NOT WIN32 AND NOT GAMBASSE_STATIC)
+if(NOT GAMBASSE_STATIC)
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++.so
         OUTPUT_VARIABLE _gambasse_libstdcxx OUTPUT_STRIP_TRAILING_WHITESPACE
         COMMAND_ERROR_IS_FATAL ANY)
@@ -55,6 +64,13 @@ if(GAMBASSE_STATIC)
     get_target_property(_gambasse_qt_type Qt6::Core TYPE)
     if(NOT _gambasse_qt_type STREQUAL "STATIC_LIBRARY")
         cmake_path(GET CMAKE_SOURCE_DIR PARENT_PATH _gambasse_parent_dir)
+        if(WIN32)
+            message(FATAL_ERROR
+                "GAMBASSE_STATIC for Windows needs the static Qt for Windows, but the Qt "
+                "found (${Qt6_DIR}) is not static. It is expected in "
+                "${_gambasse_parent_dir}/toolchain-cpp/software/Qt/6.12.0-mingw: install it "
+                "with ../toolchain-cpp/install.sh qt-mingw and configure with the windows preset.")
+        endif()
         message(FATAL_ERROR
             "GAMBASSE_STATIC needs a static Qt, but the Qt found (${Qt6_DIR}) is not "
             "static. The static Qt is expected in "
@@ -218,13 +234,26 @@ target_link_libraries(Gambasse PRIVATE
     GambasseQmlplugin
 )
 
-# Static executable: the C++ runtime inside, and the Qt plugins the Linux package
-# ships (deploy-linux.sh): xcb (plus offscreen for the diagnostics), SQLite, JPEG
-# and SVG images, SVG icons and the input contexts. No platform theme, so the photo
-# chooser stays the Qt Quick one, in the application's language and theme.
-# qmlimportscanner adds the QML modules' plugins.
+# Static executable: the C++ runtime inside, and the Qt plugins it links, fixed
+# here. qmlimportscanner adds the QML modules' plugins.
 if(GAMBASSE_STATIC)
     target_link_options(Gambasse PRIVATE -static-libstdc++ -static-libgcc)
+endif()
+if(GAMBASSE_STATIC AND WIN32)
+    # Windows: its platform, which also brings the native file dialog of the
+    # photo chooser (plus offscreen for the diagnostics), SQLite, JPEG and SVG
+    # images and SVG icons. winpthreads is static only in gcc-mingw.
+    qt_import_plugins(Gambasse
+        INCLUDE_BY_TYPE platforms Qt6::QWindowsIntegrationPlugin Qt6::QOffscreenIntegrationPlugin
+        INCLUDE_BY_TYPE imageformats Qt6::QJpegPlugin Qt6::QSvgPlugin
+        INCLUDE_BY_TYPE iconengines Qt6::QSvgIconPlugin
+        INCLUDE_BY_TYPE sqldrivers Qt6::QSQLiteDriverPlugin
+        EXCLUDE_BY_TYPE tls networkinformation generic qmltooling)
+elseif(GAMBASSE_STATIC)
+    # Linux: the plugins the Linux package ships (deploy-linux.sh): xcb (plus
+    # offscreen for the diagnostics), SQLite, JPEG and SVG images, SVG icons and
+    # the input contexts. No platform theme, so the photo chooser stays the Qt
+    # Quick one, in the application's language and theme.
     qt_import_plugins(Gambasse
         INCLUDE_BY_TYPE platforms Qt6::QXcbIntegrationPlugin Qt6::QOffscreenIntegrationPlugin
         INCLUDE_BY_TYPE xcbglintegrations Qt6::QXcbGlxIntegrationPlugin Qt6::QXcbEglIntegrationPlugin
@@ -234,34 +263,6 @@ if(GAMBASSE_STATIC)
         INCLUDE_BY_TYPE iconengines Qt6::QSvgIconPlugin
         INCLUDE_BY_TYPE sqldrivers Qt6::QSQLiteDriverPlugin
         EXCLUDE_BY_TYPE platformthemes tls networkinformation generic qmltooling)
-endif()
-
-# After building, copy Qt DLLs and plugins next to the executable on Windows so
-# it can run from build/ without modifying the system PATH.
-if(WIN32)
-    get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
-    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
-
-    if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET Gambasse POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXECUTABLE}" --no-translations
-                    --qmldir "${CMAKE_SOURCE_DIR}/qml"
-                    $<TARGET_FILE:Gambasse>
-            COMMENT "Running windeployqt for Gambasse.exe"
-        )
-    else()
-        message(WARNING "windeployqt was not found next to Qt6::qmake; build/Gambasse.exe will not include Qt DLLs.")
-    endif()
-endif()
-
-# The standalone launcher is deployed only on Windows. It starts the Qt
-# application from lib/ without depending on the Qt runtime itself.
-if(WIN32)
-    add_executable(Lanzador WIN32 src/launcher/launcher.cpp)
-    set_target_properties(Lanzador PROPERTIES OUTPUT_NAME "gambasse")
-    target_link_libraries(Lanzador PRIVATE shell32)
-    target_link_options(Lanzador PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
 
 if(BUILD_TESTING)

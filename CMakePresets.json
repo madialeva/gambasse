@@ -33,6 +33,19 @@
         "GAMBASSE_STATIC": "ON",
         "BUILD_TESTING": "OFF"
       }
+    },
+    {
+      "name": "windows",
+      "displayName": "Self-contained 64-bit Windows executable (gcc-mingw cross GCC 16.2, static Qt 6.12 for Windows from toolchain-cpp)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-windows",
+      "toolchainFile": "${sourceParentDir}/toolchain-cpp/software/Qt/6.12.0-mingw/lib/cmake/Qt6/qt.toolchain.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "QT_HOST_PATH": "${sourceParentDir}/toolchain-cpp/software/Qt/6.12.0/gcc_64",
+        "GAMBASSE_STATIC": "ON",
+        "BUILD_TESTING": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -47,6 +60,13 @@
     {
       "name": "static",
       "configurePreset": "static",
+      "targets": [
+        "Gambasse"
+      ]
+    },
+    {
+      "name": "windows",
+      "configurePreset": "windows",
       "targets": [
         "Gambasse"
       ]

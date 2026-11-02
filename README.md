@@ -39,7 +39,7 @@
 | ✅ | Column filtering |
 | ✅ | Patient CRUD |
 | ✅ | Language/theme selection |
-| ✅ | Windows launcher |
+| ✅ | Self-contained Windows executable |
 | ✅ | Linux package (tar.gz) |
 | ✅ | Automatic database creation and schema migration |
 | ✅ | Histories |
@@ -86,8 +86,9 @@ baselined without re-running the initial schema, so its data is preserved.
   clone serves the maintainer's other projects.
 - CMake 3.25+ and Ninja.
 - Linux deployment: `patchelf`, `ldd` and `objdump` besides the tools above.
-- Windows deployment: pending on the move to GCC 16.2 and Qt 6.12 (issue
-  #60); until then the configure step rejects the MinGW of the Qt kits.
+- Windows executable (optional, see Windows build): toolchain-cpp's
+  `gcc-mingw` (the GCC 16.2.0 cross compiler for Windows) and `qt-mingw` (a
+  static Qt 6.12.0 for Windows).
 
 The CI builds with the same GCC (the `gcc:16.2.0-trixie` image, checked
 against the pinned toolchain-cpp) and the same Qt, which it installs with
@@ -130,37 +131,29 @@ typed QML types. Keep every file formatted and lint-clean:
 cmake --build --preset native --target all_qmllint   # must print no warning
 ```
 
-Windows deployment adds the QML runtime with
-`windeployqt --qmldir qml/ ...`. QML development needs no install beyond the
+The self-contained executables link the QML modules the views import
+(found by `qmlimportscanner`). QML development needs no install beyond the
 requirements above; the Qt VS Code extension covers editing and previewing.
 
-## Windows development and deployment
+## Windows build
 
-> The Windows build has not moved to GCC 16.2 and Qt 6.12 yet (issue #60): the
-> configure step rejects the MinGW of the Qt kits. The instructions below
-> describe the previous toolchain, and Windows packages come from releases
-> before that move.
+Windows is built from Linux only: the `windows` preset cross-builds a
+self-contained `Gambasse.exe` with toolchain-cpp's `gcc-mingw` cross compiler
+and its static Qt for Windows (`qt-mingw`), with the desktop kit as the host
+for Qt's tools. Qt, its plugins (Windows platform, offscreen, SQLite,
+JPEG/SVG), the QML modules and the C++ runtime are linked into the executable:
+there is no launcher, `lib/`, or DLL beside it. Configuring for Windows
+without the preset, or with the MinGW of the Qt kits, fails.
 
-Use a shell where Qt MinGW, Ninja, CMake, and the Qt `bin` directory are on
-`PATH`, then configure as above with `-DCMAKE_PREFIX_PATH="<Qt-prefix>"`.
-
-`deploy-windows.bat` and `deploy-windows.sh` create this self-contained Windows
-layout:
-
-```text
-<destination>/
-├── gambasse.exe       Qt-free launcher
-├── config.ini
-├── database.db
-├── fotos/
-└── lib/
-    ├── gambasse.exe
-    ├── Qt and MinGW runtime DLLs
-    └── Qt plugins
+```sh
+../toolchain-cpp/install.sh gcc-mingw qt-mingw   # once: cross compiler, Qt for Windows
+cmake --preset windows
+cmake --build --preset windows                   # build-windows/Gambasse.exe
 ```
 
-The launcher starts `lib/gambasse.exe --base <destination>`, keeping Qt DLLs
-beside the application while data remains at the distribution root.
+`Gambasse.exe` keeps `config.ini`, `database.db` and `fotos/` beside itself,
+or in the directory given with `--base`, and creates the database on first
+run. The photo chooser is the native Windows dialog.
 
 ## Linux deployment
 
@@ -184,9 +177,9 @@ gambasse-<version>-linux-x86_64/
                        Qt.labs.folderlistmodel (photo file chooser)
 ```
 
-There is no launcher: the executable sits at the root, so the base path is
-the extracted directory and `config.ini`, `database.db` and `fotos/` live
-there, as on Windows. The package ships no database or `config.ini`; the
+The executable sits at the root, so the base path is the extracted directory
+and `config.ini`, `database.db` and `fotos/` live there, as beside the Windows
+executable. The package ships no database or `config.ini`; the
 application creates and migrates the database on first run. The archive keeps
 the executable bit, so users only extract it and double-click `Gambasse`.
 

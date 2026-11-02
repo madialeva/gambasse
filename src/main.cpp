@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
     // generic default icon.
     QGuiApplication::setWindowIcon(gambasse::applicationIcon());
 
-    // Deployment base path (the root directory above lib/). The launcher passes
-    // it through --base; otherwise the executable directory is used.
+    // Base path of the data: the executable's directory, unless --base gives
+    // another one.
     {
         const QStringList args = app.arguments();
         const int bi = args.indexOf(QStringLiteral("--base"));
