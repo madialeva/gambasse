@@ -3,13 +3,13 @@
   "configurePresets": [
     {
       "name": "native",
-      "displayName": "Linux (GCC 16.2, Qt 6.12 in ~/software)",
+      "displayName": "Linux (GCC 16.2, Qt 6.12 from toolchain-cpp)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-linux",
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "$env{HOME}/software/gcc-16.2.0/bin/g++",
+        "CMAKE_CXX_COMPILER": "${sourceParentDir}/toolchain-cpp/software/gcc-16.2.0/bin/g++",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_PREFIX_PATH": "$env{HOME}/software/Qt/6.12.0/gcc_64"
+        "CMAKE_PREFIX_PATH": "${sourceParentDir}/toolchain-cpp/software/Qt/6.12.0/gcc_64"
       }
     },
     {
@@ -23,13 +23,13 @@
     },
     {
       "name": "static",
-      "displayName": "Self-contained Linux executable (GCC 16.2, static Qt 6.12 in ~/software)",
+      "displayName": "Self-contained Linux executable (GCC 16.2, static Qt 6.12 from toolchain-cpp)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-static",
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "$env{HOME}/software/gcc-16.2.0/bin/g++",
+        "CMAKE_CXX_COMPILER": "${sourceParentDir}/toolchain-cpp/software/gcc-16.2.0/bin/g++",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_PREFIX_PATH": "$env{HOME}/software/Qt/6.12.0-static",
+        "CMAKE_PREFIX_PATH": "${sourceParentDir}/toolchain-cpp/software/Qt/6.12.0-static",
         "GAMBASSE_STATIC": "ON",
         "BUILD_TESTING": "OFF"
       }

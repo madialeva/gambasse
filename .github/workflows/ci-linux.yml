@@ -10,39 +10,56 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-24.04
-    # GCC built from the GNU sources with the options scripts/build-gcc.sh uses
-    # locally: the same compiler on both sides.
+    # GCC built from the GNU sources with the options of toolchain-cpp's gcc
+    # component, which builds it locally: the same compiler on both sides.
     container: gcc:16.2.0-trixie
     env:
       QT_QPA_PLATFORM: offscreen
+      # The version of toolchain-cpp gambasse pins, and the components of the
+      # native build (gcc comes from the image, linked below).
+      TOOLCHAIN_CPP_REF: v0.2.0
+      TOOLCHAIN_CPP_COMPONENTS: qt
+    # gambasse and toolchain-cpp are checked out side by side, as in local work:
+    # the presets name the toolchain from gambasse's parent directory.
     defaults:
       run:
         shell: bash
+        working-directory: gambasse
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: gambasse
+
+      # The toolchain at the version gambasse pins.
+      - name: Checkout toolchain-cpp
+        uses: actions/checkout@v4
+        with:
+          repository: madialeva/toolchain-cpp
+          ref: ${{ env.TOOLCHAIN_CPP_REF }}
+          path: toolchain-cpp
 
       # The checkout belongs to the runner's user, not to the container's root:
       # git refuses it unless it is trusted.
       - name: Trust the checkout
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE/gambasse"
 
       - name: Check branch name matches project version
         if: github.event_name == 'push'
         run: sh scripts/check-branch-version.sh "${GITHUB_REF_NAME}"
 
-      # The version of scripts/build-gcc.sh, so that the local compiler and this
+      # The GCC of the pinned toolchain-cpp, so that the local compiler and this
       # image cannot drift apart.
-      - name: Check the compiler against scripts/build-gcc.sh
+      - name: Check the compiler against toolchain-cpp
         run: |
-          expected="$(sed -n 's/^GCC_VERSION=.*:-\([0-9.]*\)}.*/\1/p' scripts/build-gcc.sh)"
+          source ../toolchain-cpp/versions.sh
           actual="$(g++ -dumpfullversion)"
-          if [[ "$actual" != "$expected" ]]; then
-            echo "::error::The image has GCC $actual, but scripts/build-gcc.sh installs GCC $expected:" \
-                 "change the image tag and the script together"
+          if [[ "$actual" != "$GCC_VERSION" ]]; then
+            echo "::error::The image has GCC $actual, but toolchain-cpp $TOOLCHAIN_CPP_REF has GCC" \
+                 "$GCC_VERSION: change the image tag and TOOLCHAIN_CPP_REF together"
             exit 1
           fi
-          echo "GCC $actual, as scripts/build-gcc.sh"
+          echo "GCC $actual, as toolchain-cpp $TOOLCHAIN_CPP_REF"
 
       # Build tools, Python for aqtinstall, and the libraries Qt takes from the
       # system to build and to run the tests offscreen.
@@ -54,32 +71,42 @@ jobs:
             libgl-dev libegl-dev libxkbcommon-dev libfontconfig1 libfreetype6 \
             libglib2.0-0t64 libdbus-1-3
 
-      # The presets look for GCC where scripts/build-gcc.sh installs it; the
-      # image has it in /usr/local.
-      - name: Link the image's GCC where the presets look for it
+      # The image has GCC in /usr/local: toolchain-cpp's gcc component takes a
+      # link to it as installed, so nothing builds GCC here. The link stays out
+      # of the cache.
+      - name: Link the image's GCC as toolchain-cpp's native compiler
         run: |
-          mkdir -p ~/software
-          ln -sfn /usr/local ~/software/gcc-16.2.0
+          source ../toolchain-cpp/versions.sh
+          mkdir -p ../toolchain-cpp/software
+          ln -sfn /usr/local "../toolchain-cpp/software/gcc-$GCC_VERSION"
 
-      # Qt in ~/software/Qt, where the presets look for it. Saved right after
-      # installing, so that a run with failing tests keeps it.
-      - name: Restore Qt
-        id: qt
+      # Qt in toolchain-cpp/software, where the presets look for it. Saved right
+      # after installing, so that a run with failing tests keeps it.
+      - name: Restore the toolchain
+        id: toolchain
         uses: actions/cache/restore@v4
         with:
-          path: ~/software/Qt
-          key: qt-6.12.0-trixie-${{ hashFiles('scripts/setup-qt.sh') }}
+          path: |
+            toolchain-cpp/software
+            !toolchain-cpp/software/gcc-*
+          key: toolchain-cpp-${{ env.TOOLCHAIN_CPP_REF }}-gcc-16.2.0-trixie-${{ env.TOOLCHAIN_CPP_COMPONENTS }}
 
-      - name: Install Qt
-        if: steps.qt.outputs.cache-hit != 'true'
-        run: scripts/setup-qt.sh
+      # The downloads and aqt's environment only serve to install: out of the cache.
+      - name: Install the toolchain
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        run: |
+          ../toolchain-cpp/install.sh $TOOLCHAIN_CPP_COMPONENTS
+          rm -rf ../toolchain-cpp/software/src ../toolchain-cpp/software/aqt-venv \
+            ../toolchain-cpp/software/aqtinstall.log
 
-      - name: Save Qt
-        if: steps.qt.outputs.cache-hit != 'true'
+      - name: Save the toolchain
+        if: steps.toolchain.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ~/software/Qt
-          key: ${{ steps.qt.outputs.cache-primary-key }}
+          path: |
+            toolchain-cpp/software
+            !toolchain-cpp/software/gcc-*
+          key: ${{ steps.toolchain.outputs.cache-primary-key }}
 
       - name: Configure
         run: cmake --preset native
@@ -97,7 +124,7 @@ jobs:
             exit 1
           fi
           for f in $(find qml -name '*.qml'); do
-            ~/software/Qt/6.12.0/gcc_64/bin/qmlformat "$f" | diff -u "$f" -
+            ../toolchain-cpp/software/Qt/6.12.0/gcc_64/bin/qmlformat "$f" | diff -u "$f" -
           done
 
       - name: Test

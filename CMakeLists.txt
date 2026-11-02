@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Gambasse VERSION 1.0.0 LANGUAGES CXX)
 
-# The compiler of the project: GCC 16 or later (scripts/build-gcc.sh, AGENTS.md),
+# The compiler of the project: GCC 16 or later (toolchain-cpp's gcc, AGENTS.md),
 # checked before anything is searched or built. On Windows too: the MinGW of the
 # Qt kits is rejected until the Windows build moves to GCC 16 (issue #60).
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
@@ -11,7 +11,7 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSIO
             "The Windows build has not moved to GCC 16 yet: see issue #60")
     else()
         set(_gambasse_compiler_hint
-            "Build it with scripts/build-gcc.sh and configure with the native preset, which uses it")
+            "Install it with ../toolchain-cpp/install.sh gcc and configure with the native preset, which uses it")
     endif()
     message(FATAL_ERROR
         "Found ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} (${CMAKE_CXX_COMPILER}), "
@@ -23,7 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # The self-contained Linux executable (static preset, scripts/build-static.sh): Qt
-# from the static kit of scripts/build-static-deps.sh and the C++ runtime linked
+# from toolchain-cpp's static kit (qt-static) and the C++ runtime linked
 # statically, with no run path. Off for every other build.
 option(GAMBASSE_STATIC "Build a self-contained executable with the static Qt kit" OFF)
 if(GAMBASSE_STATIC AND NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -50,14 +50,16 @@ find_package(Qt6 6.12 REQUIRED COMPONENTS Core Gui Sql Qml Quick QuickControls2)
 qt_standard_project_setup(REQUIRES 6.12)
 
 # The static build needs the static kit: with the shared one it would build an
-# executable that still loads Qt from ~/software.
+# executable that still loads Qt from toolchain-cpp.
 if(GAMBASSE_STATIC)
     get_target_property(_gambasse_qt_type Qt6::Core TYPE)
     if(NOT _gambasse_qt_type STREQUAL "STATIC_LIBRARY")
+        cmake_path(GET CMAKE_SOURCE_DIR PARENT_PATH _gambasse_parent_dir)
         message(FATAL_ERROR
             "GAMBASSE_STATIC needs a static Qt, but the Qt found (${Qt6_DIR}) is not "
-            "static. The static Qt is expected in $ENV{HOME}/software/Qt/6.12.0-static: "
-            "build it with scripts/build-static-deps.sh and configure with the static preset.")
+            "static. The static Qt is expected in "
+            "${_gambasse_parent_dir}/toolchain-cpp/software/Qt/6.12.0-static: install it "
+            "with ../toolchain-cpp/install.sh qt-static and configure with the static preset.")
     endif()
 endif()
 

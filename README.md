@@ -73,34 +73,33 @@ baselined without re-running the initial schema, so its data is preserved.
 
 ## Requirements
 
-- GCC 16.2.0 built from the GNU sources (C++26): `scripts/build-gcc.sh`
-  installs it, without root, in `~/software/gcc-16.2.0` (it needs the system
-  compiler, about 10 GB of free disk and from half an hour to an hour).
-- Qt 6.12.0 desktop: `scripts/setup-qt.sh` installs it, without root, in
-  `~/software/Qt/6.12.0/gcc_64` through aqtinstall (it needs `python3` with
-  `venv`). The base kit has all the project uses, including the
-  `qmllint`/`qmlformat` tools.
+- [toolchain-cpp](https://github.com/madialeva/toolchain-cpp) `v0.2.0`, cloned
+  next to this repository (`../toolchain-cpp`). It builds and installs, without
+  root, in its own `software/` directory, the toolchain of the project:
+  - `gcc`: GCC 16.2.0 built from the GNU sources (C++26);
+  - `qt`: the Qt 6.12.0 desktop kit, with the `qmllint`/`qmlformat` tools;
+  - `qt-static` (optional, see Static build): a static Qt 6.12.0 for the
+    self-contained executable.
+
+  What each component needs from the system (disk, time, development
+  packages) is in toolchain-cpp's README and `docs/toolchain.md`. The same
+  clone serves the maintainer's other projects.
 - CMake 3.25+ and Ninja.
 - Linux deployment: `patchelf`, `ldd` and `objdump` besides the tools above.
-- Static build (optional, see Static build): a static Qt 6.12.0 that
-  `scripts/build-static-deps.sh` builds from the sources, without root, in
-  `~/software/Qt/6.12.0-static`. The kit is shared with the maintainer's other
-  Qt project, whose script builds the same one. It needs the development
-  packages of OpenSSL, libxcb and xcb-util (`-wm`, `-image`, `-keysyms`,
-  `-renderutil`, `-cursor`), libxkbcommon and libxkbcommon-x11, fontconfig,
-  freetype, Mesa (GL and EGL), X11 and zlib, about half an hour with 12 cores
-  and several GB of free disk while it builds.
 - Windows deployment: pending on the move to GCC 16.2 and Qt 6.12 (issue
   #60); until then the configure step rejects the MinGW of the Qt kits.
 
-Both scripts do nothing when the toolchain is already installed, so several
-projects can share it. The CI builds with the same GCC (the `gcc:16.2.0-trixie`
-image, checked against `scripts/build-gcc.sh`) and the same Qt.
+The CI builds with the same GCC (the `gcc:16.2.0-trixie` image, checked
+against the pinned toolchain-cpp) and the same Qt, which it installs with
+toolchain-cpp at the same version.
 
 ## Linux development
 
 ```sh
-scripts/build-gcc.sh && scripts/setup-qt.sh   # once
+# once: toolchain-cpp next to this repository, with the native components
+git clone --branch v0.2.0 https://github.com/madialeva/toolchain-cpp.git ../toolchain-cpp
+../toolchain-cpp/install.sh gcc qt
+
 cmake --preset native
 cmake --build --preset native
 ctest --preset native
@@ -108,8 +107,10 @@ ctest --preset native
 ```
 
 The `native` preset (`CMakePresets.json`) builds in Release in `build-linux`
-with the toolchain in `~/software`; the configure step stops at once with any
-compiler older than GCC 16. The executables find GCC 16's `libstdc++` through
+with the toolchain in `../toolchain-cpp/software`; the configure step stops at
+once with any compiler older than GCC 16. With toolchain-cpp somewhere else, a
+`CMakeUserPresets.json` (ignored by git) changes those paths, and
+`SOFTWARE_DIR` those of the scripts. The executables find GCC 16's `libstdc++` through
 their run path, with no `LD_LIBRARY_PATH`. The executable uses `config.ini`
 and `database.db` beside itself by default; `--base <directory>` overrides it.
 The database file is created and migrated on first run.
@@ -125,7 +126,7 @@ controllers in `src/ui/`, registered in the same module (`QML_ELEMENT`,
 typed QML types. Keep every file formatted and lint-clean:
 
 ```sh
-~/software/Qt/6.12.0/gcc_64/bin/qmlformat -i qml/<file>.qml
+../toolchain-cpp/software/Qt/6.12.0/gcc_64/bin/qmlformat -i qml/<file>.qml
 cmake --build --preset native --target all_qmllint   # must print no warning
 ```
 
@@ -164,7 +165,7 @@ beside the application while data remains at the distribution root.
 ## Linux deployment
 
 `deploy-linux.sh` builds with the `release` preset (GCC 16.2 and Qt 6.12 from
-`~/software`, see Requirements) and creates
+toolchain-cpp, see Requirements) and creates
 `deploy-linux/gambasse-<version>-linux-x86_64.tar.gz` (the version comes from
 `CMakeLists.txt`) plus the extracted directory beside it. The plugins and QML
 modules come from the same Qt the build used. It needs `cmake`, `ninja`,
@@ -201,19 +202,19 @@ Debian 12+, Fedora 35+ and RHEL 9+).
 `scripts/build-static.sh` builds a self-contained executable: a single file
 with Qt, its plugins (xcb, offscreen, SQLite, JPEG/SVG), the QML modules and
 GCC 16's C++ runtime linked statically. It can be copied to another Linux
-machine and run without installing Qt or anything from `~/software`. It is
+machine and run without installing Qt or anything from toolchain-cpp. It is
 built on demand on the developer's machine only: the CI, the tests and the
 Linux package do not use it.
 
 ```sh
-scripts/build-static-deps.sh   # once: the static Qt kit
-scripts/build-static.sh        # build-static/dist/Gambasse
+../toolchain-cpp/install.sh qt-static   # once: the static Qt kit
+scripts/build-static.sh                 # build-static/dist/Gambasse
 ```
 
 The script builds with the `static` preset (`build-static`, Release, no
 tests), copies the executable without symbols to `build-static/dist/Gambasse`
 and fails if it carries a run path or needs a shared library of Qt or of the
-C++ runtime, or one from `~/software`. Then it tries a copy in an empty
+C++ runtime, or one from toolchain-cpp. Then it tries a copy in an empty
 directory and environment: `--check-db` must create the database and
 `--svg2png` render the logo. `scripts/build-static.sh --check <executable>`
 runs only the check.

@@ -4,6 +4,7 @@ build-linux/
 build-static/
 out/
 cmake-build-*/
+CMakeUserPresets.json
 
 # Deploy / empaquetado
 deploy/
