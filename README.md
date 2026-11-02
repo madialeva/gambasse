@@ -215,9 +215,8 @@ The script builds with the `static` preset (`build-static`, Release, no
 tests), copies the executable without symbols to `build-static/dist/Gambasse`
 and fails if it carries a run path or needs a shared library of Qt or of the
 C++ runtime, or one from toolchain-cpp. Then it tries a copy in an empty
-directory and environment: `--check-db` must create the database and
-`--svg2png` render the logo. `scripts/build-static.sh --check <executable>`
-runs only the check.
+directory and environment: `--check-db` must create and migrate the database.
+`scripts/build-static.sh --check <executable>` runs only the check.
 
 Like the package, the executable keeps `config.ini`, `database.db` and
 `fotos/` beside itself, and it creates the database on first run. It takes
@@ -242,7 +241,6 @@ build; it prints a notice about it on the standard error.
 ## Diagnostics
 
 - `--check-db` prints `PATIENTS=<count>`.
-- `--svg2png <input.svg> <output.png> <height>` rasterizes an SVG.
 - `--crud-selftest` executes CRUD in a transaction and rolls it back.
 
 ## Internationalization
