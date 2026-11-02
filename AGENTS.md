@@ -185,6 +185,20 @@ in a change of toolchain-cpp, and to the plugin list of `GAMBASSE_STATIC` in
 `CMakeLists.txt` (which, like the package, links no platform theme), without
 having to build the kit in the same change.
 
+The Windows executable (`scripts/build-windows.sh`, the `windows` preset and
+`GAMBASSE_STATIC` with the cross compiler) is built on demand only too, under
+the same rule. It cross-builds `build-windows/dist/Gambasse.exe` with
+toolchain-cpp's `gcc-mingw` and `qt-mingw` (`Qt/6.12.0-mingw`, with the
+desktop kit as host) and checks that it imports only the DLLs of its list of
+Windows DLLs, the same list as guita's. A Qt module or plugin the application
+starts using also goes to `qt-mingw`'s list in toolchain-cpp and to the
+Windows plugin list of `GAMBASSE_STATIC`. The script's smoke test runs
+`--check-db` under Wine, offscreen, with a temporary prefix and home. For
+visual checks the executable runs under Wine on `Xvfb :99`, never on the
+user's desktop, with a temporary prefix (never `~/.wine`) without its sRGB
+colour profile: Wine 10.6 lacks `mscms.dll.WcsCreateIccProfile`, and Qt aborts
+on start without that workaround.
+
 ## Working preferences
 
 - Conversation with the user in Spanish.

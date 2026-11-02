@@ -145,15 +145,35 @@ JPEG/SVG), the QML modules and the C++ runtime are linked into the executable:
 there is no launcher, `lib/`, or DLL beside it. Configuring for Windows
 without the preset, or with the MinGW of the Qt kits, fails.
 
+It is built on demand on the developer's machine only, like the static Linux
+executable: the CI, the tests and the Linux package do not use it.
+
 ```sh
 ../toolchain-cpp/install.sh gcc-mingw qt-mingw   # once: cross compiler, Qt for Windows
-cmake --preset windows
-cmake --build --preset windows                   # build-windows/Gambasse.exe
+scripts/build-windows.sh                         # build-windows/dist/Gambasse.exe
 ```
 
-`Gambasse.exe` keeps `config.ini`, `database.db` and `fotos/` beside itself,
-or in the directory given with `--base`, and creates the database on first
-run. The photo chooser is the native Windows dialog.
+The script builds with the `windows` preset (`build-windows`, Release, no
+tests), copies the executable without symbols to
+`build-windows/dist/Gambasse.exe` and fails, naming them, if it imports a DLL
+that is not part of Windows 10 1809 (the oldest Windows Qt 6.12 supports).
+When Wine is installed, it then tries a copy in an empty directory with a
+temporary Wine prefix: `--check-db` must create and migrate the database;
+without Wine it skips that test with a warning.
+`scripts/build-windows.sh --check <executable>` runs only the DLL check.
+
+`Gambasse.exe` takes 54 MB and needs Windows 10 1809 or later, with no Qt,
+MinGW or Visual C++ runtime installed. It keeps `config.ini`, `database.db`
+and `fotos/` beside itself, or in the directory given with `--base`, and
+creates the database on first run. The photo chooser is the native Windows
+dialog.
+
+To update an installation made with an older package (a `gambasse.exe`
+launcher at the root and the application in `lib/`): back up the folder, copy
+`Gambasse.exe` over the root `gambasse.exe`, delete `lib/` and open the
+application. The database, `config.ini` and `fotos/` stay where they were,
+and the schema is migrated if needed. To go back, restore the whole folder
+from the backup.
 
 ## Linux deployment
 
@@ -261,7 +281,8 @@ Released under the **MIT License**. You are free to use, modify, and distribute
 this software, including in proprietary projects, provided you retain the
 original copyright notice. See [LICENSE.md](LICENSE.md) for details.
 
-Qt is used under the LGPL v3. The static executable links it statically: anyone
-who receives it must be able to link it again against another Qt, which the
-public sources of this project and its build scripts allow. A distributed
-static executable must come with the text of the LGPL and Qt's notices.
+Qt is used under the LGPL v3. The self-contained Linux and Windows executables
+link it statically: anyone who receives them must be able to link them again
+against another Qt, which the public sources of this project and its build
+scripts allow. A distributed self-contained executable must come with the text
+of the LGPL and Qt's notices.
