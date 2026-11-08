@@ -40,6 +40,39 @@
     </message>
 </context>
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="51"/>
+        <source>Version %1</source>
+        <translation>Versão %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="55"/>
+        <source>MIT License</source>
+        <translation>Licença MIT</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="63"/>
+        <source>Developed in %1, an ISO standard.</source>
+        <translation>Desenvolvida em %1, uma norma ISO.</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="67"/>
+        <source>Compiled with GCC %1, under the GPL v3 with the GCC Runtime Library Exception.</source>
+        <translation>Compilada com o GCC %1, sob a licença GPL v3 com a exceção da biblioteca de execução do GCC.</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="71"/>
+        <source>Built with Qt %1, under the LGPL v3.</source>
+        <translation>Construída com o Qt %1, sob a licença LGPL v3.</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="80"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+</context>
+<context>
     <name>ActiveIngredient</name>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="240"/>
@@ -1524,44 +1557,44 @@
 <context>
     <name>ConsultationWindow</name>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="90"/>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="204"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="88"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="203"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="90"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="88"/>
         <source>Could not save the consultation.</source>
         <translation>Não foi possível guardar a consulta.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="103"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="101"/>
         <source>Delete the consultation of %1?</source>
         <translation>Apagar a consulta de %1?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="104"/>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="186"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="102"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="185"/>
         <source>Delete consultation</source>
         <translation>Apagar consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="156"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="155"/>
         <source>Exit</source>
         <translation>Sair</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="165"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="164"/>
         <source>Save consultation</source>
         <translation>Guardar consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="175"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="174"/>
         <source>New consultation</source>
         <translation>Nova consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="204"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="203"/>
         <source>Could not delete the consultation.</source>
         <translation>Não foi possível apagar a consulta.</translation>
     </message>
@@ -1745,34 +1778,34 @@
         <translation>Apagar a história de adulto de &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="87"/>
-        <location filename="../qml/windows/HistoryWindow.qml" line="189"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="188"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="87"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
         <source>Could not save the history.</source>
         <translation>Não foi possível guardar a história.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="98"/>
-        <location filename="../qml/windows/HistoryWindow.qml" line="152"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="96"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="151"/>
         <source>Delete history</source>
         <translation>Apagar história</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="163"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="162"/>
         <source>Save history</source>
         <translation>Guardar história</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="173"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="172"/>
         <source>Exit</source>
         <translation>Sair</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="189"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="188"/>
         <source>Could not delete the history.</source>
         <translation>Não foi possível apagar a história.</translation>
     </message>
@@ -1806,9 +1839,9 @@
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="146"/>
-        <location filename="../qml/windows/MainWindow.qml" line="808"/>
-        <location filename="../qml/windows/MainWindow.qml" line="819"/>
-        <location filename="../qml/windows/MainWindow.qml" line="830"/>
+        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <location filename="../qml/windows/MainWindow.qml" line="825"/>
+        <location filename="../qml/windows/MainWindow.qml" line="836"/>
         <source>Error</source>
         <translation type="unfinished">Erro</translation>
     </message>
@@ -1994,27 +2027,27 @@
         <translation type="unfinished">Nº irmãos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <location filename="../qml/windows/MainWindow.qml" line="804"/>
         <source>Invalid image</source>
         <translation>Imagem inválida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <location filename="../qml/windows/MainWindow.qml" line="804"/>
         <source>The selected file is not a readable image.</source>
         <translation>O ficheiro escolhido não é uma imagem legível.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="808"/>
+        <location filename="../qml/windows/MainWindow.qml" line="806"/>
         <source>Could not save the photo.</source>
         <translation>Não foi possível guardar a foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="819"/>
+        <location filename="../qml/windows/MainWindow.qml" line="825"/>
         <source>Could not delete the photo.</source>
         <translation>Não foi possível apagar a foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="830"/>
+        <location filename="../qml/windows/MainWindow.qml" line="836"/>
         <source>Could not delete the patient.</source>
         <translation type="unfinished">Não foi possível apagar o paciente.</translation>
     </message>
@@ -2903,17 +2936,17 @@
 <context>
     <name>PhotoDialog</name>
     <message>
-        <location filename="../qml/dialogs/PhotoDialog.qml" line="9"/>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="7"/>
         <source>Choose the patient&apos;s photo</source>
         <translation>Escolha a foto do paciente</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/PhotoDialog.qml" line="11"/>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="9"/>
         <source>Images (*.jpg *.jpeg *.png *.bmp)</source>
         <translation>Imagens (*.jpg *.jpeg *.png *.bmp)</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/PhotoDialog.qml" line="11"/>
+        <location filename="../qml/dialogs/PhotoDialog.qml" line="9"/>
         <source>All files (*)</source>
         <translation>Todos os ficheiros (*)</translation>
     </message>
@@ -3534,7 +3567,7 @@
 %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="104"/>
+        <location filename="../src/main.cpp" line="78"/>
         <source>Database error</source>
         <translation>Erro de base de dados</translation>
     </message>
@@ -3733,7 +3766,7 @@
 <context>
     <name>SplashWindow</name>
     <message>
-        <location filename="../qml/windows/SplashWindow.qml" line="39"/>
+        <location filename="../qml/windows/SplashWindow.qml" line="40"/>
         <source>Project by Juan Franco, available on &lt;a href=&quot;%1&quot; style=&quot;color:#58A6FF; text-decoration:none;&quot;&gt;GitHub&lt;/a&gt;.</source>
         <translation>Projeto realizado por Juan Franco, disponível no &lt;a href=&quot;%1&quot; style=&quot;color:#58A6FF; text-decoration:none;&quot;&gt;GitHub&lt;/a&gt;.</translation>
     </message>
@@ -3787,62 +3820,72 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../qml/TitleBar.qml" line="147"/>
-        <location filename="../qml/TitleBar.qml" line="175"/>
+        <location filename="../qml/TitleBar.qml" line="149"/>
+        <source>Help</source>
+        <translation>Ajuda</translation>
+    </message>
+    <message>
+        <location filename="../qml/TitleBar.qml" line="157"/>
+        <source>About</source>
+        <translation>Informação</translation>
+    </message>
+    <message>
+        <location filename="../qml/TitleBar.qml" line="169"/>
+        <location filename="../qml/TitleBar.qml" line="199"/>
         <source>Spanish</source>
         <translation type="unfinished">Espanhol</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="149"/>
-        <location filename="../qml/TitleBar.qml" line="183"/>
+        <location filename="../qml/TitleBar.qml" line="171"/>
+        <location filename="../qml/TitleBar.qml" line="207"/>
         <source>Portuguese</source>
         <translation type="unfinished">Português</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="150"/>
-        <location filename="../qml/TitleBar.qml" line="191"/>
+        <location filename="../qml/TitleBar.qml" line="172"/>
+        <location filename="../qml/TitleBar.qml" line="215"/>
         <source>English</source>
         <translation type="unfinished">Inglês</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="169"/>
+        <location filename="../qml/TitleBar.qml" line="191"/>
         <source>Language</source>
         <translation type="unfinished">Língua</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="205"/>
-        <location filename="../qml/TitleBar.qml" line="219"/>
+        <location filename="../qml/TitleBar.qml" line="230"/>
+        <location filename="../qml/TitleBar.qml" line="246"/>
         <source>Dark</source>
         <translation type="unfinished">Escuro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="205"/>
-        <location filename="../qml/TitleBar.qml" line="212"/>
+        <location filename="../qml/TitleBar.qml" line="230"/>
+        <location filename="../qml/TitleBar.qml" line="239"/>
         <source>Light</source>
         <translation type="unfinished">Claro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="206"/>
+        <location filename="../qml/TitleBar.qml" line="231"/>
         <source>Theme</source>
         <translation type="unfinished">Tema</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="230"/>
+        <location filename="../qml/TitleBar.qml" line="257"/>
         <source>Minimize</source>
         <translation>Minimizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="237"/>
+        <location filename="../qml/TitleBar.qml" line="264"/>
         <source>Restore</source>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="237"/>
+        <location filename="../qml/TitleBar.qml" line="264"/>
         <source>Maximize</source>
         <translation>Maximizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="244"/>
+        <location filename="../qml/TitleBar.qml" line="271"/>
         <source>Close</source>
         <translation>Fechar</translation>
     </message>

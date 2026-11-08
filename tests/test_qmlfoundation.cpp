@@ -99,6 +99,7 @@ private slots:
     void aboutDialogOpensTheLink();
     void helpMenuOpensTheDialog();
     void titleBarMenusDropBelowTheBar();
+    void helpAndDialogFollowTheLanguage();
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
@@ -545,6 +546,81 @@ void TestQmlFoundation::titleBarMenusDropBelowTheBar() {
 
         QTest::keyClick(window, Qt::Key_Escape);
         QTRY_VERIFY2(!menu->property("visible").toBool(), menuName);
+    }
+}
+
+void TestQmlFoundation::helpAndDialogFollowTheLanguage() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QCOMPARE(window->size(), QSize(1008, 561));
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* helpButton = bar->findChild<QQuickItem*>(QStringLiteral("helpButton"));
+    auto* menu = bar->findChild<QObject*>(QStringLiteral("helpMenu"));
+    QVERIFY(helpButton != nullptr);
+    QVERIFY(menu != nullptr);
+    QQuickItem* entry = nullptr;
+    QMetaObject::invokeMethod(menu, "itemAt", Q_RETURN_ARG(QQuickItem*, entry), Q_ARG(int, 0));
+    QVERIFY(entry != nullptr);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    QVERIFY(settings != nullptr);
+
+    struct Expected {
+        QString code, help, about, version, license, language, compiler, qt, ok;
+    };
+    const QList<Expected> languages = {
+        {QStringLiteral("es"), QStringLiteral("Ayuda"), QStringLiteral("Información"),
+         QStringLiteral("Versión"), QStringLiteral("Licencia MIT"), QStringLiteral("estándar ISO"),
+         QStringLiteral("biblioteca de ejecución de GCC"), QStringLiteral("licencia LGPL v3"),
+         QStringLiteral("Aceptar")},
+        {QStringLiteral("pt"), QStringLiteral("Ajuda"), QStringLiteral("Informação"),
+         QStringLiteral("Versão"), QStringLiteral("Licença MIT"), QStringLiteral("norma ISO"),
+         QStringLiteral("biblioteca de execução do GCC"), QStringLiteral("licença LGPL v3"),
+         QStringLiteral("OK")},
+        {QStringLiteral("en"), QStringLiteral("Help"), QStringLiteral("About"),
+         QStringLiteral("Version"), QStringLiteral("MIT License"), QStringLiteral("ISO standard"),
+         QStringLiteral("GCC Runtime Library Exception"), QStringLiteral("LGPL v3"),
+         QStringLiteral("OK")}};
+
+    for (const Expected& expected : languages) {
+        settings->setLanguage(expected.code);
+        QCOMPARE(helpButton->property("text").toString(), expected.help);
+        QCOMPARE(entry->property("text").toString(), expected.about);
+
+        QObject* dialog = openAboutDialog(window);
+        QVERIFY(dialog != nullptr);
+        const auto textOf = [dialog](const char* name) {
+            auto* item = dialog->findChild<QQuickItem*>(QLatin1String(name));
+            return item != nullptr ? item->property("text").toString() : QString();
+        };
+        QVERIFY2(textOf("aboutVersion").startsWith(expected.version), qPrintable(expected.code));
+        QCOMPARE(textOf("aboutLicense"), expected.license);
+        QVERIFY2(textOf("aboutLanguage").contains(expected.language), qPrintable(expected.code));
+        QVERIFY2(textOf("aboutCompiler").contains(expected.compiler), qPrintable(expected.code));
+        QVERIFY2(textOf("aboutQt").contains(expected.qt), qPrintable(expected.code));
+        QCOMPARE(textOf("aboutOkButton"), expected.ok);
+
+        // Whole inside the base window, and every text at its full height.
+        auto* content = dialog->property("contentItem").value<QQuickItem*>();
+        QVERIFY(content != nullptr);
+        const QRectF area =
+            content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
+        QVERIFY2(area.top() >= 0 && area.bottom() <= window->height(), qPrintable(expected.code));
+        for (const char* name : {"aboutName", "aboutVersion", "aboutLicense", "aboutLanguage",
+                                 "aboutCompiler", "aboutQt", "aboutLink"}) {
+            auto* text = dialog->findChild<QQuickItem*>(QLatin1String(name));
+            QVERIFY2(text != nullptr, name);
+            QVERIFY2(text->property("contentHeight").toReal() <= text->height(), name);
+            const QRectF box = text->mapRectToScene(QRectF(0, 0, text->width(), text->height()));
+            QVERIFY2(box.top() >= area.top() && box.bottom() <= area.bottom(), name);
+        }
+        auto* ok = dialog->findChild<QQuickItem*>(QStringLiteral("aboutOkButton"));
+        QVERIFY(ok != nullptr);
+        QVERIFY(ok->mapRectToScene(QRectF(0, 0, ok->width(), ok->height())).bottom() <= area.bottom());
+
+        QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+        QTRY_VERIFY(!dialog->property("visible").toBool());
     }
 }
 
