@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Gambasse
 
 // Main shell window: frameless, with the custom title bar (language and
@@ -82,6 +83,11 @@ Window {
     }
     ResizeHandles {
         anchors.fill: parent
+    }
+    AboutDialog {
+        id: aboutDialog
+        objectName: "aboutDialog"
+        parent: Overlay.overlay
     }
 
     // While a history or consultation window is open (modal, in front), the

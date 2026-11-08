@@ -120,11 +120,11 @@ The database file is created and migrated on first run.
 
 The declarative UI lives in `qml/` as the `Gambasse` module (`qt_add_qml_module`):
 shell (`Root.qml`, `Theme.qml` singleton, `TitleBar.qml`, `ResizeHandles.qml`)
-plus the `qml/components/` custom control library and the screens under
-`qml/windows/`, started by `App.qml`. C++ only decides and persists: thin
-controllers in `src/ui/`, registered in the same module (`QML_ELEMENT`,
-`QML_SINGLETON`), expose the `logic/` services and the models to the views as
-typed QML types. Keep every file formatted and lint-clean:
+plus the `qml/components/` custom control library, the `qml/dialogs/` dialogs
+and the screens under `qml/windows/`, started by `App.qml`. C++ only decides
+and persists: thin controllers in `src/ui/`, registered in the same module
+(`QML_ELEMENT`, `QML_SINGLETON`), expose the `logic/` services and the models
+to the views as typed QML types. Keep every file formatted and lint-clean:
 
 ```sh
 ../toolchain-cpp/software/Qt/6.12.0/gcc_64/bin/qmlformat -i qml/<file>.qml

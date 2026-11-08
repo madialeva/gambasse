@@ -38,6 +38,8 @@ QtObject {
     readonly property color disabledText: dark ? "#7A7A7A" : "#A0A0A0"
     // Placeholder text: the text color at half opacity, like QPalette's.
     readonly property color placeholderText: dark ? Qt.rgba(1, 1, 1, 0.5) : Qt.rgba(0.102, 0.102, 0.102, 0.5)
+    // Links, readable on the editable areas' background of each theme.
+    readonly property color linkText: dark ? "#58A6FF" : "#1F6FB8"
 
     // Editable areas.
     readonly property color fieldBackground: dark ? "#232323" : "#FBFAF6"

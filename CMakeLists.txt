@@ -195,6 +195,7 @@ qt_add_qml_module(GambasseQml
         qml/components/GxCheckField.qml
         qml/components/GxTabView.qml
         qml/components/GxActionButton.qml
+        qml/dialogs/AboutDialog.qml
         qml/dialogs/PhotoDialog.qml
         qml/windows/HistoryWindow.qml
         qml/windows/ConsultationWindow.qml

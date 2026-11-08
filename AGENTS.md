@@ -57,6 +57,7 @@ qml/
 ├── App.qml                  entry point: splash, then the main shell
 ├── Root.qml, Theme.qml, TitleBar.qml, ...   shell and theme singleton
 ├── components/              Gx* custom control library
+├── dialogs/                 dialogs of the shell and the screens
 └── windows/                 screens
 ```
 

@@ -1,3 +1,4 @@
+#include <QDesktopServices>
 #include <QGuiApplication>
 #include <QImage>
 #include <QQmlApplicationEngine>
@@ -49,6 +50,15 @@ InterfaceSettings* settingsOf(QQmlEngine& engine) {
                                                         QStringLiteral("InterfaceSettings"));
 }
 
+// Receives what the application opens externally, instead of a browser.
+class UrlCatcher : public QObject {
+    Q_OBJECT
+public:
+    QList<QUrl> opened;
+public slots:
+    void open(const QUrl& url) { opened.append(url); }
+};
+
 } // namespace
 
 // Verifies the QML foundation wiring: theme/language persistence through
@@ -66,6 +76,9 @@ private:
     // English source texts. Null when the module fails to load.
     QQuickWindow* openShell(const QString& theme);
     void cleanup();
+    // The information dialog of the shell, once it is on screen; null if it
+    // does not open.
+    QObject* openAboutDialog(QQuickWindow* window);
 
 private slots:
     void initTestCase();
@@ -78,6 +91,12 @@ private slots:
     void appOpensShellAfterSplash();
     void applicationIconIsTheLogo();
     void appInfoReportsTheBuild();
+    void aboutDialogContent();
+    void aboutDialogIsCentredAndFits();
+    void aboutDialogFollowsTheTheme();
+    void aboutDialogCloses();
+    void aboutDialogIsModal();
+    void aboutDialogOpensTheLink();
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
@@ -98,6 +117,14 @@ QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
 void TestQmlFoundation::cleanup() {
     delete m_engine;
     m_engine = nullptr;
+}
+
+QObject* TestQmlFoundation::openAboutDialog(QQuickWindow* window) {
+    auto* dialog = window->findChild<QObject*>(QStringLiteral("aboutDialog"));
+    if (dialog == nullptr || !QMetaObject::invokeMethod(dialog, "present"))
+        return nullptr;
+    const bool opened = QTest::qWaitFor([dialog] { return dialog->property("opened").toBool(); });
+    return opened ? dialog : nullptr;
 }
 
 void TestQmlFoundation::initTestCase() {
@@ -305,6 +332,135 @@ void TestQmlFoundation::appInfoReportsTheBuild() {
              QStringLiteral("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__));
     QCOMPARE(info.qtVersion(), QString::fromLatin1(qVersion()));
     QCOMPARE(info.repositoryUrl(), QStringLiteral("https://github.com/madialeva/gambasse"));
+}
+
+void TestQmlFoundation::aboutDialogContent() {
+    QCoreApplication::setApplicationVersion(QStringLiteral("9.8.7"));
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    const auto textOf = [dialog](const char* name) {
+        auto* item = dialog->findChild<QQuickItem*>(QLatin1String(name));
+        return item != nullptr ? item->property("text").toString() : QString();
+    };
+    const AppInfo info;
+    QCOMPARE(textOf("aboutName"), QStringLiteral("Gambasse"));
+    QVERIFY(textOf("aboutVersion").contains(QStringLiteral("9.8.7")));
+    QVERIFY(textOf("aboutLicense").contains(QStringLiteral("MIT")));
+    QVERIFY(textOf("aboutLanguage").contains(QStringLiteral("C++26")));
+    QVERIFY(textOf("aboutLanguage").contains(QStringLiteral("ISO")));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("GCC ") + info.compilerVersion()));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("GPL v3")));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("Runtime Library Exception")));
+    QVERIFY(textOf("aboutQt").contains(QStringLiteral("Qt ") + info.qtVersion()));
+    QVERIFY(textOf("aboutQt").contains(QStringLiteral("LGPL v3")));
+    QVERIFY(textOf("aboutLink").contains(QStringLiteral("https://github.com/madialeva/gambasse")));
+
+    auto* logo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(logo != nullptr);
+    QCOMPARE(logo->property("source").toUrl(), QUrl(QStringLiteral("qrc:/img/logo.svg")));
+    QCOMPARE(logo->width(), qreal(96));
+    QCOMPARE(logo->height(), qreal(96));
+    QTRY_COMPARE(logo->property("status").toInt(), 1); // Image.Ready
+}
+
+void TestQmlFoundation::aboutDialogIsCentredAndFits() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QCOMPARE(window->size(), QSize(1008, 561));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    auto* content = dialog->property("contentItem").value<QQuickItem*>();
+    QVERIFY(content != nullptr);
+    const QRectF area = content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
+    QCOMPARE(qRound(area.center().x()), window->width() / 2);
+    QVERIFY(qAbs(area.center().y() - window->height() / 2.0) <= 1);
+    QVERIFY(area.top() >= 0 && area.bottom() <= window->height());
+
+    auto* logo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(logo != nullptr);
+    QCOMPARE(qRound(itemCenter(logo).x() - area.center().x()), 0);
+}
+
+void TestQmlFoundation::aboutDialogFollowsTheTheme() {
+    const QList<std::pair<QString, QColor>> themes = {
+        {QStringLiteral("claro"), QColor(0x1F, 0x6F, 0xB8)},
+        {QStringLiteral("oscuro"), QColor(0x58, 0xA6, 0xFF)}};
+    for (const auto& [mode, linkColor] : themes) {
+        QQuickWindow* window = openShell(mode);
+        QVERIFY(window != nullptr);
+        QVERIFY(QTest::qWaitForWindowExposed(window));
+        QObject* dialog = openAboutDialog(window);
+        QVERIFY(dialog != nullptr);
+
+        auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLink"));
+        QVERIFY(link != nullptr);
+        QCOMPARE(link->property("linkColor").value<QColor>(), linkColor);
+        auto* name = dialog->findChild<QQuickItem*>(QStringLiteral("aboutName"));
+        QVERIFY(name != nullptr);
+        QCOMPARE(name->property("color").value<QColor>(),
+                 mode == QStringLiteral("oscuro") ? QColor(Qt::white) : QColor(0x1A, 0x1A, 0x1A));
+    }
+}
+
+void TestQmlFoundation::aboutDialogCloses() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    auto* ok = dialog->findChild<QQuickItem*>(QStringLiteral("aboutOkButton"));
+    QVERIFY(ok != nullptr);
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(ok));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+
+    QCOMPARE(openAboutDialog(window), dialog);
+    QTest::keyClick(window, Qt::Key_Escape);
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::aboutDialogIsModal() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    // A button with a visible effect, well outside the dialog.
+    auto* maximizeButton = window->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
+    QVERIFY(maximizeButton != nullptr);
+    const QWindow::Visibility before = window->visibility();
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(maximizeButton));
+    QTest::qWait(100);
+    QCOMPARE(window->visibility(), before);
+    QVERIFY(dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::aboutDialogOpensTheLink() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLink"));
+    QVERIFY(link != nullptr);
+
+    UrlCatcher catcher;
+    QDesktopServices::setUrlHandler(QStringLiteral("https"), &catcher, "open");
+    // The address is the only text of the item and it is centred.
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(link));
+    QDesktopServices::unsetUrlHandler(QStringLiteral("https"));
+
+    QCOMPARE(catcher.opened, QList<QUrl>{QUrl(QStringLiteral("https://github.com/madialeva/gambasse"))});
+    QVERIFY(dialog->property("visible").toBool());
 }
 
 void TestQmlFoundation::titleBarChrome() {

@@ -1,4 +1,5 @@
 import QtQuick
+import Gambasse
 
 // Frameless splash with the logo image and a credits strip at the bottom.
 // Closes after three seconds and emits finished(); App.qml centres it and
@@ -36,7 +37,7 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: qsTr('Project by Juan Franco, available on <a href="%1" style="color:#58A6FF; text-decoration:none;">GitHub</a>.').arg("https://github.com/madialeva/gambasse")
+                text: qsTr('Project by Juan Franco, available on <a href="%1" style="color:#58A6FF; text-decoration:none;">GitHub</a>.').arg(AppInfo.repositoryUrl)
                 textFormat: Text.RichText
                 color: "white"
                 font.pixelSize: 12
