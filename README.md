@@ -30,23 +30,26 @@
 
 ---
 
-## Status
+## Features
 
-| Status | Feature |
-|:---:|---|
-| ✅ | Splash screen |
-| ✅ | Patient master-detail screen |
-| ✅ | Column filtering |
-| ✅ | Patient CRUD |
-| ✅ | Language/theme selection |
-| ✅ | Help menu with the product information |
-| ✅ | Self-contained Windows executable |
-| ✅ | Linux package (tar.gz) |
-| ✅ | Automatic database creation and schema migration |
-| ✅ | Histories |
-| ✅ | Consultations |
-| ✅ | Interactive photo management |
-| ⬜ | USB backup |
+- **Patients:** a list with a live filter on every column and sorting, and a
+  detail panel to add, edit and delete patients, rejecting duplicates. Each
+  patient records their address, cohabitants, contact and siblings, so they can
+  be found again without an ID, and can have a photo.
+- **Clinical histories:** pediatric, adult and pregnancy histories, offered
+  according to the patient's age and sex. They also capture social context such
+  as housing, treated water and mosquito nets.
+- **Consultations:** pediatric, adult and pregnancy consultations, listed per
+  patient. Depending on the type, they record the nursing diagnosis, the
+  physical examination, treatments, care advice and a diagram of body lesions.
+- **Interface:** Spanish, European Portuguese and English, and light and dark
+  themes, switched live and remembered between sessions. It fits small screens,
+  and a Help menu shows the version and the licences.
+- **Local data:** no server or network is needed. The records live in a local
+  SQLite database, created and updated automatically, legacy databases included,
+  and the photos in a folder.
+- **Distribution:** a Linux package and self-contained executables for Linux and
+  Windows.
 
 ## Branching and versioning
 

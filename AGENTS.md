@@ -3,18 +3,11 @@
 ## Project
 
 Gambasse is a clinical-record and nursing-consultation application for an
-NGO in Guinea-Bissau. It continues an earlier desktop application that is no
-longer maintained; the SQLite schema is owned by this project, and a legacy
-database with Spanish table and column names is still supported through the
-embedded migration patches (see Persistent compatibility below).
-
-A local copy of the original application lives in `tmp/dispensario/`
-(git-ignored, so it may be absent after a fresh clone) — consult it as a
-functional and UX reference for every screen and business rule still to be
-developed: `src/Dispensario/Forms/` (including the six
-`FrmHistoria*`/`FrmConsulta*` child forms), `src/Dispensario/ORM/` (data access
-per area), and `src/Dispensario/Utilidades/` (shared framework, NOT to be
-ported: Qt covers those services natively).
+NGO in Guinea-Bissau. It replaced an earlier desktop application, now obsolete:
+all its features were migrated, except its USB backup, deliberately dropped. The
+SQLite schema is owned by this project, and a legacy database with Spanish table
+and column names is still supported through the embedded migration patches (see
+Persistent compatibility below).
 
 Use Qt Quick (QML), CMake (3.25+) with the presets of `CMakePresets.json`,
 Ninja, C++26, GCC 16.2.0 built from the GNU sources and Qt 6.12.0. The project
@@ -134,8 +127,7 @@ Use English for source, identifiers, comments, CMake, scripts, technical docs,
 commits, and pull requests. GitHub issues and milestones: titles and
 descriptions always in English. OpenSpec artifacts and user conversation remain in
 Spanish. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
-source language and the Spanish catalog must preserve its current displayed
-text. The Portuguese catalog is European Portuguese (the norm used in
+source language. The Portuguese catalog is European Portuguese (the norm used in
 Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
 drop-down options in capitals as in the other languages; never carry over the
 Brazilian, Spanish or Galician forms of the original application. Qt's own
