@@ -6,6 +6,7 @@
 #include <QSqlQuery>
 #include <QTemporaryDir>
 #include <QtTest>
+#include <algorithm>
 #include <functional>
 
 #include <Paths.h>
@@ -39,6 +40,18 @@ QQuickItem* visualChild(QQuickItem* item, const QString& name) {
 
 QPoint centerOf(QQuickItem* item) {
     return item->mapToScene(QPointF(item->width() / 2.0, item->height() / 2.0)).toPoint();
+}
+
+// The letters of the patient's side over the body diagram, from left to right.
+QList<QQuickItem*> sideLetters(QQuickItem* diagram) {
+    QList<QQuickItem*> letters;
+    for (QQuickItem* kid : diagram->childItems()) {
+        if (kid->objectName() == QLatin1String("sideLetter"))
+            letters.append(kid);
+    }
+    std::sort(letters.begin(), letters.end(),
+              [](const QQuickItem* a, const QQuickItem* b) { return a->x() < b->x(); });
+    return letters;
 }
 
 // Clicks in the window that owns the item: the consultation screen is a
@@ -163,6 +176,9 @@ private slots:
     void reusedWindowKeepsTheFormControllerTyped();
     void pediatricTabsShowWholeCaptions_data();
     void pediatricTabsShowWholeCaptions();
+    void bodyDiagramLettersFollowTheLanguage_data();
+    void bodyDiagramLettersFollowTheLanguage();
+    void bodyDiagramFollowsItsSize();
 };
 
 void TestQmlConsultations::initTestCase() {
@@ -609,6 +625,69 @@ void TestQmlConsultations::reusedWindowKeepsTheFormControllerTyped() {
     QVERIFY(form != nullptr);
     QCOMPARE(form->property("item").value<QObject*>()->property("controller").value<QObject*>(),
              consultationWindow()->property("controller").value<QObject*>());
+}
+
+void TestQmlConsultations::bodyDiagramLettersFollowTheLanguage_data() {
+    QTest::addColumn<QString>("language");
+    QTest::addColumn<QString>("letters");
+    // The patient's right and left on the front view, then left and right on
+    // the back view.
+    QTest::newRow("en") << QStringLiteral("en") << QStringLiteral("R L L R");
+    QTest::newRow("es") << QStringLiteral("es") << QStringLiteral("D I I D");
+    QTest::newRow("pt") << QStringLiteral("pt") << QStringLiteral("D E E D");
+}
+
+void TestQmlConsultations::bodyDiagramLettersFollowTheLanguage() {
+    QFETCH(QString, language);
+    QFETCH(QString, letters);
+    open(screenData().at(0));
+    QQuickItem* diagram = inConsultation(QStringLiteral("bodyDiagram"));
+    QVERIFY(diagram != nullptr);
+    auto* settings = m_engine->singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    settings->setLanguage(language);
+    QStringList shown;
+    for (const QQuickItem* letter : sideLetters(diagram))
+        shown.append(letter->property("text").toString());
+    settings->setLanguage(QStringLiteral("en"));
+    QCOMPARE(shown.join(u' '), letters);
+}
+
+// The picture is drawn at the size it shows, not stretched, and its letters stay
+// on the same spot of it.
+void TestQmlConsultations::bodyDiagramFollowsItsSize() {
+    open(screenData().at(0));
+    QQuickItem* diagram = inConsultation(QStringLiteral("bodyDiagram"));
+    QVERIFY(diagram != nullptr);
+    QQuickItem* picture = visualChild(diagram, QStringLiteral("bodyRegions"));
+    QVERIFY(picture != nullptr);
+    const int ready = 1; // Image.Ready
+    QCOMPARE(picture->property("status").toInt(), ready);
+    QCOMPARE(picture->property("sourceSize").toSize(), picture->size().toSize());
+
+    const QList<QQuickItem*> letters = sideLetters(diagram);
+    QCOMPARE(letters.size(), 4);
+    const auto center = [](const QQuickItem* letter) {
+        return QPointF(letter->x() + letter->width() / 2.0, letter->y() + letter->height() / 2.0);
+    };
+    const auto fontSize = [](const QQuickItem* letter) {
+        return letter->property("font").value<QFont>().pixelSize();
+    };
+    QList<QPointF> centers;
+    for (const QQuickItem* letter : letters)
+        centers.append(center(letter));
+    const int smallFont = fontSize(letters.first());
+
+    diagram->setSize(diagram->size() * 2.0);
+
+    QTRY_COMPARE(picture->property("status").toInt(), ready);
+    QCOMPARE(picture->property("sourceSize").toSize(), picture->size().toSize());
+    QVERIFY(fontSize(letters.first()) > smallFont);
+    for (int i = 0; i < letters.size(); ++i) {
+        const QPointF moved = center(letters.at(i)) - centers.at(i) * 2.0;
+        QVERIFY2(moved.manhattanLength() < 1.0,
+                 qPrintable(letters.at(i)->property("text").toString()));
+    }
 }
 
 void TestQmlConsultations::pediatricTabsShowWholeCaptions_data() {

@@ -1025,202 +1025,216 @@
 <context>
     <name>AdultConsultationForm</name>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="60"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="77"/>
         <source>Personal data</source>
         <translation>Datos personales</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="69"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="86"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="81"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="98"/>
         <source>Date:</source>
         <translation>Fecha:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="92"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="109"/>
         <source>Consultation list</source>
         <translation>Lista de consultas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="113"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="130"/>
         <source>Reason for consultation</source>
         <translation>Motivo de la consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="135"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="152"/>
         <source>Lesion</source>
         <translation>Lesión</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="180"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="178"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="195"/>
+        <source>R</source>
+        <extracomment>First letter of the patient&apos;s right side, on the body diagram</extracomment>
+        <translation>D</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="184"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="190"/>
+        <source>L</source>
+        <extracomment>First letter of the patient&apos;s left side, on the body diagram</extracomment>
+        <translation>I</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="225"/>
         <source>Region</source>
         <translation>Región</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="189"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="234"/>
         <source>Impairment</source>
         <translation>Perjuicio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="208"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="253"/>
         <source>Physical examination</source>
         <translation>Exploración física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="217"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="262"/>
         <source>Respiratory</source>
         <translation>Respiratorio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="224"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="269"/>
         <source>Nasal flaring</source>
         <translation>Aleteo nasal</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="231"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="276"/>
         <source>Stridor</source>
         <translation>Estridor</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="238"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="283"/>
         <source>Wheezing</source>
         <translation>Sibilancias</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="245"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="290"/>
         <source>Retraction</source>
         <translation>Tiraje</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="255"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="300"/>
         <source>Circulatory</source>
         <translation>Circulatorio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="262"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="307"/>
         <source>Arrhythmia</source>
         <translation>Arritmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="269"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="314"/>
         <source>Capillary refill</source>
         <translation>Relleno capilar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="276"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="321"/>
         <source>No radial pulse</source>
         <translation>Ausencia de pulso radial</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="283"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="328"/>
         <source>Edema</source>
         <translation>Edemas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="293"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="338"/>
         <source>Skin and mucosa</source>
         <translation>Piel y mucosas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="300"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="345"/>
         <source>Skin fold &gt; 2&quot;</source>
         <translation>Pliegue cutáneo &gt; 2&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="307"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="352"/>
         <source>Pale mucosa</source>
         <translation>Mucosas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="314"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="359"/>
         <source>Enophthalmos</source>
         <translation>Enoftalmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="321"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="366"/>
         <source>Pale palms</source>
         <translation>Palmas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="331"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="376"/>
         <source>Endocrine-metabolic</source>
         <translation>Endocrino-metabólico</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="338"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="383"/>
         <source>Organomegaly</source>
         <translation>Organomegalia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="354"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="399"/>
         <source>Lymphadenopathy</source>
         <translation>Adenopatías</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="373"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="418"/>
         <source>Elimination</source>
         <translation>Eliminación</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="380"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="425"/>
         <source>Secretion</source>
         <translation>Secreción</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="387"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="432"/>
         <source>Stool changes</source>
         <translation>Heces alteradas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="394"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="439"/>
         <source>Cough</source>
         <translation>Tos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="410"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="455"/>
         <source>Urine changes</source>
         <translation>Orina alterada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="426"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="471"/>
         <source>Vomiting</source>
         <translation>Vómitos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="436"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="481"/>
         <source>Health disorders</source>
         <translation>Trastornos de la salud</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="446"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="491"/>
         <source>Dehydration degree:</source>
         <translation>Deshidratación, grado:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="457"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="502"/>
         <source>Malnutrition degree:</source>
         <translation>Desnutrición, grado:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="468"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="513"/>
         <source>Others:</source>
         <translation>Otros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="479"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="524"/>
         <source>Conduct</source>
         <translation>Conducta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="486"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="531"/>
         <source>Irritable</source>
         <translation>Irritable</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="495"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="540"/>
         <source>Other:</source>
         <translation>Otra:</translation>
     </message>
