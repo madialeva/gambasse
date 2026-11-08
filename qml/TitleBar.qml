@@ -14,6 +14,10 @@ Item {
     // Optional language/theme controls, bound to the InterfaceSettings
     // singleton (main window only; child windows leave it false).
     property bool showLanguageTheme: false
+    // Optional Help menu (main window only). The bar only announces the choice:
+    // the window that shows the bar owns the dialog.
+    property bool showHelp: false
+    signal aboutRequested
     // config.ini is free text, so the code is checked before building any URL
     // (a wrong one used to point at a non-existing flag image).
     // Window.window is an attached property and only resolves on Items, so the
@@ -138,6 +142,24 @@ Item {
         anchors.top: parent.top
         spacing: 6
         ToolButton {
+            id: helpButton
+            objectName: "helpButton"
+            height: Theme.titleBarButtonHeight
+            visible: root.showHelp
+            text: qsTr("Help")
+            onClicked: helpMenu.open()
+            Menu {
+                id: helpMenu
+                objectName: "helpMenu"
+                y: helpButton.height
+                MenuItem {
+                    objectName: "aboutMenuItem"
+                    text: qsTr("About")
+                    onTriggered: root.aboutRequested()
+                }
+            }
+        }
+        ToolButton {
             id: languageButton
             objectName: "languageButton"
             height: Theme.titleBarButtonHeight
@@ -171,6 +193,8 @@ Item {
             onClicked: languageMenu.open()
             Menu {
                 id: languageMenu
+                objectName: "languageMenu"
+                y: languageButton.height
                 MenuItem {
                     text: qsTr("Spanish")
                     icon.source: "qrc:/img/flag-es.png"
@@ -198,6 +222,7 @@ Item {
             }
         }
         ToolButton {
+            id: themeButton
             objectName: "themeButton"
             height: Theme.titleBarButtonHeight
             visible: root.showLanguageTheme
@@ -208,6 +233,8 @@ Item {
             onClicked: themeMenu.open()
             Menu {
                 id: themeMenu
+                objectName: "themeMenu"
+                y: themeButton.height
                 MenuItem {
                     text: qsTr("Light")
                     icon.source: "qrc:/img/sun.svg"

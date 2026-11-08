@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Gambasse
 
-// Main shell window: frameless, with the custom title bar (language and
+// Main shell window: frameless, with the custom title bar (help, language and
 // theme controls) over the patient screen. It owns the patient controller,
 // loaded from the database already opened by main.cpp; the theme follows the
 // InterfaceSettings singleton through Theme.
@@ -80,6 +80,8 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         showLanguageTheme: true
+        showHelp: true
+        onAboutRequested: aboutDialog.present()
     }
     ResizeHandles {
         anchors.fill: parent

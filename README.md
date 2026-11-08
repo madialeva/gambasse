@@ -39,6 +39,7 @@
 | ✅ | Column filtering |
 | ✅ | Patient CRUD |
 | ✅ | Language/theme selection |
+| ✅ | Help menu with the product information |
 | ✅ | Self-contained Windows executable |
 | ✅ | Linux package (tar.gz) |
 | ✅ | Automatic database creation and schema migration |

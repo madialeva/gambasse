@@ -97,6 +97,8 @@ private slots:
     void aboutDialogCloses();
     void aboutDialogIsModal();
     void aboutDialogOpensTheLink();
+    void helpMenuOpensTheDialog();
+    void titleBarMenusDropBelowTheBar();
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
@@ -435,13 +437,22 @@ void TestQmlFoundation::aboutDialogIsModal() {
     QVERIFY(dialog != nullptr);
 
     // A button with a visible effect, well outside the dialog.
-    auto* maximizeButton = window->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* maximizeButton = bar->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
     QVERIFY(maximizeButton != nullptr);
+    const QPoint outside = itemCenter(maximizeButton);
     const QWindow::Visibility before = window->visibility();
-    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(maximizeButton));
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, outside);
     QTest::qWait(100);
     QCOMPARE(window->visibility(), before);
     QVERIFY(dialog->property("visible").toBool());
+
+    // The same click does act once the dialog is closed.
+    QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, outside);
+    QTRY_COMPARE(window->visibility(), QWindow::Maximized);
 }
 
 void TestQmlFoundation::aboutDialogOpensTheLink() {
@@ -463,6 +474,80 @@ void TestQmlFoundation::aboutDialogOpensTheLink() {
     QVERIFY(dialog->property("visible").toBool());
 }
 
+void TestQmlFoundation::helpMenuOpensTheDialog() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    // From the bar: the hidden child windows hold bars of their own.
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* helpButton = bar->findChild<QQuickItem*>(QStringLiteral("helpButton"));
+    auto* languageButton = bar->findChild<QQuickItem*>(QStringLiteral("languageButton"));
+    auto* menu = bar->findChild<QObject*>(QStringLiteral("helpMenu"));
+    auto* dialog = window->findChild<QObject*>(QStringLiteral("aboutDialog"));
+    QVERIFY(helpButton != nullptr);
+    QVERIFY(languageButton != nullptr);
+    QVERIFY(menu != nullptr);
+    QVERIFY(dialog != nullptr);
+
+    // Right beside the language button, on its left (the row's 6 px apart).
+    QVERIFY(helpButton->isVisible());
+    QCOMPARE(helpButton->property("text").toString(), QStringLiteral("Help"));
+    QCOMPARE(helpButton->x() + helpButton->width() + 6, languageButton->x());
+
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(helpButton));
+    QTRY_VERIFY(menu->property("opened").toBool());
+    QCOMPARE(menu->property("count").toInt(), 1);
+
+    QQuickItem* entry = nullptr;
+    QMetaObject::invokeMethod(menu, "itemAt", Q_RETURN_ARG(QQuickItem*, entry), Q_ARG(int, 0));
+    QVERIFY(entry != nullptr);
+    QCOMPARE(entry->property("text").toString(), QStringLiteral("About"));
+
+    // The real click: the dialog must survive the focus change of the event
+    // that closes the menu.
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(entry));
+    QTRY_VERIFY(dialog->property("opened").toBool());
+    QVERIFY(!menu->property("visible").toBool());
+    QTest::qWait(100);
+    QVERIFY(dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::titleBarMenusDropBelowTheBar() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    const QList<std::pair<const char*, const char*>> menus = {{"helpButton", "helpMenu"},
+                                                              {"languageButton", "languageMenu"},
+                                                              {"themeButton", "themeMenu"}};
+    for (const auto& [buttonName, menuName] : menus) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        auto* menu = bar->findChild<QObject*>(QLatin1String(menuName));
+        QVERIFY2(button != nullptr, buttonName);
+        QVERIFY2(menu != nullptr, menuName);
+
+        QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(button));
+        QTRY_VERIFY2(menu->property("opened").toBool(), menuName);
+
+        auto* content = menu->property("contentItem").value<QQuickItem*>();
+        QVERIFY2(content != nullptr, menuName);
+        const QPointF menuOrigin = content->mapToScene(QPointF(0, 0));
+        const QPointF buttonOrigin = button->mapToScene(QPointF(0, 0));
+        const qreal padding = menu->property("leftPadding").toReal();
+        const qreal topPadding = menu->property("topPadding").toReal();
+        QCOMPARE(menuOrigin.x() - padding, buttonOrigin.x());
+        QVERIFY2(menuOrigin.y() - topPadding >= buttonOrigin.y() + button->height(), menuName);
+
+        QTest::keyClick(window, Qt::Key_Escape);
+        QTRY_VERIFY2(!menu->property("visible").toBool(), menuName);
+    }
+}
+
 void TestQmlFoundation::titleBarChrome() {
     // Same assertions in both themes (tooltips stay in English: no
     // translator is installed in tests, like a fresh English session).
@@ -476,7 +561,7 @@ void TestQmlFoundation::titleBarChrome() {
         // 40 px of buttons plus the 1 px bottom line: every button of the bar
         // fits exactly above that line.
         QCOMPARE(bar->property("height").toInt(), 41);
-        for (const char* name : {"languageButton", "themeButton", "minimizeButton",
+        for (const char* name : {"helpButton", "languageButton", "themeButton", "minimizeButton",
                                  "maximizeButton", "closeButton"}) {
             auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
             QVERIFY2(button != nullptr, name);

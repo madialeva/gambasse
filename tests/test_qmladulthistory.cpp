@@ -260,6 +260,10 @@ void TestQmlAdultHistory::newHistoryCannotBeDeleted() {
     QVERIFY(bar != nullptr);
     QCOMPARE(bar->mapToScene(QPointF(0, 0)), QPointF(0, 0));
     QCOMPARE(bar->width(), qreal(window->width()));
+    // The Help menu belongs to the main window only.
+    auto* helpButton = inHistory(QStringLiteral("helpButton"));
+    QVERIFY(helpButton != nullptr);
+    QVERIFY(!helpButton->isVisible());
 }
 
 void TestQmlAdultHistory::formRendersEveryControllerField() {
