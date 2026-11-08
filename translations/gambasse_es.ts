@@ -36,7 +36,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="219"/>
         <source>FIST PERCUSSION SIGN</source>
-        <translation>SIGNO PUÑO/PERCUSIÓN</translation>
+        <translation>PUÑOPERCUSIÓN</translation>
     </message>
 </context>
 <context>
@@ -82,7 +82,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="241"/>
         <source>Acetylcysteine</source>
-        <translation>Acetilcisteina</translation>
+        <translation>Acetilcisteína</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="242"/>
@@ -122,7 +122,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="249"/>
         <source>Almagate (Almax)</source>
-        <translation>Almagato (almax)</translation>
+        <translation>Almagato (Almax)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="250"/>
@@ -137,7 +137,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="252"/>
         <source>Amitriptyline (Tryptizol)</source>
-        <translation>Amitriptilina (triptizol)</translation>
+        <translation>Amitriptilina (Tryptizol)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="253"/>
@@ -152,7 +152,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="255"/>
         <source>Amoxicillin/clavulanic acid</source>
-        <translation>Amoxiclavulánico</translation>
+        <translation>Amoxicilina/ácido clavulánico</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="256"/>
@@ -167,12 +167,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="258"/>
         <source>Artemether</source>
-        <translation>Artemether</translation>
+        <translation>Arteméter</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="259"/>
         <source>Artemether + lumefantrine</source>
-        <translation>Artemisina + lumefantrina</translation>
+        <translation>Arteméter + lumefantrina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="260"/>
@@ -192,12 +192,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="263"/>
         <source>Benzathine benzylpenicillin</source>
-        <translation>Benzaticina penicilina</translation>
+        <translation>Bencilpenicilina benzatina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="264"/>
         <source>Betahistine (Serc)</source>
-        <translation>Betahistina (serc)</translation>
+        <translation>Betahistina (Serc)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="265"/>
@@ -207,7 +207,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="266"/>
         <source>Bromazepam</source>
-        <translation>Bromozepam</translation>
+        <translation>Bromazepam</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="267"/>
@@ -217,7 +217,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="268"/>
         <source>Hyoscine butylbromide (Buscopan)</source>
-        <translation>Buscapina</translation>
+        <translation>Butilescopolamina (Buscapina)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="269"/>
@@ -267,7 +267,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="278"/>
         <source>Cinitapride (Cidine)</source>
-        <translation>Cinitaprida (cidine)</translation>
+        <translation>Cinitaprida (Cidine)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="279"/>
@@ -287,7 +287,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="282"/>
         <source>Clebopride (Flatoril)</source>
-        <translation>Cleboprida (flatoril)</translation>
+        <translation>Cleboprida (Flatoril)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="283"/>
@@ -297,7 +297,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="284"/>
         <source>Clonazepam (Rivotril)</source>
-        <translation>Clonazepam (rivotril)</translation>
+        <translation>Clonazepam (Rivotril)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="285"/>
@@ -312,12 +312,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="287"/>
         <source>Vitamin B complex</source>
-        <translation>Complejo B vitamínico</translation>
+        <translation>Complejo vitamínico B</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="288"/>
         <source>Co-trimoxazole: sulfamethoxazole + trimethoprim (Bactrim)</source>
-        <translation>Co-trimoxazol: sulfametoxazol + trimetoprim (bactrim)</translation>
+        <translation>Co-trimoxazol: sulfametoxazol + trimetoprim (Bactrim)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="289"/>
@@ -332,7 +332,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="291"/>
         <source>Diethylcarbamazine</source>
-        <translation>Dietilcarbamacina</translation>
+        <translation>Dietilcarbamazina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="292"/>
@@ -347,7 +347,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="294"/>
         <source>Domperidone (Motilium)</source>
-        <translation>Domperidona (motilium)</translation>
+        <translation>Domperidona (Motilium)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="295"/>
@@ -357,7 +357,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="296"/>
         <source>Dexketoprofen (Enantyum)</source>
-        <translation>Enantyum</translation>
+        <translation>Dexketoprofeno (Enantyum)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="297"/>
@@ -367,7 +367,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="298"/>
         <source>Spironolactone (Aldactone)</source>
-        <translation>Espironolactona (aldactone)</translation>
+        <translation>Espironolactona (Aldactone)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="299"/>
@@ -377,7 +377,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="300"/>
         <source>Etoricoxib (Arcoxia)</source>
-        <translation>Etoricoxib (arcoxia)</translation>
+        <translation>Etoricoxib (Arcoxia)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="301"/>
@@ -432,12 +432,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="311"/>
         <source>Gliclazide (Diamicron)</source>
-        <translation>Gliclazida (diamicron)</translation>
+        <translation>Gliclazida (Diamicron)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="312"/>
         <source>Griseofulvin</source>
-        <translation>Gliseofulvina</translation>
+        <translation>Griseofulvina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="313"/>
@@ -452,7 +452,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="315"/>
         <source>Hydralazine</source>
-        <translation>Hidrazalina</translation>
+        <translation>Hidralazina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="316"/>
@@ -502,17 +502,17 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="325"/>
         <source>Labetalol (Trandate)</source>
-        <translation>Labetalol (trandate)</translation>
+        <translation>Labetalol (Trandate)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="326"/>
         <source>Lactulose (Duphalac)</source>
-        <translation>Lactulosa (duphalac)</translation>
+        <translation>Lactulosa (Duphalac)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="327"/>
         <source>Levetiracetam (Keppra)</source>
-        <translation>Levetiracetam (keppra)</translation>
+        <translation>Levetiracetam (Keppra)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="328"/>
@@ -522,17 +522,17 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="329"/>
         <source>Levothyroxine (Eutirox)</source>
-        <translation>Levotiroxina (eutirox)</translation>
+        <translation>Levotiroxina (Eutirox)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="330"/>
         <source>Loperamide (Fortasec)</source>
-        <translation>Loperamida (fortasec)</translation>
+        <translation>Loperamida (Fortasec)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="331"/>
         <source>Loratadine (Clarityne)</source>
-        <translation>Loratadina (clarytine)</translation>
+        <translation>Loratadina (Clarityne)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="332"/>
@@ -542,12 +542,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="333"/>
         <source>Lormetazepam (Noctamid)</source>
-        <translation>Lormetazepam (noctamid)</translation>
+        <translation>Lormetazepam (Noctamid)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="334"/>
         <source>Macrogol (Movicol)</source>
-        <translation>Macrogol (movicol)</translation>
+        <translation>Macrogol (Movicol)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="335"/>
@@ -557,7 +557,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="336"/>
         <source>Metformin</source>
-        <translation>Melformina</translation>
+        <translation>Metformina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="337"/>
@@ -572,17 +572,17 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="339"/>
         <source>Metoclopramide</source>
-        <translation>Metroclopramida</translation>
+        <translation>Metoclopramida</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="340"/>
         <source>Metronidazole (Flagyl)</source>
-        <translation>Metronidazol (fragyl)</translation>
+        <translation>Metronidazol (Flagyl)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="341"/>
         <source>Metronidazole + spiramycin (Rhodogil)</source>
-        <translation>Metronidazol + espiramicina (rhodogil)</translation>
+        <translation>Metronidazol + espiramicina (Rhodogil)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="342"/>
@@ -627,12 +627,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="350"/>
         <source>Neomycin + bacitracin</source>
-        <translation>Neomycina + batricina</translation>
+        <translation>Neomicina + bacitracina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="351"/>
         <source>Nifedipine (Adalat)</source>
-        <translation>Nifedipino (adalat)</translation>
+        <translation>Nifedipino (Adalat)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="352"/>
@@ -642,7 +642,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="353"/>
         <source>Nitrofural (Furacin)</source>
-        <translation>Nitrofural (furacin)</translation>
+        <translation>Nitrofural (Furacin)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="354"/>
@@ -662,7 +662,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="357"/>
         <source>Ondansetron (Zofran)</source>
-        <translation>Ondasetrón (zofrán)</translation>
+        <translation>Ondansetrón (Zofran)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="358"/>
@@ -677,7 +677,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="360"/>
         <source>Risperidone (Risperdal)</source>
-        <translation>Risperidona (risperdal)</translation>
+        <translation>Risperidona (Risperdal)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="361"/>
@@ -707,7 +707,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="366"/>
         <source>Propranolol</source>
-        <translation>Propanolol</translation>
+        <translation>Propranolol</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="367"/>
@@ -722,7 +722,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="369"/>
         <source>Simeticone (Aero Red)</source>
-        <translation>Simeticona (aerored)</translation>
+        <translation>Simeticona (Aero Red)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="370"/>
@@ -732,27 +732,27 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="371"/>
         <source>Lactated Ringer&apos;s solution</source>
-        <translation>Suero Ringer Lactato</translation>
+        <translation>Suero Ringer lactato</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="372"/>
         <source>Normal saline 0.9%</source>
-        <translation>Suero Fisiológico 0,9%</translation>
+        <translation>Suero fisiológico 0,9%</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="373"/>
         <source>Glucose 5% solution</source>
-        <translation>Suero Glucosado 5%</translation>
+        <translation>Suero glucosado 5%</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="374"/>
         <source>Silver sulfadiazine ointment</source>
-        <translation>Sulfadiazina argéntica pomada</translation>
+        <translation>Sulfadiazina argéntica, pomada</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="375"/>
         <source>Sulfadoxine/pyrimethamine</source>
-        <translation>sulfadoxina/pirimetamina</translation>
+        <translation>Sulfadoxina/pirimetamina</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="376"/>
@@ -767,7 +767,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="378"/>
         <source>Tetracycline eye ointment</source>
-        <translation>Tetraciclina oftámica</translation>
+        <translation>Tetraciclina, pomada oftálmica</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="379"/>
@@ -782,12 +782,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="381"/>
         <source>Clorazepate (Tranxilium)</source>
-        <translation>Tranxilium</translation>
+        <translation>Clorazepato (Tranxilium)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="382"/>
         <source>Sodium valproate, valproic acid (Depakine)</source>
-        <translation>Valproato de sodio, ácido valproico (depakine)</translation>
+        <translation>Valproato de sodio, ácido valproico (Depakine)</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="383"/>
@@ -802,7 +802,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="385"/>
         <source>Vitamin C</source>
-        <translation>vitamina C</translation>
+        <translation>Vitamina C</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="386"/>
@@ -1136,7 +1136,7 @@
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="321"/>
         <source>Pale palms</source>
-        <translation>Palma de la mano blanca</translation>
+        <translation>Palmas pálidas</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="331"/>
@@ -1146,7 +1146,7 @@
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="338"/>
         <source>Organomegaly</source>
-        <translation>Megalia</translation>
+        <translation>Organomegalia</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="354"/>
@@ -1244,7 +1244,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="66"/>
         <source>Adult history</source>
-        <translation>Historia del adulto</translation>
+        <translation>Historia de adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="73"/>
@@ -1276,7 +1276,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="124"/>
         <source>HIV</source>
-        <translation>HIV</translation>
+        <translation>VIH</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="143"/>
@@ -1321,7 +1321,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="219"/>
         <source>Net use</source>
-        <translation>Usana</translation>
+        <translation>La usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="226"/>
@@ -1351,7 +1351,7 @@
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="272"/>
         <source>Weight (Kg):</source>
-        <translation>Peso (Kg):</translation>
+        <translation>Peso (kg):</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="284"/>
@@ -1565,7 +1565,7 @@
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="88"/>
         <source>Could not save the consultation.</source>
-        <translation>No se pudo grabar la consulta.</translation>
+        <translation>No se pudo guardar la consulta.</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="101"/>
@@ -1586,7 +1586,7 @@
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="164"/>
         <source>Save consultation</source>
-        <translation>Grabar consulta</translation>
+        <translation>Guardar consulta</translation>
     </message>
     <message>
         <location filename="../qml/windows/ConsultationWindow.qml" line="174"/>
@@ -1678,12 +1678,12 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="174"/>
         <source>VERY SEVERE</source>
-        <translation>MUY SERIO</translation>
+        <translation>MUY GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="175"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="176"/>
@@ -1729,7 +1729,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="167"/>
         <source>SEVERE PURULENT</source>
-        <translation>PURULENTA SERIA</translation>
+        <translation>PURULENTA GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="168"/>
@@ -1770,12 +1770,12 @@
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="28"/>
         <source>Delete the pregnancy history of &quot;%1&quot;?</source>
-        <translation>¿Borrar la historia embarazada de &quot;%1&quot;?</translation>
+        <translation>¿Borrar la historia de embarazo de &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="29"/>
         <source>Delete the adult history of &quot;%1&quot;?</source>
-        <translation>¿Borrar la historia adulto de &quot;%1&quot;?</translation>
+        <translation>¿Borrar la historia de adulto de &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
@@ -1786,7 +1786,7 @@
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
         <source>Could not save the history.</source>
-        <translation>No se pudo grabar la historia.</translation>
+        <translation>No se pudo guardar la historia.</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="96"/>
@@ -1797,7 +1797,7 @@
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="162"/>
         <source>Save history</source>
-        <translation>Grabar historia</translation>
+        <translation>Guardar historia</translation>
     </message>
     <message>
         <location filename="../qml/windows/HistoryWindow.qml" line="172"/>
@@ -1853,17 +1853,17 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Adult History</source>
-        <translation>Historia Adulto</translation>
+        <translation>Historia de adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Pediatric History</source>
-        <translation>Historia Pediátrica</translation>
+        <translation>Historia pediátrica</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="154"/>
         <source>Pregnancy History</source>
-        <translation>Historia Embarazada</translation>
+        <translation>Historia de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="164"/>
@@ -1878,7 +1878,7 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="164"/>
         <source>Pregnancy Consultation</source>
-        <translation>Consulta de embarazada</translation>
+        <translation>Consulta de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="223"/>
@@ -1893,22 +1893,22 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="235"/>
         <source>Adult history</source>
-        <translation>Historia del adulto</translation>
+        <translation>Historia de adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="241"/>
         <source>Adult consultation</source>
-        <translation>Consulta adulto</translation>
+        <translation>Consulta de adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="247"/>
         <source>Pregnancy history</source>
-        <translation>Historia del embarazo</translation>
+        <translation>Historia de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="253"/>
         <source>Pregnancy consultation</source>
-        <translation>Consulta embarazada</translation>
+        <translation>Consulta de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="547"/>
@@ -1934,12 +1934,12 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="575"/>
         <source>Create adult history</source>
-        <translation>Crear historia adulto</translation>
+        <translation>Crear historia de adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="582"/>
         <source>Create pregnancy history</source>
-        <translation>Crear historia embarazada</translation>
+        <translation>Crear historia de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="460"/>
@@ -1969,7 +1969,7 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="489"/>
         <source>Save</source>
-        <translation>Grabar</translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="495"/>
@@ -2110,7 +2110,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="208"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="209"/>
@@ -2128,7 +2128,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="30"/>
         <source>SEVERE DEHYDRATION</source>
-        <translation>DESHIDRATACIÓN SERIA</translation>
+        <translation>DESHIDRATACIÓN GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="31"/>
@@ -2143,22 +2143,22 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="33"/>
         <source>SEVERE MALNUTRITION</source>
-        <translation>MALNUTRICIÓN SERIA</translation>
+        <translation>DESNUTRICIÓN GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="34"/>
         <source>MODERATE MALNUTRITION</source>
-        <translation>MALNUTRICIÓN MODERADA</translation>
+        <translation>DESNUTRICIÓN MODERADA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="35"/>
         <source>MILD MALNUTRITION</source>
-        <translation>MALNUTRICIÓN LEVE</translation>
+        <translation>DESNUTRICIÓN LEVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="36"/>
         <source>CHRONIC MALNUTRITION</source>
-        <translation>MALNUTRICIÓN CRÓNICA</translation>
+        <translation>DESNUTRICIÓN CRÓNICA</translation>
     </message>
 </context>
 <context>
@@ -2294,7 +2294,7 @@
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="216"/>
         <source>Weight (Kg):</source>
-        <translation>Peso (Kg):</translation>
+        <translation>Peso (kg):</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="227"/>
@@ -2490,7 +2490,7 @@
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="565"/>
         <source>Pale palms</source>
-        <translation>Palma de la mano blanca</translation>
+        <translation>Palmas pálidas</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="571"/>
@@ -2556,7 +2556,7 @@
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="665"/>
         <source>Pale conjunctiva</source>
-        <translation>Conjuntiva blanca</translation>
+        <translation>Conjuntiva pálida</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="671"/>
@@ -2865,7 +2865,7 @@
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="188"/>
         <source>Net use</source>
-        <translation>Usana</translation>
+        <translation>La usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricHistoryForm.qml" line="195"/>
@@ -3006,7 +3006,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
         <source>2nd or 3rd trimester</source>
-        <translation>2º o 3º trimestre</translation>
+        <translation>2º o 3er trimestre</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
@@ -3031,7 +3031,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="81"/>
         <source>Malaria prophylaxis</source>
-        <translation>Profilaxis de la malaria</translation>
+        <translation>Profilaxis malaria</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="96"/>
@@ -3086,7 +3086,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="266"/>
         <source>Weight (Kg):</source>
-        <translation>Peso (Kg):</translation>
+        <translation>Peso (kg):</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="278"/>
@@ -3156,7 +3156,7 @@
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="407"/>
         <source>MMI</source>
-        <translation>MMI</translation>
+        <translation>MMII</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="414"/>
@@ -3184,7 +3184,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="79"/>
         <source>60 mg a day</source>
-        <translation>60 mg. día</translation>
+        <translation>60 mg al día</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="79"/>
@@ -3204,7 +3204,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
         <source>4 mg a day</source>
-        <translation>4 mg. día</translation>
+        <translation>4 mg al día</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
@@ -3274,7 +3274,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="184"/>
         <source>Pregnancy history</source>
-        <translation>Historia del embarazo</translation>
+        <translation>Historia de embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="194"/>
@@ -3284,7 +3284,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="204"/>
         <source>Deceased siblings at birth:</source>
-        <translation>Nº de hermanos muertos/parto:</translation>
+        <translation>Hnos. muertos al nacer:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="215"/>
@@ -3319,12 +3319,12 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="274"/>
         <source>HIV (woman)</source>
-        <translation>VIH + Ella</translation>
+        <translation>VIH (mujer)</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="281"/>
         <source>HIV (man)</source>
-        <translation>VIH + Hombre</translation>
+        <translation>VIH (hombre)</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="290"/>
@@ -3411,7 +3411,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
         <source>Parents net use</source>
-        <translation>Usana</translation>
+        <translation>La usan</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="460"/>
@@ -3421,7 +3421,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
         <source>Children net use</source>
-        <translation>Usana</translation>
+        <translation>La usan</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="477"/>
@@ -3436,7 +3436,7 @@
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="499"/>
         <source>Weight (Kg):</source>
-        <translation>Peso (Kg):</translation>
+        <translation>Peso (kg):</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="511"/>
@@ -3502,6 +3502,11 @@
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="632"/>
         <source>Edemas</source>
         <translation>Edemas</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="639"/>
+        <source>MMI</source>
+        <translation>MMII</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="646"/>
@@ -3710,7 +3715,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="95"/>
         <source>SEVERE</source>
-        <translation>SERIO</translation>
+        <translation>GRAVE</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="96"/>
@@ -3720,7 +3725,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="97"/>
         <source>MILD</source>
-        <translation>SUAVE</translation>
+        <translation>LEVE</translation>
     </message>
 </context>
 <context>
@@ -4000,7 +4005,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="129"/>
         <source>PYURIA</source>
-        <translation>PLAQUIURIA</translation>
+        <translation>PIURIA</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="130"/>
@@ -4038,7 +4043,7 @@
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="120"/>
         <source>FOOD</source>
-        <translation>ALIMENTICIO</translation>
+        <translation>ALIMENTICIOS</translation>
     </message>
     <message>
         <location filename="../src/logic/PediatricConsultationLabels.cpp" line="121"/>

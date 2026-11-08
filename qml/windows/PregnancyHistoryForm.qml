@@ -636,7 +636,7 @@ Item {
                 y: 19
                 controller: root.controller
                 field: "physicalExamMmi"
-                text: "MMI"
+                text: qsTr("MMI")
             }
             GxCheckField {
                 x: 9

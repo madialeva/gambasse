@@ -3504,6 +3504,11 @@
         <translation>Edemas</translation>
     </message>
     <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="639"/>
+        <source>MMI</source>
+        <translation>MMI</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="646"/>
         <source>Face</source>
         <translation>Cara</translation>
