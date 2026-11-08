@@ -1141,7 +1141,7 @@
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="345"/>
         <source>Skin fold &gt; 2&quot;</source>
-        <translation>Prega da pele ˃2&quot;</translation>
+        <translation>Prega da pele &gt; 2&quot;</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultConsultationForm.qml" line="352"/>
@@ -2505,7 +2505,7 @@
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="559"/>
         <source>Skin fold &gt; 2&quot;</source>
-        <translation>Prega da pele ˃2&quot;</translation>
+        <translation>Prega da pele &gt; 2&quot;</translation>
     </message>
     <message>
         <location filename="../qml/windows/PediatricConsultationForm.qml" line="565"/>
