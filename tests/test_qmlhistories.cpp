@@ -8,6 +8,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -45,6 +46,17 @@ QString badgeProblems(QQuickItem* item) {
 
 QQuickItem* child(QObject* parent, const QString& name) {
     return parent->findChild<QQuickItem*>(name);
+}
+
+// Like child(), through the visual tree: it also reaches the rows of a Repeater.
+QQuickItem* visualChild(QQuickItem* item, const QString& name) {
+    if (item->objectName() == name)
+        return item;
+    for (QQuickItem* kid : item->childItems()) {
+        if (QQuickItem* found = visualChild(kid, name))
+            return found;
+    }
+    return nullptr;
 }
 
 QPoint centerOf(QQuickItem* item) {
@@ -129,6 +141,9 @@ private slots:
     void fixedRowsAreNotPersisted();
     void titleBadgesLeaveControlsClear_data();
     void titleBadgesLeaveControlsClear();
+    void everyTextShowsWhole_data();
+    void everyTextShowsWhole();
+    void pregnancyExamGainsARow();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -205,6 +220,9 @@ void TestQmlHistories::openScreen() {
         baseline.setLanguage(QStringLiteral("en"));
     }
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
@@ -213,8 +231,6 @@ void TestQmlHistories::openScreen() {
     // are the engine's singleton, exactly as in the application.
     m_controller = m_window->property("patientController").value<PatientController*>();
     QVERIFY(m_controller != nullptr);
-    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
-                                                                 QStringLiteral("InterfaceSettings"));
     QVERIFY(m_settings != nullptr);
     m_screen = child(m_window, QStringLiteral("mainView"));
     QVERIFY(m_screen != nullptr);
@@ -404,6 +420,71 @@ void TestQmlHistories::titleBadgesLeaveControlsClear() {
     QVERIFY(form != nullptr);
     const QString problems = badgeProblems(form);
     QVERIFY2(problems.isEmpty(), qPrintable(problems));
+}
+
+void TestQmlHistories::everyTextShowsWhole_data() {
+    QTest::addColumn<int>("row");
+    QTest::addColumn<QString>("language");
+    for (const QString& language :
+         {QStringLiteral("en"), QStringLiteral("es"), QStringLiteral("pt")}) {
+        QTest::addRow("pediatric-%s", qPrintable(language)) << 0 << language;
+        QTest::addRow("pregnancy-%s", qPrintable(language)) << 1 << language;
+    }
+}
+
+void TestQmlHistories::everyTextShowsWhole() {
+    QFETCH(int, row);
+    QFETCH(QString, language);
+    open(screenData().at(row));
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY(window != nullptr);
+    const QStringList cut = cutTextsOnEveryTab(window->contentItem());
+    m_settings->setLanguage(QStringLiteral("en"));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+void TestQmlHistories::pregnancyExamGainsARow() {
+    open(screenData().at(1));
+    auto* form = inHistory(QStringLiteral("historyForm"));
+    QVERIFY(form != nullptr);
+    const auto field = [form](const char* name) {
+        return visualChild(form, QLatin1String(name));
+    };
+    QQuickItem* weight = field("physicalExamWeight");
+    QQuickItem* height = field("physicalExamHeight");
+    QQuickItem* temperature = field("physicalExamTemperature");
+    QQuickItem* abdominal = field("physicalExamAbdominalPerimeter");
+    QVERIFY(weight && height && temperature && abdominal);
+
+    // The temperature joins the first column, right below the height...
+    QCOMPARE(temperature->x(), height->x());
+    QVERIFY(height->y() < temperature->y() && temperature->y() < abdominal->y());
+    // ...and the Tab key walks that column in the order it is read.
+    const QList<QQuickItem*> column{weight, height, temperature, abdominal};
+    for (qsizetype i = 0; i + 1 < column.size(); ++i) {
+        QQuickItem* from = child(column.at(i), QStringLiteral("field"));
+        QQuickItem* to = child(column.at(i + 1), QStringLiteral("field"));
+        QVERIFY(from != nullptr && to != nullptr);
+        QCOMPARE(from->nextItemInFocusChain(), to);
+    }
+
+    // The treatments give up that row: they start below the examination, end
+    // above the buttons, and their tabs still hold every row.
+    QQuickItem* exam = field("examGroup");
+    QQuickItem* treatments = field("treatmentsGroup");
+    QQuickItem* tabs = field("treatmentTabs");
+    QQuickItem* saveButton = inHistory(QStringLiteral("saveHistoryButton"));
+    QVERIFY(exam && treatments && tabs && saveButton);
+    QVERIFY(exam->y() + exam->height() <= treatments->y());
+    const QPointF treatmentsEnd = treatments->mapToScene(QPointF(0, treatments->height()));
+    QVERIFY(treatmentsEnd.y() <= saveButton->mapToScene(QPointF(0, 0)).y());
+    for (const char* name : {"supplementDate5", "supplementMalariaProphylaxisD"}) {
+        QQuickItem* row = field(name);
+        QVERIFY2(row != nullptr, name);
+        QVERIFY2(row->mapToItem(tabs, QPointF(0, row->height())).y() <= tabs->height(), name);
+    }
 }
 
 } // namespace gambasse

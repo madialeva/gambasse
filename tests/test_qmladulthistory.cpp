@@ -9,6 +9,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -121,6 +122,8 @@ private slots:
     void editingUpdatesTheStoredRow();
     void deletingRemovesTheHistory();
     void boundsAndDatesAreCoercedOnSave();
+    void everyTextShowsWhole_data();
+    void everyTextShowsWhole();
 };
 
 void TestQmlAdultHistory::initTestCase() {
@@ -180,6 +183,9 @@ void TestQmlAdultHistory::openScreen() {
         baseline.setLanguage(QStringLiteral("en"));
     }
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
@@ -188,8 +194,6 @@ void TestQmlAdultHistory::openScreen() {
     // are the engine's singleton, exactly as in the application.
     m_controller = m_window->property("patientController").value<PatientController*>();
     QVERIFY(m_controller != nullptr);
-    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
-                                                                 QStringLiteral("InterfaceSettings"));
     QVERIFY(m_settings != nullptr);
     m_screen = child(m_window, QStringLiteral("mainView"));
     QVERIFY(m_screen != nullptr);
@@ -233,6 +237,27 @@ HistoryController* TestQmlAdultHistory::openHistory() {
     if (window != nullptr)
         (void)QTest::qWaitForWindowExposed(window);
     return controller;
+}
+
+void TestQmlAdultHistory::everyTextShowsWhole_data() {
+    QTest::addColumn<QString>("language");
+    QTest::newRow("en") << QStringLiteral("en");
+    QTest::newRow("es") << QStringLiteral("es");
+    QTest::newRow("pt") << QStringLiteral("pt");
+}
+
+void TestQmlAdultHistory::everyTextShowsWhole() {
+    QFETCH(QString, language);
+    QVERIFY(createPatient());
+    openScreen();
+    QVERIFY(openHistory() != nullptr);
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY(window != nullptr);
+    const QStringList cut = cutTextsOnEveryTab(window->contentItem());
+    m_settings->setLanguage(QStringLiteral("en"));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
 }
 
 void TestQmlAdultHistory::newHistoryCannotBeDeleted() {

@@ -42,32 +42,38 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="51"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="94"/>
         <source>Version %1</source>
         <translation>Versão %1</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="55"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="98"/>
         <source>MIT License</source>
         <translation>Licença MIT</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="63"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="106"/>
         <source>Developed in %1, an ISO standard.</source>
         <translation>Desenvolvida em %1, uma norma ISO.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="67"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="110"/>
         <source>Compiled with GCC %1, under the GPL v3 with the GCC Runtime Library Exception.</source>
         <translation>Compilada com o GCC %1, sob a licença GPL v3 com a exceção da biblioteca de execução do GCC.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="71"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="114"/>
         <source>Built with Qt %1, under the LGPL v3.</source>
         <translation>Construída com o Qt %1, sob a licença LGPL v3.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="80"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="118"/>
+        <source>Uses the Noto Sans font, under the %1.</source>
+        <translation>Usa o tipo de letra Noto Sans, sob a licença %1.</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="67"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="128"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -1289,9 +1295,14 @@
         <translation>Profissão:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="164"/>
-        <source>Number of children:</source>
-        <translation>Nº de filhos:</translation>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="339"/>
+        <source>HR:</source>
+        <translation>F.C.:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="349"/>
+        <source>RR:</source>
+        <translation>F.R.:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="174"/>
@@ -1344,6 +1355,11 @@
         <translation>Animais domésticos:</translation>
     </message>
     <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="164"/>
+        <source>Children:</source>
+        <translation>Nº de filhos:</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="262"/>
         <source>Vital signs</source>
         <translation>Sinais vitais</translation>
@@ -1377,16 +1393,6 @@
         <location filename="../qml/windows/AdultHistoryForm.qml" line="329"/>
         <source>Consciousness:</source>
         <translation>Consciência:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="339"/>
-        <source>Heart rate:</source>
-        <translation>F.C.:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="349"/>
-        <source>Respiratory rate:</source>
-        <translation>F.R.:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="359"/>
@@ -1813,243 +1819,243 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="104"/>
+        <location filename="../qml/windows/MainWindow.qml" line="108"/>
         <source>Code:</source>
-        <translation type="unfinished">Código:</translation>
+        <translation>Código:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="141"/>
+        <location filename="../qml/windows/MainWindow.qml" line="145"/>
         <source>Incomplete data</source>
-        <translation type="unfinished">Dados incompletos</translation>
+        <translation>Dados incompletos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="141"/>
+        <location filename="../qml/windows/MainWindow.qml" line="145"/>
         <source>Name is required.</source>
-        <translation type="unfinished">O nome é obrigatório.</translation>
+        <translation>O nome é obrigatório.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
+        <location filename="../qml/windows/MainWindow.qml" line="148"/>
         <source>Duplicate patient</source>
-        <translation type="unfinished">Paciente duplicado</translation>
+        <translation>Paciente duplicado</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
+        <location filename="../qml/windows/MainWindow.qml" line="148"/>
         <source>A patient with the same name, birth date, sex, and age already exists.</source>
-        <translation type="unfinished">Já existe um paciente com o mesmo nome, data de nascimento, sexo e idade.</translation>
+        <translation>Já existe um paciente com o mesmo nome, data de nascimento, sexo e idade.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="146"/>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
-        <location filename="../qml/windows/MainWindow.qml" line="825"/>
-        <location filename="../qml/windows/MainWindow.qml" line="836"/>
+        <location filename="../qml/windows/MainWindow.qml" line="150"/>
+        <location filename="../qml/windows/MainWindow.qml" line="834"/>
+        <location filename="../qml/windows/MainWindow.qml" line="853"/>
+        <location filename="../qml/windows/MainWindow.qml" line="864"/>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="146"/>
+        <location filename="../qml/windows/MainWindow.qml" line="150"/>
         <source>Could not save the patient.</source>
-        <translation type="unfinished">Não foi possível guardar o paciente.</translation>
+        <translation>Não foi possível guardar o paciente.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Adult History</source>
         <translation>História de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Pediatric History</source>
         <translation>História pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Pregnancy History</source>
         <translation>História de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Adult Consultation</source>
         <translation>Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Pediatric Consultation</source>
         <translation>Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Pregnancy Consultation</source>
         <translation>Consulta de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="223"/>
+        <location filename="../qml/windows/MainWindow.qml" line="227"/>
         <source>Pediatric history</source>
         <translation>História pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="229"/>
+        <location filename="../qml/windows/MainWindow.qml" line="233"/>
         <source>Pediatric consultation</source>
-        <translation type="unfinished">Consulta pediátrica</translation>
+        <translation>Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="235"/>
+        <location filename="../qml/windows/MainWindow.qml" line="239"/>
         <source>Adult history</source>
-        <translation type="unfinished">História de adulto</translation>
+        <translation>História de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="241"/>
+        <location filename="../qml/windows/MainWindow.qml" line="245"/>
         <source>Adult consultation</source>
-        <translation type="unfinished">Consulta de adulto</translation>
+        <translation>Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="247"/>
+        <location filename="../qml/windows/MainWindow.qml" line="251"/>
         <source>Pregnancy history</source>
-        <translation type="unfinished">História de gravidez</translation>
+        <translation>História de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="253"/>
+        <location filename="../qml/windows/MainWindow.qml" line="257"/>
         <source>Pregnancy consultation</source>
-        <translation type="unfinished">Consulta de gravidez</translation>
+        <translation>Consulta de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="547"/>
+        <location filename="../qml/windows/MainWindow.qml" line="575"/>
         <source>Edit photo</source>
         <translation>Editar foto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="555"/>
-        <location filename="../qml/windows/MainWindow.qml" line="560"/>
+        <location filename="../qml/windows/MainWindow.qml" line="583"/>
+        <location filename="../qml/windows/MainWindow.qml" line="588"/>
         <source>Delete photo</source>
         <translation>Apagar foto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="558"/>
+        <location filename="../qml/windows/MainWindow.qml" line="586"/>
         <source>Delete the photo of patient &quot;%1&quot;?</source>
         <translation>Apagar a foto do paciente &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="568"/>
+        <location filename="../qml/windows/MainWindow.qml" line="596"/>
         <source>Create pediatric history</source>
-        <translation type="unfinished">Criar história pediátrica</translation>
+        <translation>Criar história pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="575"/>
+        <location filename="../qml/windows/MainWindow.qml" line="603"/>
         <source>Create adult history</source>
-        <translation type="unfinished">Criar história de adulto</translation>
+        <translation>Criar história de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="582"/>
+        <location filename="../qml/windows/MainWindow.qml" line="610"/>
         <source>Create pregnancy history</source>
-        <translation type="unfinished">Criar história de gravidez</translation>
+        <translation>Criar história de gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="460"/>
+        <location filename="../qml/windows/MainWindow.qml" line="488"/>
         <source>Add</source>
-        <translation type="unfinished">Adicionar</translation>
+        <translation>Adicionar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="469"/>
+        <location filename="../qml/windows/MainWindow.qml" line="497"/>
         <source>Edit</source>
-        <translation type="unfinished">Modificar</translation>
+        <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="478"/>
+        <location filename="../qml/windows/MainWindow.qml" line="506"/>
         <source>Delete</source>
-        <translation type="unfinished">Apagar</translation>
+        <translation>Apagar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="481"/>
+        <location filename="../qml/windows/MainWindow.qml" line="509"/>
         <source>Delete patient &quot;%1&quot; and all their histories and consultations?</source>
-        <translation type="unfinished">Apagar o paciente &quot;%1&quot; e todas as suas histórias e consultas?</translation>
+        <translation>Apagar o paciente &quot;%1&quot; e todas as suas histórias e consultas?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="483"/>
+        <location filename="../qml/windows/MainWindow.qml" line="511"/>
         <source>Delete patient</source>
-        <translation type="unfinished">Apagar paciente</translation>
+        <translation>Apagar paciente</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="489"/>
+        <location filename="../qml/windows/MainWindow.qml" line="517"/>
         <source>Save</source>
         <translation>Guardar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="495"/>
+        <location filename="../qml/windows/MainWindow.qml" line="523"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="610"/>
+        <location filename="../qml/windows/MainWindow.qml" line="638"/>
         <source>Basic data</source>
-        <translation type="unfinished">Dados básicos</translation>
+        <translation>Dados básicos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="632"/>
+        <location filename="../qml/windows/MainWindow.qml" line="660"/>
         <source>Name:</source>
-        <translation type="unfinished">Nome:</translation>
+        <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="667"/>
+        <location filename="../qml/windows/MainWindow.qml" line="695"/>
         <source>Sex:</source>
-        <translation type="unfinished">Sexo:</translation>
+        <translation>Sexo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="659"/>
+        <location filename="../qml/windows/MainWindow.qml" line="687"/>
         <source>Birth date:</source>
-        <translation type="unfinished">Data nasc.:</translation>
+        <translation>Data nasc.:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="650"/>
+        <location filename="../qml/windows/MainWindow.qml" line="678"/>
         <source>Age:</source>
-        <translation type="unfinished">Idade:</translation>
+        <translation>Idade:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="679"/>
+        <location filename="../qml/windows/MainWindow.qml" line="707"/>
         <source>Address</source>
         <translation>Morada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="693"/>
+        <location filename="../qml/windows/MainWindow.qml" line="721"/>
         <source>Address:</source>
         <translation>Morada:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="708"/>
+        <location filename="../qml/windows/MainWindow.qml" line="736"/>
         <source>Cohabitants:</source>
-        <translation type="unfinished">Coabitantes:</translation>
+        <translation>Coabitantes:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="717"/>
+        <location filename="../qml/windows/MainWindow.qml" line="745"/>
         <source>Contact:</source>
-        <translation type="unfinished">Contacto:</translation>
+        <translation>Contacto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="728"/>
+        <location filename="../qml/windows/MainWindow.qml" line="756"/>
         <source>Siblings:</source>
-        <translation type="unfinished">Nº irmãos:</translation>
+        <translation>Nº irmãos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="804"/>
+        <location filename="../qml/windows/MainWindow.qml" line="832"/>
         <source>Invalid image</source>
         <translation>Imagem inválida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="804"/>
+        <location filename="../qml/windows/MainWindow.qml" line="832"/>
         <source>The selected file is not a readable image.</source>
         <translation>O ficheiro escolhido não é uma imagem legível.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <location filename="../qml/windows/MainWindow.qml" line="834"/>
         <source>Could not save the photo.</source>
         <translation>Não foi possível guardar a foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="825"/>
+        <location filename="../qml/windows/MainWindow.qml" line="853"/>
         <source>Could not delete the photo.</source>
         <translation>Não foi possível apagar a foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="836"/>
+        <location filename="../qml/windows/MainWindow.qml" line="864"/>
         <source>Could not delete the patient.</source>
-        <translation type="unfinished">Não foi possível apagar o paciente.</translation>
+        <translation>Não foi possível apagar o paciente.</translation>
     </message>
 </context>
 <context>
@@ -2994,19 +3000,14 @@
         <translation>Vitamina B9</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
-        <source>Until the fifth month of pregnancy</source>
-        <translation>Até ao 5.º mês</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="51"/>
         <source>Deworming</source>
         <translation>Desparasitação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
-        <source>2nd or 3rd trimester</source>
-        <translation>2.º/3.º trim.</translation>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
+        <source>Until 5th month</source>
+        <translation>Até ao 5.º mês</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
@@ -3017,6 +3018,11 @@
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
         <source>Single dose</source>
         <translation>Dose única</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
+        <source>2nd or 3rd trim.</source>
+        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="61"/>
@@ -3212,19 +3218,9 @@
         <translation>Vitamina B9</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
-        <source>Until the fifth month of pregnancy</source>
-        <translation>Até ao 5.º mês</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="92"/>
         <source>Deworming</source>
         <translation>Desparasitação</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
-        <source>2nd or 3rd trimester</source>
-        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
@@ -3277,29 +3273,9 @@
         <translation>História da gravidez</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="194"/>
-        <source>Last menstruation date:</source>
-        <translation>Data da última menstruação:</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="204"/>
         <source>Deceased siblings at birth:</source>
         <translation>Irmãos mortos/parto:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="215"/>
-        <source>Expected delivery date:</source>
-        <translation>Data provável do parto:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="225"/>
-        <source>Delivery count:</source>
-        <translation>Partos:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="236"/>
-        <source>Abortion count:</source>
-        <translation>Abortos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="246"/>
@@ -3409,19 +3385,9 @@
         <translation>Mosquiteiro pais</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
-        <source>Parents net use</source>
-        <translation>Usa</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="460"/>
         <source>Children mosquito net</source>
         <translation>Mosquiteiro filhos</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
-        <source>Children net use</source>
-        <translation>Usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="477"/>
@@ -3429,124 +3395,165 @@
         <translation>Animais domésticos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="489"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="491"/>
         <source>Physical examination</source>
         <translation>Exploração física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="499"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="501"/>
         <source>Weight (Kg):</source>
         <translation>Peso (Kg):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="511"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="524"/>
         <source>Temperature (ºC):</source>
         <translation>Tª (ºC):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="523"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="513"/>
         <source>Height (cm):</source>
         <translation>Altura (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="534"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
+        <source>Until 5th month</source>
+        <translation>Até ao 5.º mês</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
+        <source>2nd or 3rd trim.</source>
+        <translation>2.º/3.º trim.</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="194"/>
+        <source>Last menstruation:</source>
+        <translation>Última menstruação:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="215"/>
+        <source>Expected delivery:</source>
+        <translation>Parto provável:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="225"/>
+        <source>Deliveries:</source>
+        <translation>Partos:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="236"/>
+        <source>Abortions:</source>
+        <translation>Abortos:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
+        <source>In use</source>
+        <translation>Usa</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="536"/>
         <source>Abdominal P. (cm):</source>
         <translation>P. A. (cm):</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="544"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="546"/>
         <source>Vomiting:</source>
         <translation>Vómitos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="554"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="556"/>
         <source>Fetal auscultation:</source>
         <translation>Auscultação fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="564"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="566"/>
         <source>Fetal position:</source>
         <translation>Posição fetal:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="576"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="578"/>
         <source>Uterine height</source>
         <translation>Altura uterina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="586"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="588"/>
         <source>Week:</source>
         <translation>Semana:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="597"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="599"/>
         <source>Centimeters:</source>
         <translation>Centímetros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="608"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="610"/>
         <source>Urine</source>
         <translation>Urina</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="615"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="617"/>
         <source>Leukocytosis</source>
         <translation>Leucócitos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="622"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="624"/>
         <source>Proteinuria</source>
         <translation>Proteinúria</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="632"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="634"/>
         <source>Edemas</source>
         <translation>Edemas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="646"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="641"/>
+        <source>MMI</source>
+        <translation>MMI</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="648"/>
         <source>Face</source>
         <translation>Cara</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="653"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="655"/>
         <source>General</source>
         <translation>Geral</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="674"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="678"/>
         <source>Previous treatment</source>
         <translation>Tratamento prévio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="674"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="678"/>
         <source>Current treatments</source>
         <translation>Tratamentos dados agora</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="685"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="690"/>
         <source>MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON</source>
         <translation>PROFILAXIA DA MALÁRIA, DESPARASITAÇÃO, VITAMINA A, ÁCIDO FÓLICO, FERRO</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="693"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="698"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="698"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="770"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="703"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="775"/>
         <source>Medication:</source>
         <translation>Medicamento:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="703"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="765"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="708"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="770"/>
         <source>Dose:</source>
         <translation>Dose:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="775"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="780"/>
         <source>Next dose:</source>
         <translation>Próxima dose:</translation>
     </message>
@@ -3557,7 +3564,8 @@
         <location filename="../src/data/common/Database.cpp" line="40"/>
         <source>Could not create the database directory:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível criar o diretório da base de dados:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/Database.cpp" line="55"/>
@@ -3567,82 +3575,90 @@
 %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="78"/>
+        <location filename="../src/main.cpp" line="121"/>
         <source>Database error</source>
         <translation>Erro de base de dados</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="174"/>
         <source>Could not read schema patch %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ler a atualização do esquema %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="214"/>
         <source>Could not create the schema history table:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível criar a tabela do histórico do esquema:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="227"/>
         <source>Could not read the schema history:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ler o histórico do esquema:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="235"/>
         <source>Invalid program version in the schema history: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versão do programa inválida no histórico do esquema: %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="259"/>
         <source>Could not record schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível registar a atualização do esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="269"/>
         <source>Could not start a transaction for %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível iniciar uma transação para %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="281"/>
         <source>Failed to apply schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível aplicar a atualização do esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="295"/>
         <source>Could not commit schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível confirmar a atualização do esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="306"/>
         <source>Could not start the baseline transaction:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível iniciar a transação da linha de base:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="316"/>
         <source>Could not record the baseline patch:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível registar a atualização da linha de base:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="338"/>
         <source>No schema patches found in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foram encontradas atualizações do esquema em %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="355"/>
         <source>Schema patch %1 changed after it was applied (checksum mismatch). Applied patches must not be edited; add a new patch instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>A atualização do esquema %1 mudou depois de ser aplicada (a soma de verificação não coincide). As atualizações aplicadas não devem ser editadas; adicione uma nova.</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="401"/>
         <source>Schema patch %1 is out of order: version %2 is older than the already applied %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>A atualização do esquema %1 está fora de ordem: a versão %2 é anterior à %3, já aplicada.</translation>
     </message>
 </context>
 <context>
@@ -3820,72 +3836,72 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../qml/TitleBar.qml" line="149"/>
+        <location filename="../qml/TitleBar.qml" line="143"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="157"/>
+        <location filename="../qml/TitleBar.qml" line="151"/>
         <source>About</source>
         <translation>Informação</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="169"/>
-        <location filename="../qml/TitleBar.qml" line="199"/>
+        <location filename="../qml/TitleBar.qml" line="163"/>
+        <location filename="../qml/TitleBar.qml" line="193"/>
         <source>Spanish</source>
-        <translation type="unfinished">Espanhol</translation>
+        <translation>Espanhol</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="171"/>
-        <location filename="../qml/TitleBar.qml" line="207"/>
+        <location filename="../qml/TitleBar.qml" line="165"/>
+        <location filename="../qml/TitleBar.qml" line="201"/>
         <source>Portuguese</source>
-        <translation type="unfinished">Português</translation>
+        <translation>Português</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="172"/>
-        <location filename="../qml/TitleBar.qml" line="215"/>
+        <location filename="../qml/TitleBar.qml" line="166"/>
+        <location filename="../qml/TitleBar.qml" line="209"/>
         <source>English</source>
-        <translation type="unfinished">Inglês</translation>
+        <translation>Inglês</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="191"/>
+        <location filename="../qml/TitleBar.qml" line="185"/>
         <source>Language</source>
-        <translation type="unfinished">Língua</translation>
+        <translation>Língua</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="230"/>
-        <location filename="../qml/TitleBar.qml" line="246"/>
+        <location filename="../qml/TitleBar.qml" line="224"/>
+        <location filename="../qml/TitleBar.qml" line="240"/>
         <source>Dark</source>
-        <translation type="unfinished">Escuro</translation>
+        <translation>Escuro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="230"/>
-        <location filename="../qml/TitleBar.qml" line="239"/>
+        <location filename="../qml/TitleBar.qml" line="224"/>
+        <location filename="../qml/TitleBar.qml" line="233"/>
         <source>Light</source>
-        <translation type="unfinished">Claro</translation>
+        <translation>Claro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="231"/>
+        <location filename="../qml/TitleBar.qml" line="225"/>
         <source>Theme</source>
-        <translation type="unfinished">Tema</translation>
+        <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="257"/>
+        <location filename="../qml/TitleBar.qml" line="251"/>
         <source>Minimize</source>
         <translation>Minimizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="264"/>
+        <location filename="../qml/TitleBar.qml" line="259"/>
         <source>Restore</source>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="264"/>
+        <location filename="../qml/TitleBar.qml" line="259"/>
         <source>Maximize</source>
         <translation>Maximizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="271"/>
+        <location filename="../qml/TitleBar.qml" line="295"/>
         <source>Close</source>
         <translation>Fechar</translation>
     </message>

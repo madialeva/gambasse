@@ -4,7 +4,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Sql Test)
 # gambasse_add_test(<name> [LIBS ...] [SOURCES ...])
 # Builds test_<name>.cpp against the layer under test (GambasseCore for the
 # GUI-less suites, GambasseQml for the controllers and the views) plus any extra
-# sources (resources), and runs it headless (no X server needed on CI).
+# sources (resources), and runs it headless (no X server needed on CI) and with
+# no system font, so the results are the same on every machine.
 function(gambasse_add_test name)
     cmake_parse_arguments(TEST "" "" "LIBS;SOURCES" ${ARGN})
     add_executable(test_${name} test_${name}.cpp ${TEST_SOURCES})
@@ -13,13 +14,21 @@ function(gambasse_add_test name)
     # Shared test helpers (ConsultationTestSupport.h) by angle include.
     target_include_directories(test_${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     add_test(NAME ${name} COMMAND test_${name})
-    set_tests_properties(${name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT
+        "QT_QPA_PLATFORM=offscreen;FONTCONFIG_FILE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/no-system-fonts.conf")
 endfunction()
 
 set(SCHEMA_QRC ${CMAKE_SOURCE_DIR}/resources/bd/bd.qrc)
 set(IMAGES_QRC ${CMAKE_SOURCE_DIR}/resources/resources.qrc)
 set(I18N_QRC ${CMAKE_SOURCE_DIR}/translations/i18n.qrc)
 set(QML_LIBS GambasseQml GambasseQmlplugin)
+
+# The real executable: only main.cpp decides when the language catalog is
+# installed.
+gambasse_add_test(startuperror LIBS Qt6::Core)
+target_compile_definitions(test_startuperror PRIVATE
+    GAMBASSE_EXECUTABLE="$<TARGET_FILE:Gambasse>")
+add_dependencies(test_startuperror Gambasse)
 
 # Data and business rules.
 gambasse_add_test(schemamigrator LIBS GambasseCore SOURCES ${SCHEMA_QRC})
@@ -36,6 +45,11 @@ gambasse_add_test(adultconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QR
 gambasse_add_test(pregnancyconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(pediatricconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 
+# Translation catalogs: complete, with their placeholders, and compiled.
+gambasse_add_test(translationcatalogs LIBS Qt6::Core SOURCES ${I18N_QRC})
+target_compile_definitions(test_translationcatalogs PRIVATE
+    TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/translations")
+
 # Controllers and view helpers.
 gambasse_add_test(columnfilterproxy LIBS ${QML_LIBS})
 gambasse_add_test(patientcontroller LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${IMAGES_QRC} ${I18N_QRC})
@@ -43,7 +57,9 @@ gambasse_add_test(patientcontroller LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${IMA
 # QML foundation, control library and screens.
 gambasse_add_test(qmlfoundation LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${I18N_QRC} ${IMAGES_QRC})
 target_compile_definitions(test_qmlfoundation PRIVATE
-    QML_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures")
+    QML_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures"
+    QML_SOURCE_DIR="${CMAKE_SOURCE_DIR}/qml"
+    TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/translations")
 
 gambasse_add_test(qmlcomponents LIBS ${QML_LIBS} SOURCES ${IMAGES_QRC})
 target_compile_definitions(test_qmlcomponents PRIVATE

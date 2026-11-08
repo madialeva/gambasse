@@ -2,10 +2,38 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFont>
+#include <QFontDatabase>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlEngine>
 
 #include <Paths.h>
+
+namespace {
+// The windows use fixed coordinates, so the font travels inside the executable
+// and the texts measure the same on any system. Without hinting, because the
+// hinted widths depend on the system's font configuration. One font per
+// process, whatever the number of engines.
+void installInterfaceFont() {
+    static const bool installed = [] {
+        const int regular =
+            QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/NotoSans-Regular.ttf"));
+        const int bold =
+            QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/NotoSans-Bold.ttf"));
+        if (regular < 0 || bold < 0) {
+            qWarning("The interface font could not be loaded; using the system's.");
+            return false;
+        }
+        QFont font(QFontDatabase::applicationFontFamilies(regular).value(0));
+        font.setPixelSize(13);
+        font.setHintingPreference(QFont::PreferNoHinting);
+        QGuiApplication::setFont(font);
+        return true;
+    }();
+    Q_UNUSED(installed);
+}
+} // namespace
 
 namespace gambasse {
 
@@ -28,6 +56,7 @@ void InterfaceSettings::setTheme(const QString& mode) {
 
 InterfaceSettings* InterfaceSettings::create(QQmlEngine* qmlEngine, QJSEngine* jsEngine) {
     Q_UNUSED(jsEngine);
+    installInterfaceFont();
     auto* settings = new InterfaceSettings(qmlEngine);
     settings->applyLanguage();
     if (auto* appEngine = qobject_cast<QQmlApplicationEngine*>(qmlEngine))

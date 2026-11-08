@@ -1,10 +1,15 @@
 #include <QDesktopServices>
+#include <QDirIterator>
+#include <QFontInfo>
+#include <QFontMetricsF>
 #include <QGuiApplication>
 #include <QImage>
 #include <QQmlApplicationEngine>
 #include <QQmlComponent>
 #include <QQuickItem>
 #include <QQuickWindow>
+#include <QRawFont>
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTranslator>
@@ -97,6 +102,10 @@ private slots:
     void aboutDialogCloses();
     void aboutDialogIsModal();
     void aboutDialogOpensTheLink();
+    void aboutDialogShowsTheFontLicense();
+    void interfaceFontComesFromTheExecutable();
+    void everyItemUsesTheInterfaceFont();
+    void everyTextHasItsGlyphs();
     void helpMenuOpensTheDialog();
     void titleBarMenusDropBelowTheBar();
     void helpAndDialogFollowTheLanguage();
@@ -111,6 +120,8 @@ QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
     cleanup();
     persistInterface(theme, QStringLiteral("en"));
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    settingsOf(*m_engine);
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     if (m_engine->rootObjects().isEmpty())
         return nullptr;
@@ -360,6 +371,8 @@ void TestQmlFoundation::aboutDialogContent() {
     QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("Runtime Library Exception")));
     QVERIFY(textOf("aboutQt").contains(QStringLiteral("Qt ") + info.qtVersion()));
     QVERIFY(textOf("aboutQt").contains(QStringLiteral("LGPL v3")));
+    QVERIFY(textOf("aboutFont").contains(QStringLiteral("Noto Sans")));
+    QVERIFY(textOf("aboutFont").contains(QStringLiteral("SIL OFL 1.1")));
     QVERIFY(textOf("aboutLink").contains(QStringLiteral("https://github.com/madialeva/gambasse")));
 
     auto* logo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
@@ -475,6 +488,138 @@ void TestQmlFoundation::aboutDialogOpensTheLink() {
     QVERIFY(dialog->property("visible").toBool());
 }
 
+// The licence has to go with the font, and the executable may be a single file:
+// it is read from inside the application, and closing it goes back to the dialog.
+void TestQmlFoundation::aboutDialogShowsTheFontLicense() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutFont"));
+    auto* licenseDialog = dialog->findChild<QObject*>(QStringLiteral("fontLicenseDialog"));
+    QVERIFY(link != nullptr && licenseDialog != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(link, "linkActivated", Q_ARG(QString, QStringLiteral("license"))));
+    QTRY_VERIFY(licenseDialog->property("opened").toBool());
+
+    auto* text = licenseDialog->findChild<QQuickItem*>(QStringLiteral("fontLicenseText"));
+    QVERIFY(text != nullptr);
+    const QString license = text->property("text").toString();
+    for (const char* expected : {"Noto Sans, version 2.003", "Copyright 2015 Google Inc.",
+                                 "The Noto Project Authors", "SIL OPEN FONT LICENSE Version 1.1",
+                                 "OTHER DEALINGS IN THE FONT SOFTWARE."})
+        QVERIFY2(license.contains(QLatin1String(expected)), expected);
+
+    // Whole inside the base window, and all the text can be reached by scrolling.
+    auto* content = licenseDialog->property("contentItem").value<QQuickItem*>();
+    QVERIFY(content != nullptr);
+    const QRectF area = content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
+    QVERIFY(area.top() >= 0 && area.bottom() <= window->height());
+    auto* view = licenseDialog->findChild<QQuickItem*>(QStringLiteral("fontLicenseView"));
+    QVERIFY(view != nullptr);
+    QVERIFY(view->property("contentHeight").toReal() > view->height());
+    QCOMPARE(view->property("contentHeight").toReal(), text->height());
+    QVERIFY(text->property("contentHeight").toReal() <= text->height());
+
+    auto* ok = licenseDialog->findChild<QQuickItem*>(QStringLiteral("fontLicenseOkButton"));
+    QVERIFY(ok != nullptr);
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(ok));
+    QTRY_VERIFY(!licenseDialog->property("visible").toBool());
+    QVERIFY(dialog->property("opened").toBool());
+}
+
+// ctest runs the suites with no system font: Noto Sans can only come from the
+// executable. The sample width holds without hinting; with it the result depends
+// on the system's font configuration (174 px here).
+void TestQmlFoundation::interfaceFontComesFromTheExecutable() {
+    QVERIFY(openShell(QStringLiteral("claro")) != nullptr);
+    const QFont font = QGuiApplication::font();
+    QCOMPARE(font.family(), QStringLiteral("Noto Sans"));
+    QCOMPARE(font.pixelSize(), 13);
+    QCOMPARE(font.hintingPreference(), QFont::PreferNoHinting);
+    const QFontInfo regular(font);
+    QCOMPARE(regular.family(), QStringLiteral("Noto Sans"));
+    QCOMPARE(regular.styleName(), QStringLiteral("Regular"));
+    QFont boldFont = font;
+    boldFont.setBold(true);
+    QCOMPARE(QFontInfo(boldFont).styleName(), QStringLiteral("Bold"));
+    const qreal width =
+        QFontMetricsF(font).horizontalAdvance(QStringLiteral("Temperatura (ºC): 28/08/2026"));
+    QVERIFY2(qAbs(width - 178.67) < 0.5, qPrintable(QString::number(width)));
+}
+
+void TestQmlFoundation::everyItemUsesTheInterfaceFont() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    int texts = 0;
+    QList<QQuickItem*> pending = {window->contentItem()};
+    while (!pending.isEmpty()) {
+        QQuickItem* item = pending.takeLast();
+        pending += item->childItems();
+        const QVariant value = item->property("font");
+        if (value.metaType() != QMetaType::fromType<QFont>())
+            continue;
+        ++texts;
+        const QFont font = value.value<QFont>();
+        const QString where = QString::fromLatin1(item->metaObject()->className());
+        QVERIFY2(font.family() == QStringLiteral("Noto Sans"), qPrintable(where));
+        QVERIFY2(font.hintingPreference() == QFont::PreferNoHinting, qPrintable(where));
+    }
+    QVERIFY(texts > 20);
+}
+
+// A character the font lacks would come from a system font, or from none. The
+// catalogs hold every translated text; QML, the fixed ones and the symbols.
+void TestQmlFoundation::everyTextHasItsGlyphs() {
+    QStringList missing;
+    const auto check = [&missing](const QString& file, char32_t character) {
+        if (character < 0x7F)
+            return;
+        for (const char* name : {":/fonts/NotoSans-Regular.ttf", ":/fonts/NotoSans-Bold.ttf"}) {
+            const QRawFont font(QLatin1String(name), 13);
+            if (!font.isValid() || !font.supportsCharacter(character))
+                missing << QStringLiteral("%1: U+%2 in %3")
+                               .arg(file)
+                               .arg(quint32(character), 4, 16, QLatin1Char('0'))
+                               .arg(QLatin1String(name));
+        }
+    };
+
+    QDirIterator catalogs(QStringLiteral(TRANSLATIONS_DIR), {QStringLiteral("*.ts")}, QDir::Files);
+    int files = 0;
+    while (catalogs.hasNext()) {
+        const QString path = catalogs.next();
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::ReadOnly));
+        ++files;
+        for (const char32_t character : QString::fromUtf8(file.readAll()).toUcs4())
+            check(path, character);
+    }
+    QVERIFY(files >= 2);
+
+    static const QRegularExpression escape(QStringLiteral("\\\\u([0-9A-Fa-f]{4})"));
+    QDirIterator views(QStringLiteral(QML_SOURCE_DIR), {QStringLiteral("*.qml")}, QDir::Files,
+                       QDirIterator::Subdirectories);
+    files = 0;
+    while (views.hasNext()) {
+        const QString path = views.next();
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+        ++files;
+        for (const QString& line : QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'))) {
+            const QString code = line.trimmed().startsWith(QStringLiteral("//")) ? QString() : line;
+            for (const char32_t character : code.toUcs4())
+                check(path, character);
+            for (auto match = escape.globalMatch(code); match.hasNext();)
+                check(path, char32_t(match.next().captured(1).toUInt(nullptr, 16)));
+        }
+    }
+    QVERIFY(files > 20);
+    QVERIFY2(missing.isEmpty(), qPrintable(missing.join(QStringLiteral(" | "))));
+}
+
 void TestQmlFoundation::helpMenuOpensTheDialog() {
     QQuickWindow* window = openShell(QStringLiteral("claro"));
     QVERIFY(window != nullptr);
@@ -567,21 +712,21 @@ void TestQmlFoundation::helpAndDialogFollowTheLanguage() {
     QVERIFY(settings != nullptr);
 
     struct Expected {
-        QString code, help, about, version, license, language, compiler, qt, ok;
+        QString code, help, about, version, license, language, compiler, qt, font, ok;
     };
     const QList<Expected> languages = {
         {QStringLiteral("es"), QStringLiteral("Ayuda"), QStringLiteral("Información"),
          QStringLiteral("Versión"), QStringLiteral("Licencia MIT"), QStringLiteral("estándar ISO"),
          QStringLiteral("biblioteca de ejecución de GCC"), QStringLiteral("licencia LGPL v3"),
-         QStringLiteral("Aceptar")},
+         QStringLiteral("la fuente Noto Sans"), QStringLiteral("Aceptar")},
         {QStringLiteral("pt"), QStringLiteral("Ajuda"), QStringLiteral("Informação"),
          QStringLiteral("Versão"), QStringLiteral("Licença MIT"), QStringLiteral("norma ISO"),
          QStringLiteral("biblioteca de execução do GCC"), QStringLiteral("licença LGPL v3"),
-         QStringLiteral("OK")},
+         QStringLiteral("o tipo de letra Noto Sans"), QStringLiteral("OK")},
         {QStringLiteral("en"), QStringLiteral("Help"), QStringLiteral("About"),
          QStringLiteral("Version"), QStringLiteral("MIT License"), QStringLiteral("ISO standard"),
          QStringLiteral("GCC Runtime Library Exception"), QStringLiteral("LGPL v3"),
-         QStringLiteral("OK")}};
+         QStringLiteral("the Noto Sans font"), QStringLiteral("OK")}};
 
     for (const Expected& expected : languages) {
         settings->setLanguage(expected.code);
@@ -599,6 +744,7 @@ void TestQmlFoundation::helpAndDialogFollowTheLanguage() {
         QVERIFY2(textOf("aboutLanguage").contains(expected.language), qPrintable(expected.code));
         QVERIFY2(textOf("aboutCompiler").contains(expected.compiler), qPrintable(expected.code));
         QVERIFY2(textOf("aboutQt").contains(expected.qt), qPrintable(expected.code));
+        QVERIFY2(textOf("aboutFont").contains(expected.font), qPrintable(expected.code));
         QCOMPARE(textOf("aboutOkButton"), expected.ok);
 
         // Whole inside the base window, and every text at its full height.
@@ -608,7 +754,7 @@ void TestQmlFoundation::helpAndDialogFollowTheLanguage() {
             content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
         QVERIFY2(area.top() >= 0 && area.bottom() <= window->height(), qPrintable(expected.code));
         for (const char* name : {"aboutName", "aboutVersion", "aboutLicense", "aboutLanguage",
-                                 "aboutCompiler", "aboutQt", "aboutLink"}) {
+                                 "aboutCompiler", "aboutQt", "aboutFont", "aboutLink"}) {
             auto* text = dialog->findChild<QQuickItem*>(QLatin1String(name));
             QVERIFY2(text != nullptr, name);
             QVERIFY2(text->property("contentHeight").toReal() <= text->height(), name);
@@ -657,7 +803,7 @@ void TestQmlFoundation::titleBarChrome() {
         QCOMPARE(minimizeButton->property("tip").toString(), QStringLiteral("Minimize"));
         QCOMPARE(maximizeButton->property("tip").toString(), QStringLiteral("Maximize"));
         QCOMPARE(closeButton->property("tip").toString(), QStringLiteral("Close"));
-        QCOMPARE(maximizeButton->property("glyph").toString(), QStringLiteral("\u25A1"));
+        QCOMPARE(maximizeButton->property("maximized").toBool(), false);
     }
 }
 
@@ -674,11 +820,11 @@ void TestQmlFoundation::titleBarWindowButtons() {
 
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(maximizeButton));
     QTRY_VERIFY(window->visibility() == QWindow::Maximized);
-    QCOMPARE(maximizeButton->property("glyph").toString(), QStringLiteral("\u2750"));
+    QCOMPARE(maximizeButton->property("maximized").toBool(), true);
     QCOMPARE(maximizeButton->property("tip").toString(), QStringLiteral("Restore"));
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(maximizeButton));
     QTRY_VERIFY(window->visibility() != QWindow::Maximized);
-    QCOMPARE(maximizeButton->property("glyph").toString(), QStringLiteral("\u25A1"));
+    QCOMPARE(maximizeButton->property("maximized").toBool(), false);
 
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(minimizeButton));
     QTRY_VERIFY(window->visibility() == QWindow::Minimized);

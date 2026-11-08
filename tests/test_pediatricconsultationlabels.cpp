@@ -97,6 +97,11 @@ void TestPediatricConsultationLabels::labelsFollowTheTranslator() {
     QCOMPARE(label("armColor", 1), QStringLiteral("ROJO"));
     QCOMPARE(label("stool", 4), QStringLiteral("ESTREÑIMIENTO"));
     QCOMPARE(label("administrationDays", 17), QStringLiteral("2 MESES"));
+    // Clinical terms and active ingredients with their correct Spanish names.
+    QCOMPARE(label("severity", 1), QStringLiteral("GRAVE"));
+    QCOMPARE(label("severity", 3), QStringLiteral("LEVE"));
+    QCOMPARE(label("urine", 4), QStringLiteral("PIURIA"));
+    QCOMPARE(label("activeIngredient", 96), QStringLiteral("Metformina"));
     QCoreApplication::removeTranslator(&spanish);
 }
 

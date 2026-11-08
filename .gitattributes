@@ -6,4 +6,5 @@
 *.jpg binary
 *.jpeg binary
 *.svg binary
+*.ttf binary
 *.db binary

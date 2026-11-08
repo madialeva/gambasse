@@ -12,4 +12,9 @@
     <file alias="github.svg">img/github.svg</file>
     <file alias="body-regions.jpg">img/body-regions.jpg</file>
   </qresource>
+  <qresource prefix="/fonts">
+    <file alias="NotoSans-Regular.ttf">fonts/NotoSans-Regular.ttf</file>
+    <file alias="NotoSans-Bold.ttf">fonts/NotoSans-Bold.ttf</file>
+    <file alias="OFL.txt">fonts/OFL.txt</file>
+  </qresource>
 </RCC>

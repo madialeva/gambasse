@@ -29,6 +29,9 @@ QQuickItem* asItem(QObject* object) {
 
 bool openHarness(QQmlApplicationEngine* engine, const char* file, const QString& theme,
                  Harness& out) {
+    // Up front, like the application: it installs the interface font.
+    engine->singletonInstance<gambasse::InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                            QStringLiteral("InterfaceSettings"));
     QQmlComponent harness(
         engine, QUrl::fromLocalFile(QStringLiteral(QML_FIXTURE_DIR "/ComponentHarness.qml")));
     QObject* root = harness.create();
@@ -464,9 +467,13 @@ void TestQmlComponents::checkBox() {
         const QColor checkedExpected =
             mode == QStringLiteral("oscuro") ? QColor(0xE8, 0x9A, 0x9A) : QColor(0x80, 0, 0);
         QCOMPARE(label->property("color").value<QColor>(), checkedExpected);
+        auto* tick = root->findChild<QQuickItem*>(QStringLiteral("checkTick"));
+        QVERIFY(tick != nullptr);
+        QVERIFY(tick->isVisible());
 
         // Focus shows the tint background.
         root->setProperty("checked", false);
+        QVERIFY(!tick->isVisible());
         auto* check = asItem(root);
         QVERIFY(check != nullptr);
         check->forceActiveFocus();
@@ -492,37 +499,30 @@ void TestQmlComponents::checkBox() {
 
 
 // The history forms give the entry fields 21 px: the text line must fit in
-// the field without the style's vertical padding eating it, whatever the
-// interface font size of the desktop (checked from 9 to 12 points).
+// the field without the style's vertical padding eating it.
 void TestQmlComponents::fieldTextFitsTheBox() {
-    const QFont original = QGuiApplication::font();
-    for (int points : {9, 10, 11, 12}) {
-        QFont font = original;
-        font.setPointSize(points);
-        QGuiApplication::setFont(font);
-        for (const char* file : {"GxTextInput.qml", "GxNumberInput.qml", "GxDateInput.qml"}) {
-            QQmlApplicationEngine engine;
-            Harness harness;
-            QVERIFY(openHarness(&engine, file, QStringLiteral("claro"), harness));
-            QObject* root = harness.component;
-            root->setProperty("labelText", QStringLiteral("Label:"));
-            root->setProperty("width", 200);
-            root->setProperty("height", 21);
-            harness.window->show();
-            QVERIFY(QTest::qWaitForWindowExposed(harness.window));
-            auto* field = root->findChild<QQuickItem*>(QStringLiteral("field"));
-            QVERIFY(field != nullptr);
-            QTRY_COMPARE(field->height(), 21.0);
-            const qreal available = field->height() - field->property("topPadding").toReal()
-                                    - field->property("bottomPadding").toReal();
-            const int line = QFontMetrics(field->property("font").value<QFont>()).height();
-            QVERIFY2(available >= line,
-                     qPrintable(QStringLiteral("%1 at %2 pt: %3 px for a %4 px line")
-                                    .arg(QLatin1String(file)).arg(points).arg(available).arg(line)));
-            delete harness.window;
-        }
+    for (const char* file : {"GxTextInput.qml", "GxNumberInput.qml", "GxDateInput.qml"}) {
+        QQmlApplicationEngine engine;
+        Harness harness;
+        QVERIFY(openHarness(&engine, file, QStringLiteral("claro"), harness));
+        QObject* root = harness.component;
+        root->setProperty("labelText", QStringLiteral("Label:"));
+        root->setProperty("width", 200);
+        root->setProperty("height", 21);
+        harness.window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+        auto* field = root->findChild<QQuickItem*>(QStringLiteral("field"));
+        QVERIFY(field != nullptr);
+        QTRY_COMPARE(field->height(), 21.0);
+        const qreal available = field->height() - field->property("topPadding").toReal()
+                                - field->property("bottomPadding").toReal();
+        const int line = QFontMetrics(field->property("font").value<QFont>()).height();
+        QVERIFY2(available >= line, qPrintable(QStringLiteral("%1: %2 px for a %3 px line")
+                                                   .arg(QLatin1String(file))
+                                                   .arg(available)
+                                                   .arg(line)));
+        delete harness.window;
     }
-    QGuiApplication::setFont(original);
 }
 
 

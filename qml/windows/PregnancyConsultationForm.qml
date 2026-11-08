@@ -45,7 +45,7 @@ Item {
             "fieldY": 74,
             "fieldH": 21,
             "fixed": true,
-            "values": [qsTr("4 mg a day"), qsTr("Vitamin B9"), qsTr("Until the fifth month of pregnancy")]
+            "values": [qsTr("4 mg a day"), qsTr("Vitamin B9"), qsTr("Until 5th month")]
         },
         {
             "caption": qsTr("Deworming"),
@@ -55,7 +55,7 @@ Item {
             "fieldY": 94,
             "fieldH": 21,
             "fixed": true,
-            "values": [qsTr("2nd or 3rd trimester"), qsTr("Mebendazole"), qsTr("Single dose")]
+            "values": [qsTr("2nd or 3rd trim."), qsTr("Mebendazole"), qsTr("Single dose")]
         },
         {
             "caption": qsTr("Vitamin C"),
@@ -92,17 +92,17 @@ Item {
     readonly property var treatmentColumns: [
         {
             "x": 126,
-            "w": 100,
+            "w": 106,
             "caption": qsTr("Dose:")
         },
         {
-            "x": 225,
-            "w": 109,
+            "x": 231,
+            "w": 101,
             "caption": qsTr("Medication:")
         },
         {
-            "x": 333,
-            "w": 100,
+            "x": 331,
+            "w": 106,
             "caption": qsTr("Next dose:")
         }
     ]
@@ -258,7 +258,7 @@ Item {
         GxField {
             x: 6
             y: 22
-            width: 105
+            width: 110
             height: 21
             controller: root.controller
             field: "weight"
@@ -268,9 +268,9 @@ Item {
             decimalDigits: 1
         }
         GxField {
-            x: 121
+            x: 120
             y: 22
-            width: 81
+            width: 88
             height: 21
             controller: root.controller
             field: "temperature"
@@ -282,7 +282,7 @@ Item {
         GxField {
             x: 6
             y: 47
-            width: 110
+            width: 112
             height: 21
             controller: root.controller
             field: "height"
@@ -336,7 +336,7 @@ Item {
             objectName: "uterineHeightGroup"
             x: 210
             y: 11
-            width: 122
+            width: 126
             height: 66
             nested: true
             title: qsTr("Uterine height")
@@ -344,7 +344,7 @@ Item {
             GxField {
                 x: 6
                 y: 17
-                width: 110
+                width: 114
                 height: 21
                 controller: root.controller
                 field: "uterineHeightWeeks"
@@ -355,7 +355,7 @@ Item {
             GxField {
                 x: 6
                 y: 40
-                width: 110
+                width: 114
                 height: 21
                 controller: root.controller
                 field: "uterineHeightCm"
