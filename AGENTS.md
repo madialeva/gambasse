@@ -130,11 +130,14 @@ Spanish. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
 source language. The Portuguese catalog is European Portuguese (the norm used in
 Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
 drop-down options in capitals as in the other languages; never carry over the
-Brazilian, Spanish or Galician forms of the original application. Qt's own
-strings the interface shows (the Linux file chooser) are translated by hand in
-`translations/qtstrings_<es|pt|en>.ts`, English included so the system-language
-Qt catalog never answers; add any new one the views come to show. Text uses LF;
-never line-ending-normalize binaries such as `.qm`, images, or databases.
+Brazilian, Spanish or Galician forms of the original application. A new text is
+translated in both catalogs in the same change: `test_translationcatalogs` fails
+on unfinished or empty entries, lost `%n` placeholders and a `.qm` that does not
+match its `.ts`. Qt's own strings the interface shows (the Linux file chooser)
+are translated by hand in `translations/qtstrings_<es|pt|en>.ts`, English
+included so the system-language Qt catalog never answers; add any new one the
+views come to show. Text uses LF; never line-ending-normalize binaries such as
+`.qm`, images, or databases.
 
 ## C++ includes
 

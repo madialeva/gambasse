@@ -1815,27 +1815,27 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="104"/>
         <source>Code:</source>
-        <translation type="unfinished">Código:</translation>
+        <translation>Código:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="141"/>
         <source>Incomplete data</source>
-        <translation type="unfinished">Datos incompletos</translation>
+        <translation>Datos incompletos</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="141"/>
         <source>Name is required.</source>
-        <translation type="unfinished">El nombre es obligatorio.</translation>
+        <translation>El nombre es obligatorio.</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="144"/>
         <source>Duplicate patient</source>
-        <translation type="unfinished">Paciente duplicado</translation>
+        <translation>Paciente duplicado</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="144"/>
         <source>A patient with the same name, birth date, sex, and age already exists.</source>
-        <translation type="unfinished">Ya existe un paciente con el mismo nombre, fecha de nacimiento, sexo y edad.</translation>
+        <translation>Ya existe un paciente con el mismo nombre, fecha de nacimiento, sexo y edad.</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="146"/>
@@ -1843,12 +1843,12 @@
         <location filename="../qml/windows/MainWindow.qml" line="825"/>
         <location filename="../qml/windows/MainWindow.qml" line="836"/>
         <source>Error</source>
-        <translation type="unfinished">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="146"/>
         <source>Could not save the patient.</source>
-        <translation type="unfinished">No se pudo guardar el paciente.</translation>
+        <translation>No se pudo guardar el paciente.</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="154"/>
@@ -1883,32 +1883,32 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="223"/>
         <source>Pediatric history</source>
-        <translation type="unfinished">Historia pediátrica</translation>
+        <translation>Historia pediátrica</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="229"/>
         <source>Pediatric consultation</source>
-        <translation type="unfinished">Consulta pediátrica</translation>
+        <translation>Consulta pediátrica</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="235"/>
         <source>Adult history</source>
-        <translation type="unfinished">Historia del adulto</translation>
+        <translation>Historia del adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="241"/>
         <source>Adult consultation</source>
-        <translation type="unfinished">Consulta adulto</translation>
+        <translation>Consulta adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="247"/>
         <source>Pregnancy history</source>
-        <translation type="unfinished">Historia del embarazo</translation>
+        <translation>Historia del embarazo</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="253"/>
         <source>Pregnancy consultation</source>
-        <translation type="unfinished">Consulta embarazada</translation>
+        <translation>Consulta embarazada</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="547"/>
@@ -1929,102 +1929,102 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="568"/>
         <source>Create pediatric history</source>
-        <translation type="unfinished">Crear historia pediátrica</translation>
+        <translation>Crear historia pediátrica</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="575"/>
         <source>Create adult history</source>
-        <translation type="unfinished">Crear historia adulto</translation>
+        <translation>Crear historia adulto</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="582"/>
         <source>Create pregnancy history</source>
-        <translation type="unfinished">Crear historia embarazada</translation>
+        <translation>Crear historia embarazada</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="460"/>
         <source>Add</source>
-        <translation type="unfinished">Añadir</translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="469"/>
         <source>Edit</source>
-        <translation type="unfinished">Modificar</translation>
+        <translation>Modificar</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="478"/>
         <source>Delete</source>
-        <translation type="unfinished">Borrar</translation>
+        <translation>Borrar</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="481"/>
         <source>Delete patient &quot;%1&quot; and all their histories and consultations?</source>
-        <translation type="unfinished">¿Borrar al paciente &quot;%1&quot; y todas sus historias y consultas?</translation>
+        <translation>¿Borrar al paciente &quot;%1&quot; y todas sus historias y consultas?</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="483"/>
         <source>Delete patient</source>
-        <translation type="unfinished">Borrar paciente</translation>
+        <translation>Borrar paciente</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="489"/>
         <source>Save</source>
-        <translation type="unfinished">Grabar</translation>
+        <translation>Grabar</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="495"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="610"/>
         <source>Basic data</source>
-        <translation type="unfinished">Datos básicos</translation>
+        <translation>Datos básicos</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="632"/>
         <source>Name:</source>
-        <translation type="unfinished">Nombre:</translation>
+        <translation>Nombre:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="667"/>
         <source>Sex:</source>
-        <translation type="unfinished">Sexo:</translation>
+        <translation>Sexo:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="659"/>
         <source>Birth date:</source>
-        <translation type="unfinished">Fecha nac.:</translation>
+        <translation>Fecha nac.:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="650"/>
         <source>Age:</source>
-        <translation type="unfinished">Edad:</translation>
+        <translation>Edad:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="679"/>
         <source>Address</source>
-        <translation type="unfinished">Dirección</translation>
+        <translation>Dirección</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="693"/>
         <source>Address:</source>
-        <translation type="unfinished">Dirección:</translation>
+        <translation>Dirección:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="708"/>
         <source>Cohabitants:</source>
-        <translation type="unfinished">Cohabitantes:</translation>
+        <translation>Cohabitantes:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="717"/>
         <source>Contact:</source>
-        <translation type="unfinished">Contacto:</translation>
+        <translation>Contacto:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="728"/>
         <source>Siblings:</source>
-        <translation type="unfinished">Nº hermanos:</translation>
+        <translation>Nº hermanos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="804"/>
@@ -2049,7 +2049,7 @@
     <message>
         <location filename="../qml/windows/MainWindow.qml" line="836"/>
         <source>Could not delete the patient.</source>
-        <translation type="unfinished">No se pudo borrar el paciente.</translation>
+        <translation>No se pudo borrar el paciente.</translation>
     </message>
 </context>
 <context>
@@ -3557,7 +3557,8 @@
         <location filename="../src/data/common/Database.cpp" line="40"/>
         <source>Could not create the database directory:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo crear el directorio de la base de datos:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/Database.cpp" line="55"/>
@@ -3567,82 +3568,90 @@
 %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="78"/>
+        <location filename="../src/main.cpp" line="121"/>
         <source>Database error</source>
         <translation>Error de base de datos</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="174"/>
         <source>Could not read schema patch %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo leer el parche del esquema %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="214"/>
         <source>Could not create the schema history table:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo crear la tabla del histórico del esquema:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="227"/>
         <source>Could not read the schema history:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo leer el histórico del esquema:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="235"/>
         <source>Invalid program version in the schema history: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versión de programa no válida en el histórico del esquema: %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="259"/>
         <source>Could not record schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo registrar el parche del esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="269"/>
         <source>Could not start a transaction for %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo iniciar una transacción para %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="281"/>
         <source>Failed to apply schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo aplicar el parche del esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="295"/>
         <source>Could not commit schema patch %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo confirmar el parche del esquema %1:
+%2</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="306"/>
         <source>Could not start the baseline transaction:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo iniciar la transacción de la línea base:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="316"/>
         <source>Could not record the baseline patch:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo registrar el parche de la línea base:
+%1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="338"/>
         <source>No schema patches found in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encontraron parches del esquema en %1</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="355"/>
         <source>Schema patch %1 changed after it was applied (checksum mismatch). Applied patches must not be edited; add a new patch instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>El parche del esquema %1 cambió después de aplicarse (la suma de comprobación no coincide). Los parches aplicados no se deben editar; añade uno nuevo.</translation>
     </message>
     <message>
         <location filename="../src/data/common/SchemaMigrator.cpp" line="401"/>
         <source>Schema patch %1 is out of order: version %2 is older than the already applied %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>El parche del esquema %1 está fuera de orden: la versión %2 es anterior a la %3, ya aplicada.</translation>
     </message>
 </context>
 <context>
@@ -3833,41 +3842,41 @@
         <location filename="../qml/TitleBar.qml" line="169"/>
         <location filename="../qml/TitleBar.qml" line="199"/>
         <source>Spanish</source>
-        <translation type="unfinished">Español</translation>
+        <translation>Español</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="171"/>
         <location filename="../qml/TitleBar.qml" line="207"/>
         <source>Portuguese</source>
-        <translation type="unfinished">Portugués</translation>
+        <translation>Portugués</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="172"/>
         <location filename="../qml/TitleBar.qml" line="215"/>
         <source>English</source>
-        <translation type="unfinished">Inglés</translation>
+        <translation>Inglés</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="191"/>
         <source>Language</source>
-        <translation type="unfinished">Idioma</translation>
+        <translation>Idioma</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="230"/>
         <location filename="../qml/TitleBar.qml" line="246"/>
         <source>Dark</source>
-        <translation type="unfinished">Oscuro</translation>
+        <translation>Oscuro</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="230"/>
         <location filename="../qml/TitleBar.qml" line="239"/>
         <source>Light</source>
-        <translation type="unfinished">Claro</translation>
+        <translation>Claro</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="231"/>
         <source>Theme</source>
-        <translation type="unfinished">Tema</translation>
+        <translation>Tema</translation>
     </message>
     <message>
         <location filename="../qml/TitleBar.qml" line="257"/>

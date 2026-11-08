@@ -272,6 +272,10 @@ lrelease translations/gambasse_es.ts -qm translations/gambasse_es.qm
 lrelease translations/gambasse_pt.ts -qm translations/gambasse_pt.qm
 ```
 
+A new text is translated in the same change that adds it. The
+`translationcatalogs` test fails when a catalog has unfinished or empty entries
+or loses a `%n` placeholder, and when a `.qm` does not match its `.ts`.
+
 Qt's own strings that the interface shows, those of the Linux photo file
 chooser (side bar places, buttons, filter), follow the interface language
 too. They live in `translations/qtstrings_<es|pt|en>.ts`, written by hand

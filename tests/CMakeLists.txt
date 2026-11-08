@@ -43,6 +43,11 @@ gambasse_add_test(adultconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QR
 gambasse_add_test(pregnancyconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(pediatricconsultationservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 
+# Translation catalogs: complete, with their placeholders, and compiled.
+gambasse_add_test(translationcatalogs LIBS Qt6::Core SOURCES ${I18N_QRC})
+target_compile_definitions(test_translationcatalogs PRIVATE
+    TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/translations")
+
 # Controllers and view helpers.
 gambasse_add_test(columnfilterproxy LIBS ${QML_LIBS})
 gambasse_add_test(patientcontroller LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${IMAGES_QRC} ${I18N_QRC})
