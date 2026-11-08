@@ -5,10 +5,10 @@ import Gambasse
 // Pregnancy history form (Widgets PregnancyHistoryWindow): personal data,
 // pregnancy and medical history, housing, the physical examination with its
 // three inner groups and the two treatment tabs. Every control is transcribed
-// from the .cpp layout (absolute coordinates, group-relative) and bound by
-// name to PregnancyHistoryController; the three fixed VB.NET rows (iron, folic
-// acid and deworming) are shown read-only because the form never persisted
-// them.
+// from the .cpp layout (absolute coordinates, group-relative), except for the
+// rearranged examination and treatments, and bound by name to
+// PregnancyHistoryController; the three fixed VB.NET rows (iron, folic acid and
+// deworming) are shown read-only because the form never persisted them.
 Item {
     id: root
 
@@ -155,7 +155,7 @@ Item {
             objectName: "openingDateField"
             x: 15
             y: 47
-            width: 196
+            width: 240
             height: 21
             controller: root.controller
             field: "openingDate"
@@ -191,7 +191,7 @@ Item {
             controller: root.controller
             field: "obstetricLastMenstruation"
             type: "date"
-            labelText: qsTr("Last menstruation date:")
+            labelText: qsTr("Last menstruation:")
         }
         GxField {
             x: 298
@@ -212,7 +212,7 @@ Item {
             controller: root.controller
             field: "obstetricExpectedDelivery"
             type: "date"
-            labelText: qsTr("Expected delivery date:")
+            labelText: qsTr("Expected delivery:")
         }
         GxField {
             x: 252
@@ -479,19 +479,21 @@ Item {
         }
     }
 
-    // --- Physical examination (492, 95, 514, 126). ---
+    // --- Physical examination (492, 95, 514, 151): one row taller than in the
+    // original screen, so the temperature goes below the height and the three
+    // inner groups have the width their texts need. ---
     GxGroup {
         objectName: "examGroup"
         x: 492
         y: 95
         width: 514
-        height: 126
+        height: 151
         title: qsTr("Physical examination")
 
         GxField {
             x: 6
             y: 22
-            width: 105
+            width: 150
             height: 21
             controller: root.controller
             field: "physicalExamWeight"
@@ -501,9 +503,20 @@ Item {
             decimalDigits: 1
         }
         GxField {
-            x: 121
-            y: 22
-            width: 81
+            x: 6
+            y: 47
+            width: 150
+            height: 21
+            controller: root.controller
+            field: "physicalExamHeight"
+            type: "number"
+            labelText: qsTr("Height (cm):")
+            integerDigits: 3
+        }
+        GxField {
+            x: 6
+            y: 72
+            width: 150
             height: 21
             controller: root.controller
             field: "physicalExamTemperature"
@@ -514,19 +527,8 @@ Item {
         }
         GxField {
             x: 6
-            y: 47
-            width: 110
-            height: 21
-            controller: root.controller
-            field: "physicalExamHeight"
-            type: "number"
-            labelText: qsTr("Height (cm):")
-            integerDigits: 3
-        }
-        GxField {
-            x: 6
-            y: 74
-            width: 109
+            y: 97
+            width: 150
             height: 21
             controller: root.controller
             field: "physicalExamAbdominalPerimeter"
@@ -536,7 +538,7 @@ Item {
         }
         GxField {
             x: 6
-            y: 99
+            y: 124
             width: 150
             height: 21
             controller: root.controller
@@ -546,7 +548,7 @@ Item {
         }
         GxField {
             x: 167
-            y: 99
+            y: 124
             width: 166
             height: 21
             controller: root.controller
@@ -556,7 +558,7 @@ Item {
         }
         GxField {
             x: 342
-            y: 99
+            y: 124
             width: 166
             height: 21
             controller: root.controller
@@ -569,16 +571,16 @@ Item {
         GxGroup {
             objectName: "uterineGroup"
             nested: true
-            x: 208
+            x: 168
             y: 11
-            width: 122
+            width: 128
             height: 66
             title: qsTr("Uterine height")
 
             GxField {
                 x: 6
                 y: 17
-                width: 110
+                width: 116
                 height: 21
                 controller: root.controller
                 field: "physicalExamUterineHeightWeeks"
@@ -589,7 +591,7 @@ Item {
             GxField {
                 x: 6
                 y: 40
-                width: 110
+                width: 116
                 height: 21
                 controller: root.controller
                 field: "physicalExamUterineHeightCm"
@@ -601,9 +603,9 @@ Item {
         GxGroup {
             objectName: "urineGroup"
             nested: true
-            x: 337
+            x: 302
             y: 11
-            width: 97
+            width: 116
             height: 66
             title: qsTr("Urine")
 
@@ -625,9 +627,9 @@ Item {
         GxGroup {
             objectName: "edemasGroup"
             nested: true
-            x: 440
+            x: 424
             y: 11
-            width: 68
+            width: 84
             height: 83
             title: qsTr("Edemas")
 
@@ -655,14 +657,16 @@ Item {
         }
     }
 
-    // --- Treatments (492, 223, 514, 295): a titleless box holding the two
-    // treatment tabs, like the QTabWidget of the Widgets window.
+    // --- Treatments (492, 248, 514, 270): a titleless box holding the two
+    // treatment tabs, like the QTabWidget of the Widgets window. It gives the
+    // examination its extra row from the free space under the tab rows, and
+    // its bottom edge stays where it was. ---
     GxGroup {
         objectName: "treatmentsGroup"
         x: 492
-        y: 223
+        y: 248
         width: 514
-        height: 295
+        height: 270
         title: ""
 
         GxTabView {
@@ -670,7 +674,7 @@ Item {
             x: 7
             y: 16
             width: 501
-            height: 271
+            height: 246
             titles: [qsTr("Previous treatment"), qsTr("Current treatments")]
 
             // Previous treatment: five rows of date, medication, dose.

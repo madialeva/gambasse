@@ -1,3 +1,4 @@
+#include <QFontMetricsF>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickItem>
@@ -43,8 +44,42 @@ QString badgeProblems(QQuickItem* item) {
     return problems;
 }
 
+// The texts under `top` that do not show whole: squeezed below their own width,
+// or running past a group that clips them.
+QStringList cutTexts(QQuickItem* item, QQuickItem* top) {
+    QStringList cut;
+    const QString text = item->inherits("QQuickText") && item->isVisible()
+                             ? item->property("text").toString()
+                             : QString();
+    if (!text.isEmpty()) {
+        const qreal wanted = item->property("implicitWidth").toReal();
+        bool whole = wanted <= item->width() + 0.5;
+        for (QQuickItem* up = item->parentItem(); whole && up != top->parentItem();
+             up = up->parentItem()) {
+            if (up->clip())
+                whole = item->mapToItem(up, QPointF(wanted, 0)).x() <= up->width() + 0.5;
+        }
+        if (!whole)
+            cut.append(text);
+    }
+    for (QQuickItem* kid : item->childItems())
+        cut += cutTexts(kid, top);
+    return cut;
+}
+
 QQuickItem* child(QObject* parent, const QString& name) {
     return parent->findChild<QQuickItem*>(name);
+}
+
+// Like child(), through the visual tree: it also reaches the rows of a Repeater.
+QQuickItem* visualChild(QQuickItem* item, const QString& name) {
+    if (item->objectName() == name)
+        return item;
+    for (QQuickItem* kid : item->childItems()) {
+        if (QQuickItem* found = visualChild(kid, name))
+            return found;
+    }
+    return nullptr;
 }
 
 QPoint centerOf(QQuickItem* item) {
@@ -129,6 +164,11 @@ private slots:
     void fixedRowsAreNotPersisted();
     void titleBadgesLeaveControlsClear_data();
     void titleBadgesLeaveControlsClear();
+    void pregnancyExamShowsWholeTexts_data();
+    void pregnancyExamShowsWholeTexts();
+    void pregnancyDatesShowWhole_data();
+    void pregnancyDatesShowWhole();
+    void pregnancyExamGainsARow();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -404,6 +444,100 @@ void TestQmlHistories::titleBadgesLeaveControlsClear() {
     QVERIFY(form != nullptr);
     const QString problems = badgeProblems(form);
     QVERIFY2(problems.isEmpty(), qPrintable(problems));
+}
+
+void TestQmlHistories::pregnancyExamShowsWholeTexts_data() {
+    QTest::addColumn<QString>("language");
+    QTest::newRow("en") << QStringLiteral("en");
+    QTest::newRow("es") << QStringLiteral("es");
+    QTest::newRow("pt") << QStringLiteral("pt");
+}
+
+void TestQmlHistories::pregnancyExamShowsWholeTexts() {
+    QFETCH(QString, language);
+    open(screenData().at(1));
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    auto* exam = inHistory(QStringLiteral("examGroup"));
+    QVERIFY(exam != nullptr);
+    const QStringList cut = cutTexts(exam, exam);
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(", "))));
+    m_settings->setLanguage(QStringLiteral("en"));
+}
+
+void TestQmlHistories::pregnancyDatesShowWhole_data() {
+    pregnancyExamShowsWholeTexts_data();
+}
+
+void TestQmlHistories::pregnancyDatesShowWhole() {
+    QFETCH(QString, language);
+    open(screenData().at(1));
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    auto* form = inHistory(QStringLiteral("historyForm"));
+    QVERIFY(form != nullptr);
+    for (const char* name :
+         {"openingDateField", "obstetricLastMenstruation", "obstetricExpectedDelivery"}) {
+        QQuickItem* date = visualChild(form, QLatin1String(name));
+        QVERIFY2(date != nullptr, name);
+        QQuickItem* input = child(date, QStringLiteral("field"));
+        QVERIFY2(input != nullptr, name);
+        // A whole date fits between the margins and the calendar button, and so
+        // does the hint of an empty field.
+        const QFontMetricsF metrics(input->property("font").value<QFont>());
+        const qreal room = input->width() - input->property("leftPadding").toReal()
+                           - input->property("rightPadding").toReal();
+        for (const QString& text : {QStringLiteral("28/08/2026"), QStringLiteral("dd/mm/yyyy")})
+            QVERIFY2(metrics.horizontalAdvance(text) <= room,
+                     qPrintable(QStringLiteral("%1: %2 in %3 px")
+                                    .arg(QLatin1String(name), text)
+                                    .arg(room)));
+        const QStringList cut = cutTexts(date, date);
+        QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(", "))));
+    }
+    m_settings->setLanguage(QStringLiteral("en"));
+}
+
+void TestQmlHistories::pregnancyExamGainsARow() {
+    open(screenData().at(1));
+    auto* form = inHistory(QStringLiteral("historyForm"));
+    QVERIFY(form != nullptr);
+    const auto field = [form](const char* name) {
+        return visualChild(form, QLatin1String(name));
+    };
+    QQuickItem* weight = field("physicalExamWeight");
+    QQuickItem* height = field("physicalExamHeight");
+    QQuickItem* temperature = field("physicalExamTemperature");
+    QQuickItem* abdominal = field("physicalExamAbdominalPerimeter");
+    QVERIFY(weight && height && temperature && abdominal);
+
+    // The temperature joins the first column, right below the height...
+    QCOMPARE(temperature->x(), height->x());
+    QVERIFY(height->y() < temperature->y() && temperature->y() < abdominal->y());
+    // ...and the Tab key walks that column in the order it is read.
+    const QList<QQuickItem*> column{weight, height, temperature, abdominal};
+    for (qsizetype i = 0; i + 1 < column.size(); ++i) {
+        QQuickItem* from = child(column.at(i), QStringLiteral("field"));
+        QQuickItem* to = child(column.at(i + 1), QStringLiteral("field"));
+        QVERIFY(from != nullptr && to != nullptr);
+        QCOMPARE(from->nextItemInFocusChain(), to);
+    }
+
+    // The treatments give up that row: they start below the examination, end
+    // above the buttons, and their tabs still hold every row.
+    QQuickItem* exam = field("examGroup");
+    QQuickItem* treatments = field("treatmentsGroup");
+    QQuickItem* tabs = field("treatmentTabs");
+    QQuickItem* saveButton = inHistory(QStringLiteral("saveHistoryButton"));
+    QVERIFY(exam && treatments && tabs && saveButton);
+    QVERIFY(exam->y() + exam->height() <= treatments->y());
+    const QPointF treatmentsEnd = treatments->mapToScene(QPointF(0, treatments->height()));
+    QVERIFY(treatmentsEnd.y() <= saveButton->mapToScene(QPointF(0, 0)).y());
+    for (const char* name : {"supplementDate5", "supplementMalariaProphylaxisD"}) {
+        QQuickItem* row = field(name);
+        QVERIFY2(row != nullptr, name);
+        QVERIFY2(row->mapToItem(tabs, QPointF(0, row->height())).y() <= tabs->height(), name);
+    }
 }
 
 } // namespace gambasse

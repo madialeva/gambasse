@@ -22,8 +22,7 @@ Item {
     // Padded area inside the card, for a layout: `anchors.fill: group.body`.
     readonly property alias body: bodyArea
 
-    // A control that overruns the group (the edema checks of the pregnancy
-    // form) is cut at its edge.
+    // A control that overruns the group is cut at its edge.
     clip: true
 
     // A titled card starts halfway down the 18 px title strip, so the title
