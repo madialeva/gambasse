@@ -220,9 +220,10 @@ Debian 12+, Fedora 35+ and RHEL 9+).
 `scripts/build-static.sh` builds a self-contained executable: a single file
 with Qt, its plugins (xcb, offscreen, SQLite, JPEG/SVG), the QML modules and
 GCC 16's C++ runtime linked statically. It can be copied to another Linux
-machine and run without installing Qt or anything from toolchain-cpp. It is
-built on demand on the developer's machine only: the CI, the tests and the
-Linux package do not use it.
+machine and run without installing Qt or anything from toolchain-cpp. It runs
+on any x86-64 CPU, including those older than `x86-64-v2`, such as an Intel
+Core 2 or an AMD Phenom. It is built on demand on the developer's machine only:
+the CI, the tests and the Linux package do not use it.
 
 ```sh
 ../toolchain-cpp/install.sh qt-static   # once: the static Qt kit
@@ -231,9 +232,10 @@ scripts/build-static.sh                 # build-static/dist/Gambasse
 
 The script builds with the `static` preset (`build-static`, Release, no
 tests), copies the executable without symbols to `build-static/dist/Gambasse`
-and fails if it carries a run path or needs a shared library of Qt or of the
-C++ runtime, or one from toolchain-cpp. Then it tries a copy in an empty
-directory and environment: `--check-db` must create and migrate the database.
+and fails if it carries a run path, needs a shared library of Qt or of the C++
+runtime, or one from toolchain-cpp, or declares that it needs more than the
+x86-64 baseline CPU. Then it tries a copy in an empty directory and
+environment: `--check-db` must create and migrate the database.
 `scripts/build-static.sh --check <executable>` runs only the check.
 
 Like the package, the executable keeps `config.ini`, `database.db` and
