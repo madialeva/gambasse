@@ -13,6 +13,23 @@ Item {
 
     property ConsultationController controller: null
 
+    // A letter of the patient's side over the body diagram. It changes with the
+    // language, so it is a text and not part of the picture; it is placed in the
+    // picture's 366x450 coordinates, centred like the picture, and follows it
+    // when the diagram changes size.
+    component SideLetter: Text {
+        required property real pictureX
+        required property real pictureY
+        readonly property real unit: Math.min(parent.width / 366, parent.height / 450)
+
+        objectName: "sideLetter"
+        x: parent.width / 2 + (pictureX - 183) * unit - implicitWidth / 2
+        y: parent.height / 2 + (pictureY - 225) * unit - implicitHeight / 2
+        // The picture's lines: its background is white in both themes.
+        color: "#333333"
+        font.pixelSize: Math.round(14.5 * unit)
+    }
+
     // Lesion rows: region and impairment, the first one with its captions
     // above (38 px), the others 20 px apart, like the designer.
     readonly property var lesionRows: [
@@ -144,10 +161,38 @@ Item {
             width: 240
             height: 295
             Image {
+                objectName: "bodyRegions"
                 anchors.fill: parent
-                source: "qrc:/img/body-regions.jpg"
+                source: "qrc:/img/body-regions.svg"
+                // Drawn at the size it shows: without this, Qt draws it at its
+                // own 366x450 and stretches that bitmap.
+                sourceSize: Qt.size(width, height)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
+            }
+            // Front view: the patient's right is on the left of the picture.
+            SideLetter {
+                pictureX: 56
+                pictureY: 20.6
+                //: First letter of the patient's right side, on the body diagram
+                text: qsTr("R")
+            }
+            SideLetter {
+                pictureX: 111
+                pictureY: 20.6
+                //: First letter of the patient's left side, on the body diagram
+                text: qsTr("L")
+            }
+            // Back view: the other way round.
+            SideLetter {
+                pictureX: 237
+                pictureY: 22
+                text: qsTr("L")
+            }
+            SideLetter {
+                pictureX: 292.4
+                pictureY: 22
+                text: qsTr("R")
             }
             Rectangle {
                 anchors.fill: parent
