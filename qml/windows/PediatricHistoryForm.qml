@@ -37,7 +37,7 @@ Item {
             objectName: "openingDateField"
             x: 15
             y: 58
-            width: 222
+            width: 240
             height: 21
             controller: root.controller
             field: "openingDate"
@@ -121,7 +121,7 @@ Item {
         GxLabel {
             x: 15
             y: 24
-            width: 138
+            width: 170
             height: 17
             text: qsTr("Chronic diseases")
         }
@@ -298,7 +298,7 @@ Item {
         GxField {
             x: 17
             y: 29
-            width: 100
+            width: 112
             height: 44
             controller: root.controller
             field: "supplementDate1"
@@ -307,7 +307,7 @@ Item {
             labelText: qsTr("Date:")
         }
         GxField {
-            x: 123
+            x: 135
             y: 30
             width: 221
             height: 44
@@ -322,14 +322,14 @@ Item {
         GxField {
             x: 17
             y: 78
-            width: 100
+            width: 112
             height: 22
             controller: root.controller
             field: "supplementDate2"
             type: "date"
         }
         GxField {
-            x: 123
+            x: 135
             y: 78
             width: 221
             height: 22
@@ -342,14 +342,14 @@ Item {
         GxField {
             x: 17
             y: 106
-            width: 100
+            width: 112
             height: 22
             controller: root.controller
             field: "supplementDate3"
             type: "date"
         }
         GxField {
-            x: 123
+            x: 135
             y: 106
             width: 221
             height: 22
@@ -362,14 +362,14 @@ Item {
         GxField {
             x: 17
             y: 134
-            width: 100
+            width: 112
             height: 22
             controller: root.controller
             field: "supplementDate4"
             type: "date"
         }
         GxField {
-            x: 123
+            x: 135
             y: 134
             width: 221
             height: 22

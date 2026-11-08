@@ -276,6 +276,10 @@ A new text is translated in the same change that adds it. The
 `translationcatalogs` test fails when a catalog has unfinished or empty entries
 or loses a `%n` placeholder, and when a `.qm` does not match its `.ts`.
 
+The windows use fixed coordinates, so a longer text may not fit. The
+`everyTextShowsWhole` test of each screen fails when a text cannot be read whole
+in one of the three languages.
+
 Qt's own strings that the interface shows, those of the Linux photo file
 chooser (side bar places, buttons, filter), follow the interface language
 too. They live in `translations/qtstrings_<es|pt|en>.ts`, written by hand

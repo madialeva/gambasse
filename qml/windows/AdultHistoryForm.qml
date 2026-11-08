@@ -37,7 +37,7 @@ Item {
             objectName: "openingDateField"
             x: 15
             y: 54
-            width: 222
+            width: 240
             height: 21
             controller: root.controller
             field: "openingDate"
@@ -68,7 +68,7 @@ Item {
         GxLabel {
             x: 15
             y: 25
-            width: 138
+            width: 170
             height: 17
             text: qsTr("Chronic diseases")
         }
@@ -154,14 +154,14 @@ Item {
             maxLength: 100
         }
         GxField {
-            x: 339
+            x: 331
             y: 165
-            width: 138
+            width: 146
             height: 21
             controller: root.controller
             field: "historyChildCount"
             type: "number"
-            labelText: qsTr("Number of children:")
+            labelText: qsTr("Children:")
             integerDigits: 2
         }
         GxField {
@@ -336,7 +336,7 @@ Item {
             height: 21
             controller: root.controller
             field: "physicalExamHeartRate"
-            labelText: qsTr("Heart rate:")
+            labelText: qsTr("HR:")
             maxLength: 100
         }
         GxField {
@@ -346,7 +346,7 @@ Item {
             height: 21
             controller: root.controller
             field: "physicalExamRespiratoryRate"
-            labelText: qsTr("Respiratory rate:")
+            labelText: qsTr("RR:")
             maxLength: 100
         }
         GxField {

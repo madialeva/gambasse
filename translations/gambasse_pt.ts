@@ -1289,9 +1289,14 @@
         <translation>Profissão:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="164"/>
-        <source>Number of children:</source>
-        <translation>Nº de filhos:</translation>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="339"/>
+        <source>HR:</source>
+        <translation>F.C.:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="349"/>
+        <source>RR:</source>
+        <translation>F.R.:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="174"/>
@@ -1344,6 +1349,11 @@
         <translation>Animais domésticos:</translation>
     </message>
     <message>
+        <location filename="../qml/windows/AdultHistoryForm.qml" line="164"/>
+        <source>Children:</source>
+        <translation>Nº de filhos:</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="262"/>
         <source>Vital signs</source>
         <translation>Sinais vitais</translation>
@@ -1377,16 +1387,6 @@
         <location filename="../qml/windows/AdultHistoryForm.qml" line="329"/>
         <source>Consciousness:</source>
         <translation>Consciência:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="339"/>
-        <source>Heart rate:</source>
-        <translation>F.C.:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/AdultHistoryForm.qml" line="349"/>
-        <source>Respiratory rate:</source>
-        <translation>F.R.:</translation>
     </message>
     <message>
         <location filename="../qml/windows/AdultHistoryForm.qml" line="359"/>
@@ -2994,19 +2994,14 @@
         <translation>Vitamina B9</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
-        <source>Until the fifth month of pregnancy</source>
-        <translation>Até ao 5.º mês</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="51"/>
         <source>Deworming</source>
         <translation>Desparasitação</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
-        <source>2nd or 3rd trimester</source>
-        <translation>2.º/3.º trim.</translation>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="48"/>
+        <source>Until 5th month</source>
+        <translation>Até ao 5.º mês</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
@@ -3017,6 +3012,11 @@
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
         <source>Single dose</source>
         <translation>Dose única</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyConsultationForm.qml" line="58"/>
+        <source>2nd or 3rd trim.</source>
+        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyConsultationForm.qml" line="61"/>
@@ -3212,19 +3212,9 @@
         <translation>Vitamina B9</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
-        <source>Until the fifth month of pregnancy</source>
-        <translation>Até ao 5.º mês</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="92"/>
         <source>Deworming</source>
         <translation>Desparasitação</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
-        <source>2nd or 3rd trimester</source>
-        <translation>2.º/3.º trim.</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
@@ -3280,16 +3270,6 @@
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="204"/>
         <source>Deceased siblings at birth:</source>
         <translation>Irmãos mortos/parto:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="225"/>
-        <source>Delivery count:</source>
-        <translation>Partos:</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="236"/>
-        <source>Abortion count:</source>
-        <translation>Abortos:</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="246"/>
@@ -3399,19 +3379,9 @@
         <translation>Mosquiteiro pais</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
-        <source>Parents net use</source>
-        <translation>Usa</translation>
-    </message>
-    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="460"/>
         <source>Children mosquito net</source>
         <translation>Mosquiteiro filhos</translation>
-    </message>
-    <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
-        <source>Children net use</source>
-        <translation>Usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="477"/>
@@ -3439,6 +3409,16 @@
         <translation>Altura (cm):</translation>
     </message>
     <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="89"/>
+        <source>Until 5th month</source>
+        <translation>Até ao 5.º mês</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="99"/>
+        <source>2nd or 3rd trim.</source>
+        <translation>2.º/3.º trim.</translation>
+    </message>
+    <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="194"/>
         <source>Last menstruation:</source>
         <translation>Última menstruação:</translation>
@@ -3447,6 +3427,22 @@
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="215"/>
         <source>Expected delivery:</source>
         <translation>Parto provável:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="225"/>
+        <source>Deliveries:</source>
+        <translation>Partos:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="236"/>
+        <source>Abortions:</source>
+        <translation>Abortos:</translation>
+    </message>
+    <message>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="439"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="467"/>
+        <source>In use</source>
+        <translation>Usa</translation>
     </message>
     <message>
         <location filename="../qml/windows/PregnancyHistoryForm.qml" line="536"/>
@@ -3529,29 +3525,29 @@
         <translation>Tratamentos dados agora</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="689"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="690"/>
         <source>MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON</source>
         <translation>PROFILAXIA DA MALÁRIA, DESPARASITAÇÃO, VITAMINA A, ÁCIDO FÓLICO, FERRO</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="697"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="698"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="702"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="774"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="703"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="775"/>
         <source>Medication:</source>
         <translation>Medicamento:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="707"/>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="769"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="708"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="770"/>
         <source>Dose:</source>
         <translation>Dose:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="779"/>
+        <location filename="../qml/windows/PregnancyHistoryForm.qml" line="780"/>
         <source>Next dose:</source>
         <translation>Próxima dose:</translation>
     </message>

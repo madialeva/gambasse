@@ -727,7 +727,7 @@ Item {
                             objectName: "siblingsInput"
                             labelText: qsTr("Siblings:")
                             integerDigits: 2
-                            Layout.preferredWidth: 116
+                            Layout.preferredWidth: 122
                             Layout.preferredHeight: Theme.fieldHeight
                             enabled: root.hasController() && root.controller.editing
                         }

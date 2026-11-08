@@ -1,4 +1,3 @@
-#include <QFontMetricsF>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickItem>
@@ -9,6 +8,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -42,29 +42,6 @@ QString badgeProblems(QQuickItem* item) {
     for (QQuickItem* kid : item->childItems())
         problems += badgeProblems(kid);
     return problems;
-}
-
-// The texts under `top` that do not show whole: squeezed below their own width,
-// or running past a group that clips them.
-QStringList cutTexts(QQuickItem* item, QQuickItem* top) {
-    QStringList cut;
-    const QString text = item->inherits("QQuickText") && item->isVisible()
-                             ? item->property("text").toString()
-                             : QString();
-    if (!text.isEmpty()) {
-        const qreal wanted = item->property("implicitWidth").toReal();
-        bool whole = wanted <= item->width() + 0.5;
-        for (QQuickItem* up = item->parentItem(); whole && up != top->parentItem();
-             up = up->parentItem()) {
-            if (up->clip())
-                whole = item->mapToItem(up, QPointF(wanted, 0)).x() <= up->width() + 0.5;
-        }
-        if (!whole)
-            cut.append(text);
-    }
-    for (QQuickItem* kid : item->childItems())
-        cut += cutTexts(kid, top);
-    return cut;
 }
 
 QQuickItem* child(QObject* parent, const QString& name) {
@@ -164,10 +141,8 @@ private slots:
     void fixedRowsAreNotPersisted();
     void titleBadgesLeaveControlsClear_data();
     void titleBadgesLeaveControlsClear();
-    void pregnancyExamShowsWholeTexts_data();
-    void pregnancyExamShowsWholeTexts();
-    void pregnancyDatesShowWhole_data();
-    void pregnancyDatesShowWhole();
+    void everyTextShowsWhole_data();
+    void everyTextShowsWhole();
     void pregnancyExamGainsARow();
 };
 
@@ -446,56 +421,27 @@ void TestQmlHistories::titleBadgesLeaveControlsClear() {
     QVERIFY2(problems.isEmpty(), qPrintable(problems));
 }
 
-void TestQmlHistories::pregnancyExamShowsWholeTexts_data() {
+void TestQmlHistories::everyTextShowsWhole_data() {
+    QTest::addColumn<int>("row");
     QTest::addColumn<QString>("language");
-    QTest::newRow("en") << QStringLiteral("en");
-    QTest::newRow("es") << QStringLiteral("es");
-    QTest::newRow("pt") << QStringLiteral("pt");
-}
-
-void TestQmlHistories::pregnancyExamShowsWholeTexts() {
-    QFETCH(QString, language);
-    open(screenData().at(1));
-    m_settings->setLanguage(language);
-    QTest::qWait(100);
-    auto* exam = inHistory(QStringLiteral("examGroup"));
-    QVERIFY(exam != nullptr);
-    const QStringList cut = cutTexts(exam, exam);
-    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(", "))));
-    m_settings->setLanguage(QStringLiteral("en"));
-}
-
-void TestQmlHistories::pregnancyDatesShowWhole_data() {
-    pregnancyExamShowsWholeTexts_data();
-}
-
-void TestQmlHistories::pregnancyDatesShowWhole() {
-    QFETCH(QString, language);
-    open(screenData().at(1));
-    m_settings->setLanguage(language);
-    QTest::qWait(100);
-    auto* form = inHistory(QStringLiteral("historyForm"));
-    QVERIFY(form != nullptr);
-    for (const char* name :
-         {"openingDateField", "obstetricLastMenstruation", "obstetricExpectedDelivery"}) {
-        QQuickItem* date = visualChild(form, QLatin1String(name));
-        QVERIFY2(date != nullptr, name);
-        QQuickItem* input = child(date, QStringLiteral("field"));
-        QVERIFY2(input != nullptr, name);
-        // A whole date fits between the margins and the calendar button, and so
-        // does the hint of an empty field.
-        const QFontMetricsF metrics(input->property("font").value<QFont>());
-        const qreal room = input->width() - input->property("leftPadding").toReal()
-                           - input->property("rightPadding").toReal();
-        for (const QString& text : {QStringLiteral("28/08/2026"), QStringLiteral("dd/mm/yyyy")})
-            QVERIFY2(metrics.horizontalAdvance(text) <= room,
-                     qPrintable(QStringLiteral("%1: %2 in %3 px")
-                                    .arg(QLatin1String(name), text)
-                                    .arg(room)));
-        const QStringList cut = cutTexts(date, date);
-        QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(", "))));
+    for (const QString& language :
+         {QStringLiteral("en"), QStringLiteral("es"), QStringLiteral("pt")}) {
+        QTest::addRow("pediatric-%s", qPrintable(language)) << 0 << language;
+        QTest::addRow("pregnancy-%s", qPrintable(language)) << 1 << language;
     }
+}
+
+void TestQmlHistories::everyTextShowsWhole() {
+    QFETCH(int, row);
+    QFETCH(QString, language);
+    open(screenData().at(row));
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY(window != nullptr);
+    const QStringList cut = cutTextsOnEveryTab(window->contentItem());
     m_settings->setLanguage(QStringLiteral("en"));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
 }
 
 void TestQmlHistories::pregnancyExamGainsARow() {

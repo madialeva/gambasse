@@ -9,6 +9,7 @@
 #include <functional>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -145,6 +146,8 @@ private slots:
 
     void opensWithANewConsultation_data();
     void opensWithANewConsultation();
+    void everyTextShowsWhole_data();
+    void everyTextShowsWhole();
     void formRendersEveryField_data();
     void formRendersEveryField();
     void fullCycle_data();
@@ -355,6 +358,31 @@ void TestQmlConsultations::opensWithANewConsultation() {
     QVERIFY(reason != nullptr);
     QTRY_VERIFY(consultationWindow()->activeFocusItem() != nullptr);
     QVERIFY(reason->isAncestorOf(consultationWindow()->activeFocusItem()));
+}
+
+void TestQmlConsultations::everyTextShowsWhole_data() {
+    QTest::addColumn<int>("row");
+    QTest::addColumn<QString>("language");
+    for (const QString& language :
+         {QStringLiteral("en"), QStringLiteral("es"), QStringLiteral("pt")}) {
+        for (int i = 0; i < screenData().size(); ++i) {
+            QTest::addRow("%s-%s", qPrintable(screenData().at(i).screenId), qPrintable(language))
+                << i << language;
+        }
+    }
+}
+
+void TestQmlConsultations::everyTextShowsWhole() {
+    QFETCH(int, row);
+    QFETCH(QString, language);
+    open(screenData().at(row));
+    auto* settings = m_engine->singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    settings->setLanguage(language);
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(consultationWindow()->contentItem());
+    settings->setLanguage(QStringLiteral("en"));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
 }
 
 void TestQmlConsultations::formRendersEveryField_data() {

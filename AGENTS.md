@@ -133,7 +133,9 @@ drop-down options in capitals as in the other languages; never carry over the
 Brazilian, Spanish or Galician forms of the original application. A new text is
 translated in both catalogs in the same change: `test_translationcatalogs` fails
 on unfinished or empty entries, lost `%n` placeholders and a `.qm` that does not
-match its `.ts`. Qt's own strings the interface shows (the Linux file chooser)
+match its `.ts`. The windows use fixed coordinates, so the `everyTextShowsWhole`
+test of each screen fails when a text cannot be read whole in one of the three
+languages. Qt's own strings the interface shows (the Linux file chooser)
 are translated by hand in `translations/qtstrings_<es|pt|en>.ts`, English
 included so the system-language Qt catalog never answers; add any new one the
 views come to show. Text uses LF; never line-ending-normalize binaries such as

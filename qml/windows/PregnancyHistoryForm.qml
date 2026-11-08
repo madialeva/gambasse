@@ -5,10 +5,10 @@ import Gambasse
 // Pregnancy history form (Widgets PregnancyHistoryWindow): personal data,
 // pregnancy and medical history, housing, the physical examination with its
 // three inner groups and the two treatment tabs. Every control is transcribed
-// from the .cpp layout (absolute coordinates, group-relative), except for the
-// rearranged examination and treatments, and bound by name to
-// PregnancyHistoryController; the three fixed VB.NET rows (iron, folic acid and
-// deworming) are shown read-only because the form never persisted them.
+// from the .cpp layout (absolute coordinates, group-relative), except where a
+// text needs more room, and bound by name to PregnancyHistoryController; the
+// three fixed VB.NET rows (iron, folic acid and deworming) are shown read-only
+// because the form never persisted them.
 Item {
     id: root
 
@@ -86,7 +86,7 @@ Item {
             "fieldY": 70,
             "fieldH": 21,
             "fixed": true,
-            "values": [qsTr("4 mg a day"), qsTr("Vitamin B9"), qsTr("Until the fifth month of pregnancy")]
+            "values": [qsTr("4 mg a day"), qsTr("Vitamin B9"), qsTr("Until 5th month")]
         },
         {
             "caption": qsTr("Deworming"),
@@ -96,7 +96,7 @@ Item {
             "fieldY": 90,
             "fieldH": 21,
             "fixed": true,
-            "values": [qsTr("2nd or 3rd trimester"), qsTr("Mebendazole"), qsTr("Single dose")]
+            "values": [qsTr("2nd or 3rd trim."), qsTr("Mebendazole"), qsTr("Single dose")]
         },
         {
             "caption": qsTr("Vitamin C"),
@@ -186,7 +186,7 @@ Item {
         GxField {
             x: 15
             y: 21
-            width: 261
+            width: 252
             height: 21
             controller: root.controller
             field: "obstetricLastMenstruation"
@@ -194,9 +194,9 @@ Item {
             labelText: qsTr("Last menstruation:")
         }
         GxField {
-            x: 298
+            x: 273
             y: 21
-            width: 178
+            width: 204
             height: 21
             controller: root.controller
             field: "obstetricDeceasedSiblingCount"
@@ -222,7 +222,7 @@ Item {
             controller: root.controller
             field: "obstetricDeliveryCount"
             type: "number"
-            labelText: qsTr("Delivery count:")
+            labelText: qsTr("Deliveries:")
             integerDigits: 2
         }
         GxField {
@@ -233,7 +233,7 @@ Item {
             controller: root.controller
             field: "obstetricAbortionCount"
             type: "number"
-            labelText: qsTr("Abortion count:")
+            labelText: qsTr("Abortions:")
             integerDigits: 3
         }
         GxField {
@@ -304,7 +304,7 @@ Item {
         GxLabel {
             x: 15
             y: 17
-            width: 138
+            width: 170
             height: 17
             text: qsTr("Chronic diseases")
         }
@@ -425,18 +425,18 @@ Item {
             text: qsTr("Latrine")
         }
         GxCheckField {
-            x: 316
+            x: 268
             y: 18
             controller: root.controller
             field: "housingMosquitoNetParents"
             text: qsTr("Parents mosquito net")
         }
         GxCheckField {
-            x: 449
+            x: 436
             y: 18
             controller: root.controller
             field: "housingMosquitoNetUseParents"
-            text: qsTr("Parents net use")
+            text: qsTr("In use")
         }
         GxCheckField {
             x: 17
@@ -453,22 +453,22 @@ Item {
             text: qsTr("Domestic hygiene")
         }
         GxCheckField {
-            x: 316
+            x: 268
             y: 38
             controller: root.controller
             field: "housingMosquitoNetChildren"
             text: qsTr("Children mosquito net")
         }
         GxCheckField {
-            x: 449
+            x: 436
             y: 38
             controller: root.controller
             field: "housingMosquitoNetUseChildren"
-            text: qsTr("Children net use")
+            text: qsTr("In use")
         }
         GxField {
             x: 17
-            y: 57
+            y: 59
             width: 284
             height: 23
             controller: root.controller
@@ -682,10 +682,11 @@ Item {
                 objectName: "previousTreatmentPage"
 
                 GxLabel {
-                    x: 11
+                    x: 5
                     y: 3
-                    width: 327
-                    height: 52
+                    width: 474
+                    height: 40
+                    multiline: true
                     text: qsTr("MALARIA PROPHYLAXIS, DEWORMING, VITAMIN A, FOLIC ACID, IRON")
                 }
                 // Column captions above the first row.
@@ -693,12 +694,12 @@ Item {
                     model: [
                         {
                             "x": 5,
-                            "w": 100,
+                            "w": 112,
                             "caption": qsTr("Date:")
                         },
                         {
-                            "x": 111,
-                            "w": 179,
+                            "x": 123,
+                            "w": 167,
                             "caption": qsTr("Medication:")
                         },
                         {
@@ -729,15 +730,15 @@ Item {
 
                         GxField {
                             x: 5
-                            width: 100
+                            width: 112
                             height: previousRow.modelData.h
                             controller: root.controller
                             field: previousRow.modelData.date
                             type: "date"
                         }
                         GxField {
-                            x: 111
-                            width: 179
+                            x: 123
+                            width: 167
                             height: previousRow.modelData.h
                             controller: root.controller
                             field: previousRow.modelData.medication
@@ -765,16 +766,16 @@ Item {
                     model: [
                         {
                             "x": 141,
-                            "w": 100,
+                            "w": 106,
                             "caption": qsTr("Dose:")
                         },
                         {
-                            "x": 240,
+                            "x": 246,
                             "w": 109,
                             "caption": qsTr("Medication:")
                         },
                         {
-                            "x": 348,
+                            "x": 354,
                             "w": 127,
                             "caption": qsTr("Next dose:")
                         }
@@ -809,7 +810,7 @@ Item {
                         GxField {
                             x: 141
                             y: currentRow.modelData.fieldY
-                            width: 100
+                            width: 106
                             height: currentRow.modelData.fieldH
                             controller: root.controller
                             field: currentRow.modelData.fixed ? "" : currentRow.modelData.fields[0]
@@ -818,7 +819,7 @@ Item {
                             maxLength: 50
                         }
                         GxField {
-                            x: 240
+                            x: 246
                             y: currentRow.modelData.fieldY
                             width: 109
                             height: currentRow.modelData.fieldH
@@ -829,7 +830,7 @@ Item {
                             maxLength: 50
                         }
                         GxField {
-                            x: 348
+                            x: 354
                             y: currentRow.modelData.fieldY
                             width: 127
                             height: currentRow.modelData.fieldH

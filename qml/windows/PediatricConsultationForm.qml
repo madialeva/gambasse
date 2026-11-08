@@ -83,7 +83,7 @@ Item {
         },
         {
             x: 716,
-            w: 86,
+            w: 98,
             caption: qsTr("Infusion ml/h:")
         }
     ]

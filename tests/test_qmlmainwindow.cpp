@@ -14,6 +14,7 @@
 #include <QtTest>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -167,6 +168,8 @@ private slots:
     void gridHasAFrame();
     void photoKeepsTheOriginalSize();
     void detailGroupsAreSections();
+    void everyTextShowsWhole_data();
+    void everyTextShowsWhole();
     void gridHeadersFitAndNumbersAreCentred();
     void filterRowSitsInsideTheGrid();
     void photoButtonsFitBesideTheActions();
@@ -806,6 +809,24 @@ void TestQmlMainWindow::detailGroupsAreSections() {
     m_settings->setTheme(QStringLiteral("claro"));
 }
 
+
+void TestQmlMainWindow::everyTextShowsWhole_data() {
+    QTest::addColumn<QString>("language");
+    QTest::newRow("en") << QStringLiteral("en");
+    QTest::newRow("es") << QStringLiteral("es");
+    QTest::newRow("pt") << QStringLiteral("pt");
+}
+
+void TestQmlMainWindow::everyTextShowsWhole() {
+    QFETCH(QString, language);
+    seedPatients();
+    openScreen();
+    m_settings->setLanguage(language);
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(m_window->contentItem());
+    m_settings->setLanguage(QStringLiteral("en"));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
 
 void TestQmlMainWindow::gridHeadersFitAndNumbersAreCentred() {
     seedPatients();
