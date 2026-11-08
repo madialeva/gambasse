@@ -335,6 +335,8 @@ void TestQmlConsultations::opensWithANewConsultation() {
     QVERIFY(!child(bar, QStringLiteral("minimizeButton"))->isVisible());
     QVERIFY(!child(bar, QStringLiteral("maximizeButton"))->isVisible());
     QVERIFY(child(bar, QStringLiteral("closeButton"))->isVisible());
+    // The Help menu belongs to the main window only.
+    QVERIFY(!child(bar, QStringLiteral("helpButton"))->isVisible());
 
     // The list of the patient, most recent first, and a new consultation.
     ConsultationController* c = consultation();

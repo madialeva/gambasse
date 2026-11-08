@@ -49,13 +49,15 @@ src/
 │   ├── common/              database and migration infrastructure
 │   └── model/               data model (Patient, PatientsModel)
 ├── logic/                   business logic, UI-independent
-└── ui/                      bridge to QML: interface settings, shared formats
+└── ui/                      bridge to QML: interface settings, product and build
+    │                        information, shared formats
     ├── controller/          one controller per screen (patients, histories)
     └── filter/              view helpers (proxy models)
 qml/
 ├── App.qml                  entry point: splash, then the main shell
 ├── Root.qml, Theme.qml, TitleBar.qml, ...   shell and theme singleton
 ├── components/              Gx* custom control library
+├── dialogs/                 dialogs of the shell and the screens
 └── windows/                 screens
 ```
 

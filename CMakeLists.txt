@@ -147,6 +147,8 @@ qt_add_qml_module(GambasseQml
     SOURCES
         src/ui/AppIcon.cpp
         src/ui/AppIcon.h
+        src/ui/AppInfo.cpp
+        src/ui/AppInfo.h
         src/ui/DateFormat.h
         src/ui/InterfaceSettings.cpp
         src/ui/InterfaceSettings.h
@@ -193,6 +195,7 @@ qt_add_qml_module(GambasseQml
         qml/components/GxCheckField.qml
         qml/components/GxTabView.qml
         qml/components/GxActionButton.qml
+        qml/dialogs/AboutDialog.qml
         qml/dialogs/PhotoDialog.qml
         qml/windows/HistoryWindow.qml
         qml/windows/ConsultationWindow.qml
@@ -208,6 +211,10 @@ qt_add_qml_module(GambasseQml
 # The generated type registration includes each registered header by its bare
 # file name; project code keeps including them from the `src` root.
 target_include_directories(GambasseQml PRIVATE src/ui src/ui/controller)
+# What the information dialog says about this build (AppInfo).
+target_compile_definitions(GambasseQml PRIVATE
+    GAMBASSE_CXX_STANDARD="${CMAKE_CXX_STANDARD}"
+    GAMBASSE_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}")
 target_link_libraries(GambasseQml PUBLIC
     GambasseCore
     Qt6::Gui

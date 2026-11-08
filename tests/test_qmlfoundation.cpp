@@ -1,3 +1,4 @@
+#include <QDesktopServices>
 #include <QGuiApplication>
 #include <QImage>
 #include <QQmlApplicationEngine>
@@ -11,6 +12,7 @@
 
 #include <Paths.h>
 #include <ui/AppIcon.h>
+#include <ui/AppInfo.h>
 #include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
@@ -48,6 +50,15 @@ InterfaceSettings* settingsOf(QQmlEngine& engine) {
                                                         QStringLiteral("InterfaceSettings"));
 }
 
+// Receives what the application opens externally, instead of a browser.
+class UrlCatcher : public QObject {
+    Q_OBJECT
+public:
+    QList<QUrl> opened;
+public slots:
+    void open(const QUrl& url) { opened.append(url); }
+};
+
 } // namespace
 
 // Verifies the QML foundation wiring: theme/language persistence through
@@ -65,6 +76,9 @@ private:
     // English source texts. Null when the module fails to load.
     QQuickWindow* openShell(const QString& theme);
     void cleanup();
+    // The information dialog of the shell, once it is on screen; null if it
+    // does not open.
+    QObject* openAboutDialog(QQuickWindow* window);
 
 private slots:
     void initTestCase();
@@ -76,6 +90,16 @@ private slots:
     void splashSequence();
     void appOpensShellAfterSplash();
     void applicationIconIsTheLogo();
+    void appInfoReportsTheBuild();
+    void aboutDialogContent();
+    void aboutDialogIsCentredAndFits();
+    void aboutDialogFollowsTheTheme();
+    void aboutDialogCloses();
+    void aboutDialogIsModal();
+    void aboutDialogOpensTheLink();
+    void helpMenuOpensTheDialog();
+    void titleBarMenusDropBelowTheBar();
+    void helpAndDialogFollowTheLanguage();
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
@@ -96,6 +120,14 @@ QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
 void TestQmlFoundation::cleanup() {
     delete m_engine;
     m_engine = nullptr;
+}
+
+QObject* TestQmlFoundation::openAboutDialog(QQuickWindow* window) {
+    auto* dialog = window->findChild<QObject*>(QStringLiteral("aboutDialog"));
+    if (dialog == nullptr || !QMetaObject::invokeMethod(dialog, "present"))
+        return nullptr;
+    const bool opened = QTest::qWaitFor([dialog] { return dialog->property("opened").toBool(); });
+    return opened ? dialog : nullptr;
 }
 
 void TestQmlFoundation::initTestCase() {
@@ -293,6 +325,305 @@ void TestQmlFoundation::applicationIconIsTheLogo() {
     }
 }
 
+void TestQmlFoundation::appInfoReportsTheBuild() {
+    QCoreApplication::setApplicationVersion(QStringLiteral("9.8.7"));
+    const AppInfo info;
+    QCOMPARE(info.version(), QStringLiteral("9.8.7"));
+    QCOMPARE(info.languageStandard(), QStringLiteral("C++26"));
+    // These suites and the module are built by the same compiler.
+    QCOMPARE(info.compilerVersion(),
+             QStringLiteral("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__));
+    QCOMPARE(info.qtVersion(), QString::fromLatin1(qVersion()));
+    QCOMPARE(info.repositoryUrl(), QStringLiteral("https://github.com/madialeva/gambasse"));
+}
+
+void TestQmlFoundation::aboutDialogContent() {
+    QCoreApplication::setApplicationVersion(QStringLiteral("9.8.7"));
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    const auto textOf = [dialog](const char* name) {
+        auto* item = dialog->findChild<QQuickItem*>(QLatin1String(name));
+        return item != nullptr ? item->property("text").toString() : QString();
+    };
+    const AppInfo info;
+    QCOMPARE(textOf("aboutName"), QStringLiteral("Gambasse"));
+    QVERIFY(textOf("aboutVersion").contains(QStringLiteral("9.8.7")));
+    QVERIFY(textOf("aboutLicense").contains(QStringLiteral("MIT")));
+    QVERIFY(textOf("aboutLanguage").contains(QStringLiteral("C++26")));
+    QVERIFY(textOf("aboutLanguage").contains(QStringLiteral("ISO")));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("GCC ") + info.compilerVersion()));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("GPL v3")));
+    QVERIFY(textOf("aboutCompiler").contains(QStringLiteral("Runtime Library Exception")));
+    QVERIFY(textOf("aboutQt").contains(QStringLiteral("Qt ") + info.qtVersion()));
+    QVERIFY(textOf("aboutQt").contains(QStringLiteral("LGPL v3")));
+    QVERIFY(textOf("aboutLink").contains(QStringLiteral("https://github.com/madialeva/gambasse")));
+
+    auto* logo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(logo != nullptr);
+    QCOMPARE(logo->property("source").toUrl(), QUrl(QStringLiteral("qrc:/img/logo.svg")));
+    QCOMPARE(logo->width(), qreal(96));
+    QCOMPARE(logo->height(), qreal(96));
+    QTRY_COMPARE(logo->property("status").toInt(), 1); // Image.Ready
+}
+
+void TestQmlFoundation::aboutDialogIsCentredAndFits() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QCOMPARE(window->size(), QSize(1008, 561));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    auto* content = dialog->property("contentItem").value<QQuickItem*>();
+    QVERIFY(content != nullptr);
+    const QRectF area = content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
+    QCOMPARE(qRound(area.center().x()), window->width() / 2);
+    QVERIFY(qAbs(area.center().y() - window->height() / 2.0) <= 1);
+    QVERIFY(area.top() >= 0 && area.bottom() <= window->height());
+
+    auto* logo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(logo != nullptr);
+    QCOMPARE(qRound(itemCenter(logo).x() - area.center().x()), 0);
+}
+
+void TestQmlFoundation::aboutDialogFollowsTheTheme() {
+    const QList<std::pair<QString, QColor>> themes = {
+        {QStringLiteral("claro"), QColor(0x1F, 0x6F, 0xB8)},
+        {QStringLiteral("oscuro"), QColor(0x58, 0xA6, 0xFF)}};
+    for (const auto& [mode, linkColor] : themes) {
+        QQuickWindow* window = openShell(mode);
+        QVERIFY(window != nullptr);
+        QVERIFY(QTest::qWaitForWindowExposed(window));
+        QObject* dialog = openAboutDialog(window);
+        QVERIFY(dialog != nullptr);
+
+        auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLink"));
+        QVERIFY(link != nullptr);
+        QCOMPARE(link->property("linkColor").value<QColor>(), linkColor);
+        auto* name = dialog->findChild<QQuickItem*>(QStringLiteral("aboutName"));
+        QVERIFY(name != nullptr);
+        QCOMPARE(name->property("color").value<QColor>(),
+                 mode == QStringLiteral("oscuro") ? QColor(Qt::white) : QColor(0x1A, 0x1A, 0x1A));
+    }
+}
+
+void TestQmlFoundation::aboutDialogCloses() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    auto* ok = dialog->findChild<QQuickItem*>(QStringLiteral("aboutOkButton"));
+    QVERIFY(ok != nullptr);
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(ok));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+
+    QCOMPARE(openAboutDialog(window), dialog);
+    QTest::keyClick(window, Qt::Key_Escape);
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::aboutDialogIsModal() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+
+    // A button with a visible effect, well outside the dialog.
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* maximizeButton = bar->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
+    QVERIFY(maximizeButton != nullptr);
+    const QPoint outside = itemCenter(maximizeButton);
+    const QWindow::Visibility before = window->visibility();
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, outside);
+    QTest::qWait(100);
+    QCOMPARE(window->visibility(), before);
+    QVERIFY(dialog->property("visible").toBool());
+
+    // The same click does act once the dialog is closed.
+    QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, outside);
+    QTRY_COMPARE(window->visibility(), QWindow::Maximized);
+}
+
+void TestQmlFoundation::aboutDialogOpensTheLink() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLink"));
+    QVERIFY(link != nullptr);
+
+    UrlCatcher catcher;
+    QDesktopServices::setUrlHandler(QStringLiteral("https"), &catcher, "open");
+    // The address is the only text of the item and it is centred.
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(link));
+    QDesktopServices::unsetUrlHandler(QStringLiteral("https"));
+
+    QCOMPARE(catcher.opened, QList<QUrl>{QUrl(QStringLiteral("https://github.com/madialeva/gambasse"))});
+    QVERIFY(dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::helpMenuOpensTheDialog() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    // From the bar: the hidden child windows hold bars of their own.
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* helpButton = bar->findChild<QQuickItem*>(QStringLiteral("helpButton"));
+    auto* languageButton = bar->findChild<QQuickItem*>(QStringLiteral("languageButton"));
+    auto* menu = bar->findChild<QObject*>(QStringLiteral("helpMenu"));
+    auto* dialog = window->findChild<QObject*>(QStringLiteral("aboutDialog"));
+    QVERIFY(helpButton != nullptr);
+    QVERIFY(languageButton != nullptr);
+    QVERIFY(menu != nullptr);
+    QVERIFY(dialog != nullptr);
+
+    // Right beside the language button, on its left (the row's 6 px apart).
+    QVERIFY(helpButton->isVisible());
+    QCOMPARE(helpButton->property("text").toString(), QStringLiteral("Help"));
+    QCOMPARE(helpButton->x() + helpButton->width() + 6, languageButton->x());
+
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(helpButton));
+    QTRY_VERIFY(menu->property("opened").toBool());
+    QCOMPARE(menu->property("count").toInt(), 1);
+
+    QQuickItem* entry = nullptr;
+    QMetaObject::invokeMethod(menu, "itemAt", Q_RETURN_ARG(QQuickItem*, entry), Q_ARG(int, 0));
+    QVERIFY(entry != nullptr);
+    QCOMPARE(entry->property("text").toString(), QStringLiteral("About"));
+
+    // The real click: the dialog must survive the focus change of the event
+    // that closes the menu.
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(entry));
+    QTRY_VERIFY(dialog->property("opened").toBool());
+    QVERIFY(!menu->property("visible").toBool());
+    QTest::qWait(100);
+    QVERIFY(dialog->property("visible").toBool());
+}
+
+void TestQmlFoundation::titleBarMenusDropBelowTheBar() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    const QList<std::pair<const char*, const char*>> menus = {{"helpButton", "helpMenu"},
+                                                              {"languageButton", "languageMenu"},
+                                                              {"themeButton", "themeMenu"}};
+    for (const auto& [buttonName, menuName] : menus) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        auto* menu = bar->findChild<QObject*>(QLatin1String(menuName));
+        QVERIFY2(button != nullptr, buttonName);
+        QVERIFY2(menu != nullptr, menuName);
+
+        QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(button));
+        QTRY_VERIFY2(menu->property("opened").toBool(), menuName);
+
+        auto* content = menu->property("contentItem").value<QQuickItem*>();
+        QVERIFY2(content != nullptr, menuName);
+        const QPointF menuOrigin = content->mapToScene(QPointF(0, 0));
+        const QPointF buttonOrigin = button->mapToScene(QPointF(0, 0));
+        const qreal padding = menu->property("leftPadding").toReal();
+        const qreal topPadding = menu->property("topPadding").toReal();
+        QCOMPARE(menuOrigin.x() - padding, buttonOrigin.x());
+        QVERIFY2(menuOrigin.y() - topPadding >= buttonOrigin.y() + button->height(), menuName);
+
+        QTest::keyClick(window, Qt::Key_Escape);
+        QTRY_VERIFY2(!menu->property("visible").toBool(), menuName);
+    }
+}
+
+void TestQmlFoundation::helpAndDialogFollowTheLanguage() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QCOMPARE(window->size(), QSize(1008, 561));
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* helpButton = bar->findChild<QQuickItem*>(QStringLiteral("helpButton"));
+    auto* menu = bar->findChild<QObject*>(QStringLiteral("helpMenu"));
+    QVERIFY(helpButton != nullptr);
+    QVERIFY(menu != nullptr);
+    QQuickItem* entry = nullptr;
+    QMetaObject::invokeMethod(menu, "itemAt", Q_RETURN_ARG(QQuickItem*, entry), Q_ARG(int, 0));
+    QVERIFY(entry != nullptr);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    QVERIFY(settings != nullptr);
+
+    struct Expected {
+        QString code, help, about, version, license, language, compiler, qt, ok;
+    };
+    const QList<Expected> languages = {
+        {QStringLiteral("es"), QStringLiteral("Ayuda"), QStringLiteral("Información"),
+         QStringLiteral("Versión"), QStringLiteral("Licencia MIT"), QStringLiteral("estándar ISO"),
+         QStringLiteral("biblioteca de ejecución de GCC"), QStringLiteral("licencia LGPL v3"),
+         QStringLiteral("Aceptar")},
+        {QStringLiteral("pt"), QStringLiteral("Ajuda"), QStringLiteral("Informação"),
+         QStringLiteral("Versão"), QStringLiteral("Licença MIT"), QStringLiteral("norma ISO"),
+         QStringLiteral("biblioteca de execução do GCC"), QStringLiteral("licença LGPL v3"),
+         QStringLiteral("OK")},
+        {QStringLiteral("en"), QStringLiteral("Help"), QStringLiteral("About"),
+         QStringLiteral("Version"), QStringLiteral("MIT License"), QStringLiteral("ISO standard"),
+         QStringLiteral("GCC Runtime Library Exception"), QStringLiteral("LGPL v3"),
+         QStringLiteral("OK")}};
+
+    for (const Expected& expected : languages) {
+        settings->setLanguage(expected.code);
+        QCOMPARE(helpButton->property("text").toString(), expected.help);
+        QCOMPARE(entry->property("text").toString(), expected.about);
+
+        QObject* dialog = openAboutDialog(window);
+        QVERIFY(dialog != nullptr);
+        const auto textOf = [dialog](const char* name) {
+            auto* item = dialog->findChild<QQuickItem*>(QLatin1String(name));
+            return item != nullptr ? item->property("text").toString() : QString();
+        };
+        QVERIFY2(textOf("aboutVersion").startsWith(expected.version), qPrintable(expected.code));
+        QCOMPARE(textOf("aboutLicense"), expected.license);
+        QVERIFY2(textOf("aboutLanguage").contains(expected.language), qPrintable(expected.code));
+        QVERIFY2(textOf("aboutCompiler").contains(expected.compiler), qPrintable(expected.code));
+        QVERIFY2(textOf("aboutQt").contains(expected.qt), qPrintable(expected.code));
+        QCOMPARE(textOf("aboutOkButton"), expected.ok);
+
+        // Whole inside the base window, and every text at its full height.
+        auto* content = dialog->property("contentItem").value<QQuickItem*>();
+        QVERIFY(content != nullptr);
+        const QRectF area =
+            content->mapRectToScene(QRectF(0, 0, content->width(), content->height()));
+        QVERIFY2(area.top() >= 0 && area.bottom() <= window->height(), qPrintable(expected.code));
+        for (const char* name : {"aboutName", "aboutVersion", "aboutLicense", "aboutLanguage",
+                                 "aboutCompiler", "aboutQt", "aboutLink"}) {
+            auto* text = dialog->findChild<QQuickItem*>(QLatin1String(name));
+            QVERIFY2(text != nullptr, name);
+            QVERIFY2(text->property("contentHeight").toReal() <= text->height(), name);
+            const QRectF box = text->mapRectToScene(QRectF(0, 0, text->width(), text->height()));
+            QVERIFY2(box.top() >= area.top() && box.bottom() <= area.bottom(), name);
+        }
+        auto* ok = dialog->findChild<QQuickItem*>(QStringLiteral("aboutOkButton"));
+        QVERIFY(ok != nullptr);
+        QVERIFY(ok->mapRectToScene(QRectF(0, 0, ok->width(), ok->height())).bottom() <= area.bottom());
+
+        QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+        QTRY_VERIFY(!dialog->property("visible").toBool());
+    }
+}
+
 void TestQmlFoundation::titleBarChrome() {
     // Same assertions in both themes (tooltips stay in English: no
     // translator is installed in tests, like a fresh English session).
@@ -306,7 +637,7 @@ void TestQmlFoundation::titleBarChrome() {
         // 40 px of buttons plus the 1 px bottom line: every button of the bar
         // fits exactly above that line.
         QCOMPARE(bar->property("height").toInt(), 41);
-        for (const char* name : {"languageButton", "themeButton", "minimizeButton",
+        for (const char* name : {"helpButton", "languageButton", "themeButton", "minimizeButton",
                                  "maximizeButton", "closeButton"}) {
             auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
             QVERIFY2(button != nullptr, name);
