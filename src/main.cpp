@@ -34,8 +34,8 @@ void attachConsoleIfNeeded() {
 }
 
 // Engine ready for the views: the Basic style as a blank canvas for Theme, and
-// the InterfaceSettings singleton created up front so the language catalog is
-// installed before the first view is built.
+// the InterfaceSettings singleton created up front so the font and the language
+// catalog are installed before the first view is built.
 void prepareEngine(QQmlApplicationEngine& engine) {
     QQuickStyle::setStyle(QStringLiteral("Basic"));
     engine.singletonInstance<gambasse::InterfaceSettings*>(QStringLiteral("Gambasse"),

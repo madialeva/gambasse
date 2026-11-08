@@ -3,6 +3,8 @@
 // Helper shared by the QML screen tests: which texts of a window cannot be read
 // whole in the current language.
 
+#include <QFont>
+#include <QGuiApplication>
 #include <QQuickItem>
 #include <QRectF>
 #include <QStringList>
@@ -79,6 +81,11 @@ inline QStringList cutTexts(QQuickItem* top) {
         if (isControl(item))
             controls.append(item);
         const QString text = item->property("text").toString();
+        // Measured with another font, the rest of the checks would prove nothing.
+        const QVariant font = item->property("font");
+        if (!text.isEmpty() && font.metaType() == QMetaType::fromType<QFont>()
+            && font.value<QFont>().family() != QGuiApplication::font().family())
+            report(QStringLiteral("%1 (in %2)").arg(text, font.value<QFont>().family()));
         if (!text.isEmpty() && isTextInput(item)) {
             const qreal room = item->width() - item->property("leftPadding").toReal()
                                - item->property("rightPadding").toReal();

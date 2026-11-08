@@ -227,6 +227,9 @@ void TestQmlConsultations::openScreen() {
         baseline.setLanguage(QStringLiteral("en"));
     }
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                    QStringLiteral("InterfaceSettings"));
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());

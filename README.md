@@ -44,7 +44,8 @@
   physical examination, treatments, care advice and a diagram of body lesions.
 - **Interface:** Spanish, European Portuguese and English, and light and dark
   themes, switched live and remembered between sessions. It fits small screens,
-  and a Help menu shows the version and the licences.
+  carries its own font, so it looks the same on any system, and a Help menu
+  shows the version and the licences.
 - **Local data:** no server or network is needed. The records live in a local
   SQLite database, created and updated automatically, legacy databases included,
   and the photos in a folder.
@@ -279,6 +280,8 @@ or loses a `%n` placeholder, and when a `.qm` does not match its `.ts`.
 The windows use fixed coordinates, so a longer text may not fit. The
 `everyTextShowsWhole` test of each screen fails when a text cannot be read whole
 in one of the three languages.
+Those measures hold on every system because the font is embedded in the
+application, and the tests run with no system font.
 
 Qt's own strings that the interface shows, those of the Linux photo file
 chooser (side bar places, buttons, filter), follow the interface language
@@ -298,3 +301,8 @@ link it statically: anyone who receives them must be able to link them again
 against another Qt, which the public sources of this project and its build
 scripts allow. A distributed self-contained executable must come with the text
 of the LGPL and Qt's notices.
+
+The interface font, Noto Sans (Regular and Bold, unmodified), is embedded in the
+executables under the SIL Open Font License 1.1, which the MIT License does not
+replace. Its notices and licence are in `resources/fonts/OFL.txt`, and the About
+dialog of the Help menu shows them.

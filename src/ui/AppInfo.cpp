@@ -1,6 +1,7 @@
 #include <ui/AppInfo.h>
 
 #include <QCoreApplication>
+#include <QFile>
 #include <QtVersion>
 
 namespace gambasse {
@@ -25,6 +26,13 @@ QString AppInfo::qtVersion() const {
 
 QString AppInfo::repositoryUrl() const {
     return QStringLiteral("https://github.com/madialeva/gambasse");
+}
+
+QString AppInfo::fontLicense() const {
+    QFile file(QStringLiteral(":/fonts/OFL.txt"));
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    return QString::fromUtf8(file.readAll());
 }
 
 } // namespace gambasse

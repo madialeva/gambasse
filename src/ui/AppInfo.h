@@ -19,6 +19,7 @@ class AppInfo : public QObject {
     Q_PROPERTY(QString compilerVersion READ compilerVersion CONSTANT)
     Q_PROPERTY(QString qtVersion READ qtVersion CONSTANT)
     Q_PROPERTY(QString repositoryUrl READ repositoryUrl CONSTANT)
+    Q_PROPERTY(QString fontLicense READ fontLicense CONSTANT)
 public:
     explicit AppInfo(QObject* parent = nullptr);
 
@@ -27,6 +28,9 @@ public:
     QString compilerVersion() const;
     QString qtVersion() const;
     QString repositoryUrl() const;
+    // The notices and the licence of the embedded font, which have to go with
+    // every copy of it: the Windows executable is a single file.
+    QString fontLicense() const;
 };
 
 } // namespace gambasse

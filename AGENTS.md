@@ -135,7 +135,11 @@ translated in both catalogs in the same change: `test_translationcatalogs` fails
 on unfinished or empty entries, lost `%n` placeholders and a `.qm` that does not
 match its `.ts`. The windows use fixed coordinates, so the `everyTextShowsWhole`
 test of each screen fails when a text cannot be read whole in one of the three
-languages. Qt's own strings the interface shows (the Linux file chooser)
+languages. Those measures hold everywhere because the font is embedded
+(`resources/fonts/`, Noto Sans at 13 px, without hinting, installed by
+`InterfaceSettings`), and `ctest` runs with no system font. A character that font
+lacks fails `everyTextHasItsGlyphs`: draw the symbol instead. A QML test creates
+the `InterfaceSettings` singleton before loading a view, like `main.cpp`. Qt's own strings the interface shows (the Linux file chooser)
 are translated by hand in `translations/qtstrings_<es|pt|en>.ts`, English
 included so the system-language Qt catalog never answers; add any new one the
 views come to show. Text uses LF; never line-ending-normalize binaries such as
@@ -203,6 +207,10 @@ repainted normally but the splash is never drawn; with Direct3D 11, Qt's
 default, the splash shows, but guita found that windows stop repainting after
 their first frame (Wine's presentation without a GPU, not the application):
 the splash and the rest are checked in separate runs, and on a real Windows.
+With a display, the first `wineboot` of a prefix can wait on the Mono and Gecko
+dialogs unless `WINEDLLOVERRIDES="mscoree,mshtml="` is set. Wine also offers the
+host's fonts to the application: to see only the embedded font, point
+`FONTCONFIG_FILE` to `tests/fixtures/no-system-fonts.conf`.
 
 ## Working preferences
 

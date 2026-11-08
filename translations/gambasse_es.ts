@@ -42,32 +42,38 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="51"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="94"/>
         <source>Version %1</source>
         <translation>Versión %1</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="55"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="98"/>
         <source>MIT License</source>
         <translation>Licencia MIT</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="63"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="106"/>
         <source>Developed in %1, an ISO standard.</source>
         <translation>Desarrollada en %1, un estándar ISO.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="67"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="110"/>
         <source>Compiled with GCC %1, under the GPL v3 with the GCC Runtime Library Exception.</source>
         <translation>Compilada con GCC %1, bajo la licencia GPL v3 con la excepción de la biblioteca de ejecución de GCC.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="71"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="114"/>
         <source>Built with Qt %1, under the LGPL v3.</source>
         <translation>Construida con Qt %1, bajo la licencia LGPL v3.</translation>
     </message>
     <message>
-        <location filename="../qml/dialogs/AboutDialog.qml" line="80"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="118"/>
+        <source>Uses the Noto Sans font, under the %1.</source>
+        <translation>Usa la fuente Noto Sans, bajo la licencia %1.</translation>
+    </message>
+    <message>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="67"/>
+        <location filename="../qml/dialogs/AboutDialog.qml" line="128"/>
         <source>OK</source>
         <translation>Aceptar</translation>
     </message>
@@ -1813,241 +1819,241 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="104"/>
+        <location filename="../qml/windows/MainWindow.qml" line="108"/>
         <source>Code:</source>
         <translation>Código:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="141"/>
+        <location filename="../qml/windows/MainWindow.qml" line="145"/>
         <source>Incomplete data</source>
         <translation>Datos incompletos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="141"/>
+        <location filename="../qml/windows/MainWindow.qml" line="145"/>
         <source>Name is required.</source>
         <translation>El nombre es obligatorio.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
+        <location filename="../qml/windows/MainWindow.qml" line="148"/>
         <source>Duplicate patient</source>
         <translation>Paciente duplicado</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="144"/>
+        <location filename="../qml/windows/MainWindow.qml" line="148"/>
         <source>A patient with the same name, birth date, sex, and age already exists.</source>
         <translation>Ya existe un paciente con el mismo nombre, fecha de nacimiento, sexo y edad.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="146"/>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
-        <location filename="../qml/windows/MainWindow.qml" line="825"/>
-        <location filename="../qml/windows/MainWindow.qml" line="836"/>
+        <location filename="../qml/windows/MainWindow.qml" line="150"/>
+        <location filename="../qml/windows/MainWindow.qml" line="834"/>
+        <location filename="../qml/windows/MainWindow.qml" line="853"/>
+        <location filename="../qml/windows/MainWindow.qml" line="864"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="146"/>
+        <location filename="../qml/windows/MainWindow.qml" line="150"/>
         <source>Could not save the patient.</source>
         <translation>No se pudo guardar el paciente.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Adult History</source>
         <translation>Historia de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Pediatric History</source>
         <translation>Historia pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="154"/>
+        <location filename="../qml/windows/MainWindow.qml" line="158"/>
         <source>Pregnancy History</source>
         <translation>Historia de embarazo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Adult Consultation</source>
         <translation>Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Pediatric Consultation</source>
         <translation>Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="164"/>
+        <location filename="../qml/windows/MainWindow.qml" line="168"/>
         <source>Pregnancy Consultation</source>
         <translation>Consulta de embarazo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="223"/>
+        <location filename="../qml/windows/MainWindow.qml" line="227"/>
         <source>Pediatric history</source>
         <translation>Historia pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="229"/>
+        <location filename="../qml/windows/MainWindow.qml" line="233"/>
         <source>Pediatric consultation</source>
         <translation>Consulta pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="235"/>
+        <location filename="../qml/windows/MainWindow.qml" line="239"/>
         <source>Adult history</source>
         <translation>Historia de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="241"/>
+        <location filename="../qml/windows/MainWindow.qml" line="245"/>
         <source>Adult consultation</source>
         <translation>Consulta de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="247"/>
+        <location filename="../qml/windows/MainWindow.qml" line="251"/>
         <source>Pregnancy history</source>
         <translation>Historia de embarazo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="253"/>
+        <location filename="../qml/windows/MainWindow.qml" line="257"/>
         <source>Pregnancy consultation</source>
         <translation>Consulta de embarazo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="547"/>
+        <location filename="../qml/windows/MainWindow.qml" line="575"/>
         <source>Edit photo</source>
         <translation>Editar foto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="555"/>
-        <location filename="../qml/windows/MainWindow.qml" line="560"/>
+        <location filename="../qml/windows/MainWindow.qml" line="583"/>
+        <location filename="../qml/windows/MainWindow.qml" line="588"/>
         <source>Delete photo</source>
         <translation>Borrar foto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="558"/>
+        <location filename="../qml/windows/MainWindow.qml" line="586"/>
         <source>Delete the photo of patient &quot;%1&quot;?</source>
         <translation>¿Borrar la foto del paciente &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="568"/>
+        <location filename="../qml/windows/MainWindow.qml" line="596"/>
         <source>Create pediatric history</source>
         <translation>Crear historia pediátrica</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="575"/>
+        <location filename="../qml/windows/MainWindow.qml" line="603"/>
         <source>Create adult history</source>
         <translation>Crear historia de adulto</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="582"/>
+        <location filename="../qml/windows/MainWindow.qml" line="610"/>
         <source>Create pregnancy history</source>
         <translation>Crear historia de embarazo</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="460"/>
+        <location filename="../qml/windows/MainWindow.qml" line="488"/>
         <source>Add</source>
         <translation>Añadir</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="469"/>
+        <location filename="../qml/windows/MainWindow.qml" line="497"/>
         <source>Edit</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="478"/>
+        <location filename="../qml/windows/MainWindow.qml" line="506"/>
         <source>Delete</source>
         <translation>Borrar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="481"/>
+        <location filename="../qml/windows/MainWindow.qml" line="509"/>
         <source>Delete patient &quot;%1&quot; and all their histories and consultations?</source>
         <translation>¿Borrar al paciente &quot;%1&quot; y todas sus historias y consultas?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="483"/>
+        <location filename="../qml/windows/MainWindow.qml" line="511"/>
         <source>Delete patient</source>
         <translation>Borrar paciente</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="489"/>
+        <location filename="../qml/windows/MainWindow.qml" line="517"/>
         <source>Save</source>
         <translation>Guardar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="495"/>
+        <location filename="../qml/windows/MainWindow.qml" line="523"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="610"/>
+        <location filename="../qml/windows/MainWindow.qml" line="638"/>
         <source>Basic data</source>
         <translation>Datos básicos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="632"/>
+        <location filename="../qml/windows/MainWindow.qml" line="660"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="667"/>
+        <location filename="../qml/windows/MainWindow.qml" line="695"/>
         <source>Sex:</source>
         <translation>Sexo:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="659"/>
+        <location filename="../qml/windows/MainWindow.qml" line="687"/>
         <source>Birth date:</source>
         <translation>Fecha nac.:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="650"/>
+        <location filename="../qml/windows/MainWindow.qml" line="678"/>
         <source>Age:</source>
         <translation>Edad:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="679"/>
+        <location filename="../qml/windows/MainWindow.qml" line="707"/>
         <source>Address</source>
         <translation>Dirección</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="693"/>
+        <location filename="../qml/windows/MainWindow.qml" line="721"/>
         <source>Address:</source>
         <translation>Dirección:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="708"/>
+        <location filename="../qml/windows/MainWindow.qml" line="736"/>
         <source>Cohabitants:</source>
         <translation>Cohabitantes:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="717"/>
+        <location filename="../qml/windows/MainWindow.qml" line="745"/>
         <source>Contact:</source>
         <translation>Contacto:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="728"/>
+        <location filename="../qml/windows/MainWindow.qml" line="756"/>
         <source>Siblings:</source>
         <translation>Nº hermanos:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="804"/>
+        <location filename="../qml/windows/MainWindow.qml" line="832"/>
         <source>Invalid image</source>
         <translation>Imagen no válida</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="804"/>
+        <location filename="../qml/windows/MainWindow.qml" line="832"/>
         <source>The selected file is not a readable image.</source>
         <translation>El fichero elegido no es una imagen legible.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="806"/>
+        <location filename="../qml/windows/MainWindow.qml" line="834"/>
         <source>Could not save the photo.</source>
         <translation>No se pudo guardar la foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="825"/>
+        <location filename="../qml/windows/MainWindow.qml" line="853"/>
         <source>Could not delete the photo.</source>
         <translation>No se pudo borrar la foto.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/MainWindow.qml" line="836"/>
+        <location filename="../qml/windows/MainWindow.qml" line="864"/>
         <source>Could not delete the patient.</source>
         <translation>No se pudo borrar el paciente.</translation>
     </message>
@@ -3830,72 +3836,72 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../qml/TitleBar.qml" line="149"/>
+        <location filename="../qml/TitleBar.qml" line="143"/>
         <source>Help</source>
         <translation>Ayuda</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="157"/>
+        <location filename="../qml/TitleBar.qml" line="151"/>
         <source>About</source>
         <translation>Información</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="169"/>
-        <location filename="../qml/TitleBar.qml" line="199"/>
+        <location filename="../qml/TitleBar.qml" line="163"/>
+        <location filename="../qml/TitleBar.qml" line="193"/>
         <source>Spanish</source>
         <translation>Español</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="171"/>
-        <location filename="../qml/TitleBar.qml" line="207"/>
+        <location filename="../qml/TitleBar.qml" line="165"/>
+        <location filename="../qml/TitleBar.qml" line="201"/>
         <source>Portuguese</source>
         <translation>Portugués</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="172"/>
-        <location filename="../qml/TitleBar.qml" line="215"/>
+        <location filename="../qml/TitleBar.qml" line="166"/>
+        <location filename="../qml/TitleBar.qml" line="209"/>
         <source>English</source>
         <translation>Inglés</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="191"/>
+        <location filename="../qml/TitleBar.qml" line="185"/>
         <source>Language</source>
         <translation>Idioma</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="230"/>
-        <location filename="../qml/TitleBar.qml" line="246"/>
+        <location filename="../qml/TitleBar.qml" line="224"/>
+        <location filename="../qml/TitleBar.qml" line="240"/>
         <source>Dark</source>
         <translation>Oscuro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="230"/>
-        <location filename="../qml/TitleBar.qml" line="239"/>
+        <location filename="../qml/TitleBar.qml" line="224"/>
+        <location filename="../qml/TitleBar.qml" line="233"/>
         <source>Light</source>
         <translation>Claro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="231"/>
+        <location filename="../qml/TitleBar.qml" line="225"/>
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="257"/>
+        <location filename="../qml/TitleBar.qml" line="251"/>
         <source>Minimize</source>
         <translation>Minimizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="264"/>
+        <location filename="../qml/TitleBar.qml" line="259"/>
         <source>Restore</source>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="264"/>
+        <location filename="../qml/TitleBar.qml" line="259"/>
         <source>Maximize</source>
         <translation>Maximizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="271"/>
+        <location filename="../qml/TitleBar.qml" line="295"/>
         <source>Close</source>
         <translation>Cerrar</translation>
     </message>

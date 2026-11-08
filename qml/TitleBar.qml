@@ -81,12 +81,6 @@ Item {
         }
     }
 
-    // Unstyled text: carries the application font the title is sized from.
-    Text {
-        id: appFont
-        visible: false
-    }
-
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -102,9 +96,9 @@ Item {
         }
         Text {
             text: root.title
-            // The Widgets title bar: application font, bold, one point larger.
+            // The application font, bold, one pixel larger.
             font.bold: true
-            font.pointSize: appFont.font.pointSize + 1
+            font.pixelSize: 14
             color: Theme.windowText
             anchors.verticalCenter: parent.verticalCenter
             // QLabel rounds the centring down to whole pixels.
@@ -259,15 +253,45 @@ Item {
             onClicked: Window.window.showMinimized()
         }
         WindowButton {
+            id: maximizeButton
             objectName: "maximizeButton"
-            glyph: Window.window.visibility === Window.Maximized ? "\u2750" : "\u25A1"
-            tip: Window.window.visibility === Window.Maximized ? qsTr("Restore") : qsTr("Maximize")
+            readonly property bool maximized: Window.window.visibility === Window.Maximized
+            tip: maximized ? qsTr("Restore") : qsTr("Maximize")
             visible: !root.closeOnly
             onClicked: root.toggleMaximize()
+            // Drawn: the interface font has no squares.
+            contentItem: Item {
+                Rectangle {
+                    visible: maximizeButton.maximized
+                    x: Math.floor(parent.width / 2) - 3
+                    y: Math.floor(parent.height / 2) - 6
+                    width: 9
+                    height: 2
+                    color: Theme.windowText
+                }
+                Rectangle {
+                    visible: maximizeButton.maximized
+                    x: Math.floor(parent.width / 2) + 4
+                    y: Math.floor(parent.height / 2) - 6
+                    width: 2
+                    height: 9
+                    color: Theme.windowText
+                }
+                Rectangle {
+                    x: Math.floor(parent.width / 2) - (maximizeButton.maximized ? 6 : 5)
+                    y: Math.floor(parent.height / 2) - (maximizeButton.maximized ? 3 : 5)
+                    width: maximizeButton.maximized ? 9 : 11
+                    height: width
+                    color: "transparent"
+                    border.color: Theme.windowText
+                    border.width: 2
+                }
+            }
         }
         WindowButton {
             objectName: "closeButton"
-            glyph: "\u2715"
+            glyph: "\u00D7"
+            font.pixelSize: 20
             tip: qsTr("Close")
             hoverColor: Theme.danger
             pressedColor: Theme.dangerPressed

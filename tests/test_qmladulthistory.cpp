@@ -183,6 +183,9 @@ void TestQmlAdultHistory::openScreen() {
         baseline.setLanguage(QStringLiteral("en"));
     }
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
@@ -191,8 +194,6 @@ void TestQmlAdultHistory::openScreen() {
     // are the engine's singleton, exactly as in the application.
     m_controller = m_window->property("patientController").value<PatientController*>();
     QVERIFY(m_controller != nullptr);
-    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
-                                                                 QStringLiteral("InterfaceSettings"));
     QVERIFY(m_settings != nullptr);
     m_screen = child(m_window, QStringLiteral("mainView"));
     QVERIFY(m_screen != nullptr);

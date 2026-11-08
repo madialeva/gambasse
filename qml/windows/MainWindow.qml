@@ -43,10 +43,14 @@ Item {
             required property string modelData
             visible: false
             font: headerFontSource.font
-            text: modelData + " \u25B2"
+            text: modelData
+            rightPadding: root.sortArrowRoom
             onImplicitWidthChanged: root.updateHeaderWidths()
         }
     }
+
+    // What a sorted column adds to its title: the gap and the arrow.
+    readonly property int sortArrowRoom: 12
 
     // Measured header widths (with the 6 px side padding of the header
     // cells). A notifying property, so the header row, the filter boxes and
@@ -322,13 +326,37 @@ Item {
                                                     leftPadding: 6
                                                     rightPadding: 6
                                                     font.bold: true
-                                                    text: modelData + (root.hasController() && root.controller.sortColumn === index ? (root.controller.sortOrder === 0 ? " \u25B2" : " \u25BC") : "")
+                                                    text: modelData
                                                     contentItem: Text {
+                                                        id: headerText
+                                                        readonly property bool sorted: root.hasController() && root.controller.sortColumn === headerButton.index
                                                         horizontalAlignment: root.columnAlignment(headerButton.index)
                                                         text: headerButton.text
                                                         color: Theme.windowText
                                                         font: headerButton.font
                                                         elide: Text.ElideRight
+                                                        rightPadding: sorted ? root.sortArrowRoom : 0
+                                                        // Drawn: the interface font has no triangles. A
+                                                        // square on its corner, cut in half by the clip.
+                                                        Item {
+                                                            objectName: "sortArrow"
+                                                            visible: headerText.sorted
+                                                            x: (headerText.horizontalAlignment === Text.AlignHCenter ? (headerText.width - headerText.rightPadding - headerText.contentWidth) / 2 : 0) + headerText.contentWidth + 3
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                            width: 9
+                                                            height: 5
+                                                            clip: true
+                                                            rotation: root.hasController() && root.controller.sortOrder === 0 ? 0 : 180
+                                                            Rectangle {
+                                                                x: 1.3
+                                                                y: 1.8
+                                                                width: 6.4
+                                                                height: 6.4
+                                                                rotation: 45
+                                                                antialiasing: true
+                                                                color: Theme.windowText
+                                                            }
+                                                        }
                                                     }
                                                     background: Rectangle {
                                                         color: Theme.windowBackground

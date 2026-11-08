@@ -221,6 +221,9 @@ void TestQmlMainWindow::openScreen() {
         baseline.setLanguage(QStringLiteral("en"));
     }
     m_engine = new QQmlApplicationEngine();
+    // Up front, like the application: it installs the interface font.
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
     m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
     QVERIFY(!m_engine->rootObjects().isEmpty());
     m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
@@ -229,8 +232,6 @@ void TestQmlMainWindow::openScreen() {
     // are the engine's singleton, exactly as in the application.
     m_controller = m_window->property("patientController").value<PatientController*>();
     QVERIFY(m_controller != nullptr);
-    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
-                                                                 QStringLiteral("InterfaceSettings"));
     QVERIFY(m_settings != nullptr);
     m_screen = child(m_window, QStringLiteral("mainView"));
     QVERIFY(m_screen != nullptr);
@@ -830,40 +831,50 @@ void TestQmlMainWindow::everyTextShowsWhole() {
 
 void TestQmlMainWindow::gridHeadersFitAndNumbersAreCentred() {
     seedPatients();
-    const QFont original = QGuiApplication::font();
-    for (int points : {9, 10, 11, 12}) {
-        QFont font = original;
-        font.setPointSize(points);
-        QGuiApplication::setFont(font);
-        openScreen();
-        // The sort arrow on the code column: its widest title.
-        m_controller->sortByColumn(0);
-        for (const QString& code : {QStringLiteral("es"), QStringLiteral("pt"), QStringLiteral("en")}) {
-            m_settings->setLanguage(code);
-            QTest::qWait(50);
-            const QList<QQuickItem*> headers = visualItems(m_screen, QStringLiteral("headerCell"));
-            QCOMPARE(headers.size(), 8);
-            for (QQuickItem* header : headers) {
-                auto* text = header->property("contentItem").value<QQuickItem*>();
-                QVERIFY(text != nullptr);
-                QVERIFY2(!text->property("truncated").toBool(),
-                         qPrintable(QStringLiteral("%1 pt, %2: \"%3\" is cut")
-                                        .arg(points)
-                                        .arg(code, text->property("text").toString())));
-            }
-        }
-        // Code and age centred, the other columns left-aligned.
-        const QList<QQuickItem*> cells = visualItems(m_screen, QStringLiteral("gridCell"));
-        QVERIFY(!cells.isEmpty());
-        for (QQuickItem* cell : cells) {
-            const int column = cell->property("column").toInt();
-            const QList<QQuickItem*> texts = cell->childItems();
-            QQuickItem* text = texts.last();
-            const int expected = (column == 0 || column == 3) ? Qt::AlignHCenter : Qt::AlignLeft;
-            QCOMPARE(text->property("horizontalAlignment").toInt(), expected);
+    openScreen();
+    // The sort arrow on the code column: its widest title.
+    m_controller->sortByColumn(0);
+    for (const QString& code : {QStringLiteral("es"), QStringLiteral("pt"), QStringLiteral("en")}) {
+        m_settings->setLanguage(code);
+        QTest::qWait(50);
+        const QList<QQuickItem*> headers = visualItems(m_screen, QStringLiteral("headerCell"));
+        QCOMPARE(headers.size(), 8);
+        for (QQuickItem* header : headers) {
+            auto* text = header->property("contentItem").value<QQuickItem*>();
+            QVERIFY(text != nullptr);
+            QVERIFY2(!text->property("truncated").toBool(),
+                     qPrintable(QStringLiteral("%1: \"%2\" is cut")
+                                    .arg(code, text->property("text").toString())));
         }
     }
-    QGuiApplication::setFont(original);
+    // The arrow is drawn, on the sorted column only, and points by the order.
+    m_settings->setLanguage(QStringLiteral("es"));
+    QTest::qWait(50);
+    const QList<QQuickItem*> arrows = visualItems(m_screen, QStringLiteral("sortArrow"));
+    QCOMPARE(arrows.size(), 8);
+    QVERIFY(arrows.at(0)->isVisible());
+    for (int i = 1; i < arrows.size(); ++i)
+        QVERIFY(!arrows.at(i)->isVisible());
+    const qreal ascending = arrows.at(0)->rotation();
+    m_controller->sortByColumn(0);
+    QTRY_VERIFY(arrows.at(0)->rotation() != ascending);
+    // Beside its title, inside the cell.
+    auto* first = visualItems(m_screen, QStringLiteral("headerCell")).at(0);
+    auto* title = first->property("contentItem").value<QQuickItem*>();
+    const qreal arrowEnd = arrows.at(0)->mapToItem(first, QPointF(arrows.at(0)->width(), 0)).x();
+    QVERIFY(arrowEnd <= first->width());
+    QVERIFY(arrows.at(0)->x() >= title->property("contentWidth").toReal());
+
+    // Code and age centred, the other columns left-aligned.
+    const QList<QQuickItem*> cells = visualItems(m_screen, QStringLiteral("gridCell"));
+    QVERIFY(!cells.isEmpty());
+    for (QQuickItem* cell : cells) {
+        const int column = cell->property("column").toInt();
+        const QList<QQuickItem*> texts = cell->childItems();
+        QQuickItem* text = texts.last();
+        const int expected = (column == 0 || column == 3) ? Qt::AlignHCenter : Qt::AlignLeft;
+        QCOMPARE(text->property("horizontalAlignment").toInt(), expected);
+    }
     m_settings->setLanguage(QStringLiteral("en"));
 }
 

@@ -55,13 +55,31 @@ CheckBox {
             height: 1
             color: Theme.checkShadow
         }
-        Text {
-            anchors.centerIn: parent
+        // The tick is drawn: the interface font has no such glyph.
+        Item {
+            objectName: "checkTick"
+            anchors.fill: parent
             visible: root.checked
-            text: "\u2713"
-            color: Theme.windowText
-            font.pixelSize: 11
-            font.bold: true
+            Rectangle {
+                x: 3
+                y: 6
+                width: 5
+                height: 2
+                rotation: 45
+                transformOrigin: Item.Left
+                antialiasing: true
+                color: Theme.windowText
+            }
+            Rectangle {
+                x: 6
+                y: 9
+                width: 8
+                height: 2
+                rotation: -50
+                transformOrigin: Item.Left
+                antialiasing: true
+                color: Theme.windowText
+            }
         }
     }
     background: Rectangle {
