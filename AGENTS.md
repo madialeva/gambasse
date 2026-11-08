@@ -49,7 +49,8 @@ src/
 │   ├── common/              database and migration infrastructure
 │   └── model/               data model (Patient, PatientsModel)
 ├── logic/                   business logic, UI-independent
-└── ui/                      bridge to QML: interface settings, shared formats
+└── ui/                      bridge to QML: interface settings, product and build
+    │                        information, shared formats
     ├── controller/          one controller per screen (patients, histories)
     └── filter/              view helpers (proxy models)
 qml/

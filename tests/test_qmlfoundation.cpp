@@ -11,6 +11,7 @@
 
 #include <Paths.h>
 #include <ui/AppIcon.h>
+#include <ui/AppInfo.h>
 #include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
@@ -76,6 +77,7 @@ private slots:
     void splashSequence();
     void appOpensShellAfterSplash();
     void applicationIconIsTheLogo();
+    void appInfoReportsTheBuild();
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
@@ -291,6 +293,18 @@ void TestQmlFoundation::applicationIconIsTheLogo() {
         // The logo is a filled disc: its centre is opaque.
         QCOMPARE(image.pixelColor(size / 2, size / 2).alpha(), 255);
     }
+}
+
+void TestQmlFoundation::appInfoReportsTheBuild() {
+    QCoreApplication::setApplicationVersion(QStringLiteral("9.8.7"));
+    const AppInfo info;
+    QCOMPARE(info.version(), QStringLiteral("9.8.7"));
+    QCOMPARE(info.languageStandard(), QStringLiteral("C++26"));
+    // These suites and the module are built by the same compiler.
+    QCOMPARE(info.compilerVersion(),
+             QStringLiteral("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__));
+    QCOMPARE(info.qtVersion(), QString::fromLatin1(qVersion()));
+    QCOMPARE(info.repositoryUrl(), QStringLiteral("https://github.com/madialeva/gambasse"));
 }
 
 void TestQmlFoundation::titleBarChrome() {
