@@ -21,6 +21,13 @@ set(IMAGES_QRC ${CMAKE_SOURCE_DIR}/resources/resources.qrc)
 set(I18N_QRC ${CMAKE_SOURCE_DIR}/translations/i18n.qrc)
 set(QML_LIBS GambasseQml GambasseQmlplugin)
 
+# The real executable: only main.cpp decides when the language catalog is
+# installed.
+gambasse_add_test(startuperror LIBS Qt6::Core)
+target_compile_definitions(test_startuperror PRIVATE
+    GAMBASSE_EXECUTABLE="$<TARGET_FILE:Gambasse>")
+add_dependencies(test_startuperror Gambasse)
+
 # Data and business rules.
 gambasse_add_test(schemamigrator LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(appsettings LIBS GambasseCore)
