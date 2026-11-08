@@ -5,9 +5,10 @@
 # build-static/dist/Gambasse. Then checks that the executable needs only libraries of
 # the operating system: it fails, naming them, if it carries a run path, or needs a
 # shared library of Qt or the C++ runtime, or one from the local dependencies or
-# this repository. Last, a smoke test in an empty directory and environment, with
-# no display: --check-db creates and migrates a database (the SQLite driver and the
-# embedded patches).
+# this repository. It also fails if the executable declares that it needs more than
+# the x86-64 baseline CPU, the mark the static preset removes. Last, a smoke test in
+# an empty directory and environment, with no display: --check-db creates and
+# migrates a database (the SQLite driver and the embedded patches).
 #
 #   scripts/build-static.sh                       build, copy, check and try it
 #   scripts/build-static.sh --check <executable>  only check <executable>
@@ -33,7 +34,8 @@ usage() {
 }
 
 # check <executable>: the run path and the shared libraries it needs, directly
-# (readelf) and once resolved (ldd)
+# (readelf) and once resolved (ldd), and the CPU level it declares, which the glibc
+# loader compares with the CPU before starting it
 check() {
     local exe="$1" problems=() dynamic needed lib line path
     dynamic="$(LC_ALL=C readelf -d "$exe")"
@@ -54,9 +56,13 @@ check() {
             [[ "$path" == "$SOFTWARE_DIR"/* || "$path" == "$ROOT"/* ]] && problems+=("$lib from $path")
         fi
     done < <(LC_ALL=C ldd "$exe" | sed 's/^[[:space:]]*//')
+    while read -r line; do
+        problems+=("needs CPU level $line")
+    done < <(LC_ALL=C readelf -n "$exe" 2>/dev/null | grep 'x86 ISA needed:' \
+        | grep -oE 'x86-64-v[234]' | sort -u)
 
     if ((${#problems[@]})); then
-        echo "error: $exe is not self-contained:" >&2
+        echo "error: $exe is not a valid self-contained executable:" >&2
         printf '  %s\n' "${problems[@]}" >&2
         return 1
     fi

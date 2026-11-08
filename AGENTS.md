@@ -188,6 +188,21 @@ in a change of toolchain-cpp, and to the plugin list of `GAMBASSE_STATIC` in
 `CMakeLists.txt` (which, like the package, links no platform theme), without
 having to build the kit in the same change.
 
+The self-contained Linux executable must also start on old computers, so it
+does not declare a CPU level above the `x86-64` baseline. The startup objects of
+the build machine's glibc (`crt1.o` on Oracle Linux 9) declare `x86-64-v2` and
+the linker passes that on, so the glibc loader would refuse older CPUs with
+`CPU ISA level is lower than required`, although the code does not need that
+level: Qt picks its SSE4 variants at run time. `GAMBASSE_STATIC` on Linux removes
+`.note.gnu.property` after linking, and the check of `scripts/build-static.sh`
+fails if a level above the baseline comes back. The other Linux builds keep the
+mark. The check reads that mark, not the instructions, so a change of the Qt kit
+or the compiler of this build is tried again by hand: on Debian with `qemu-user`,
+`qemu-x86_64 -cpu <model> ./Gambasse --check-db` under `env -i` and
+`QT_QPA_PLATFORM=offscreen`, with `core2duo`, `qemu64` and `phenom`, and the
+whole application with `QT_QUICK_BACKEND=software` too, must not stop with
+`Illegal instruction`.
+
 The Windows executable (`scripts/build-windows.sh`, the `windows` preset and
 `GAMBASSE_STATIC` with the cross compiler) is built on demand only too, under
 the same rule. It cross-builds `build-windows/dist/Gambasse.exe` with

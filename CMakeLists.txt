@@ -270,6 +270,22 @@ elseif(GAMBASSE_STATIC)
         INCLUDE_BY_TYPE iconengines Qt6::QSvgIconPlugin
         INCLUDE_BY_TYPE sqldrivers Qt6::QSQLiteDriverPlugin
         EXCLUDE_BY_TYPE platformthemes tls networkinformation generic qmltooling)
+
+    # The executable must also start on old computers. The startup objects of the
+    # build machine's glibc (crt1.o on Oracle Linux 9) declare that the program
+    # needs x86-64-v2, and the linker passes that on, so the glibc loader would
+    # refuse older CPUs. The code only needs the x86-64 baseline (Qt picks its SSE4
+    # variants at run time) and the linker has no option to lower the level, so the
+    # note goes after linking. scripts/build-static.sh checks that it stays out.
+    if(NOT CMAKE_OBJCOPY)
+        message(FATAL_ERROR
+            "GAMBASSE_STATIC on Linux needs objcopy, from binutils, to remove the CPU "
+            "level the executable inherits from the build machine's glibc, but CMake "
+            "did not find it.")
+    endif()
+    add_custom_command(TARGET Gambasse POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} --remove-section .note.gnu.property $<TARGET_FILE:Gambasse>
+        VERBATIM)
 endif()
 
 if(BUILD_TESTING)
