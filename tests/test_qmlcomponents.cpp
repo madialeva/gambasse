@@ -2,25 +2,34 @@
 #include <QGuiApplication>
 #include <QImage>
 #include <QJSValue>
+#include <QLocale>
 #include <QQmlApplicationEngine>
 #include <QQmlComponent>
 #include <QQuickItem>
+#include <QQuickStyle>
 #include <QQuickWindow>
+#include <QRawFont>
+#include <QScopeGuard>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QtTest>
+#include <algorithm>
+#include <memory>
 
 #include <Paths.h>
+#include <VisibleTextChecks.h>
 #include <ui/InterfaceSettings.h>
 
 namespace gambasse {
 namespace {
 
 // Loads one library component inside the test harness (production Theme
-// path) parented to a fresh exposed window.
+// path) parented to a fresh exposed window. `shell` is the harness itself,
+// whose `themeMode` switches the theme.
 struct Harness {
     QQuickWindow* window = nullptr;
     QObject* component = nullptr;
+    QObject* shell = nullptr;
 };
 
 QQuickItem* asItem(QObject* object) {
@@ -37,6 +46,7 @@ bool openHarness(QQmlApplicationEngine* engine, const char* file, const QString&
     QObject* root = harness.create();
     if (root == nullptr)
         return false;
+    out.shell = root;
     root->setProperty("themeMode", theme);
     root->setProperty("componentFile",
                       QUrl::fromLocalFile(QStringLiteral(QML_COMPONENTS_DIR "/") +
@@ -79,6 +89,112 @@ void collectVisualItems(QQuickItem* item, const QString& name, QList<QQuickItem*
         collectVisualItems(kid, name, out);
 }
 
+QQuickItem* visualItem(QQuickWindow* window, const QString& name) {
+    QList<QQuickItem*> found;
+    collectVisualItems(window->contentItem(), name, found);
+    return found.isEmpty() ? nullptr : found.first();
+}
+
+// Opens the calendar of a GxDateInput with its button, like the user.
+QObject* openCalendar(const Harness& harness) {
+    auto* button = harness.component->findChild<QQuickItem*>(QStringLiteral("calendarButton"));
+    if (button == nullptr)
+        return nullptr;
+    const QPointF centre =
+        button->mapToScene(QPointF(button->width() / 2.0, button->height() / 2.0));
+    QTest::mouseClick(harness.window, Qt::LeftButton, Qt::NoModifier, centre.toPoint());
+    QObject* popup = harness.component->findChild<QObject*>(QStringLiteral("calendarPopup"));
+    if (popup == nullptr
+        || !QTest::qWaitFor([popup] { return popup->property("opened").toBool(); }))
+        return nullptr;
+    return popup;
+}
+
+// The day names of the open calendar, from left to right.
+QList<QQuickItem*> dayNames(QQuickWindow* window) {
+    QList<QQuickItem*> names;
+    collectVisualItems(window->contentItem(), QStringLiteral("dayName"), names);
+    names.removeIf([](const QQuickItem* name) { return !name->isVisible(); });
+    std::sort(names.begin(), names.end(), [](const QQuickItem* a, const QQuickItem* b) {
+        return a->mapToScene(QPointF()).x() < b->mapToScene(QPointF()).x();
+    });
+    return names;
+}
+
+// Whether the row has laid out its seven day names: columns of the same width
+// at a regular pitch. Until then they sit at their natural widths.
+bool dayNamesAreLaidOut(QQuickWindow* window) {
+    const QList<QQuickItem*> names = dayNames(window);
+    if (names.size() != 7)
+        return false;
+    const qreal left = names.first()->mapToScene(QPointF()).x();
+    const qreal width = names.first()->width();
+    const qreal pitch = names.at(1)->mapToScene(QPointF()).x() - left;
+    if (pitch < width - 0.5)
+        return false;
+    for (qsizetype i = 0; i < names.size(); ++i) {
+        if (qAbs(names.at(i)->width() - width) > 0.5
+            || qAbs(names.at(i)->mapToScene(QPointF()).x() - (left + i * pitch)) > 0.5)
+            return false;
+    }
+    return true;
+}
+
+QStringList textsOf(const QList<QQuickItem*>& items) {
+    QStringList texts;
+    for (const QQuickItem* item : items)
+        texts.append(item->property("text").toString());
+    return texts;
+}
+
+// The day cell of `day` in the shown month (not the neighbouring months').
+QQuickItem* dayCell(QQuickWindow* window, int day) {
+    QList<QQuickItem*> cells;
+    collectVisualItems(window->contentItem(), QStringLiteral("dayCell"), cells);
+    for (QQuickItem* cell : cells) {
+        if (cell->property("other").toBool())
+            continue;
+        const QObject* model = cell->property("model").value<QObject*>();
+        if (model != nullptr && model->property("day").toInt() == day)
+            return cell;
+    }
+    return nullptr;
+}
+
+// A colour of the Theme singleton of `engine`, in its current mode.
+QColor themeColor(QQmlEngine* engine, const char* name) {
+    QQmlComponent component(engine);
+    component.setData("import QtQuick\nimport Gambasse\nQtObject { property color c: Theme."
+                          + QByteArray(name) + " }",
+                      QUrl());
+    const std::unique_ptr<QObject> probe(component.create());
+    return probe != nullptr ? probe->property("c").value<QColor>() : QColor();
+}
+
+// What the calendar shows in each interface language: the header of March
+// 1990 and the day names from the first column, Monday.
+struct CalendarTexts {
+    QString march1990;
+    QStringList days;
+};
+
+CalendarTexts calendarTexts(const QString& language) {
+    if (language == QLatin1String("pt"))
+        return {QStringLiteral("Março 1990"),
+                {QStringLiteral("Seg"), QStringLiteral("Ter"), QStringLiteral("Qua"),
+                 QStringLiteral("Qui"), QStringLiteral("Sex"), QStringLiteral("Sáb"),
+                 QStringLiteral("Dom")}};
+    if (language == QLatin1String("es"))
+        return {QStringLiteral("Marzo 1990"),
+                {QStringLiteral("Lun"), QStringLiteral("Mar"), QStringLiteral("Mié"),
+                 QStringLiteral("Jue"), QStringLiteral("Vie"), QStringLiteral("Sáb"),
+                 QStringLiteral("Dom")}};
+    return {QStringLiteral("March 1990"),
+            {QStringLiteral("Mon"), QStringLiteral("Tue"), QStringLiteral("Wed"),
+             QStringLiteral("Thu"), QStringLiteral("Fri"), QStringLiteral("Sat"),
+             QStringLiteral("Sun")}};
+}
+
 } // namespace
 
 // Verifies the QML control library against the UxWidgets behaviors: labels,
@@ -95,6 +211,8 @@ private slots:
     void textInput();
     void numberInput();
     void dateInput();
+    void calendarFollowsTheInterfaceLanguage_data();
+    void calendarFollowsTheInterfaceLanguage();
     void comboInput();
     void comboPopupHighlightIsReadable();
     void comboPopupScrollsLongLists();
@@ -246,6 +364,139 @@ void TestQmlComponents::dateInput() {
     QCOMPARE(root->property("text").toString(), expected);
     QTRY_VERIFY(!popup->property("visible").toBool());
     delete harness.window;
+}
+
+// The calendar speaks the interface language whatever the system's. The
+// system is simulated with QLocale::setDefault(), which is what Qt.locale()
+// returns; pt_PT has whole words as short day names and starts on Sunday.
+void TestQmlComponents::calendarFollowsTheInterfaceLanguage_data() {
+    QTest::addColumn<QString>("language");
+    QTest::addColumn<QString>("system");
+    for (const char* language : {"pt", "es", "en"}) {
+        for (const char* system : {"en_US", "pt_PT"})
+            QTest::addRow("%s on %s", language, system)
+                << QString::fromLatin1(language) << QString::fromLatin1(system);
+    }
+}
+
+void TestQmlComponents::calendarFollowsTheInterfaceLanguage() {
+    QFETCH(QString, language);
+    QFETCH(QString, system);
+    const QLocale systemBefore;
+    QLocale::setDefault(QLocale(system));
+    const auto restoreSystem = qScopeGuard([systemBefore] { QLocale::setDefault(systemBefore); });
+
+    QQmlApplicationEngine engine;
+    Harness harness;
+    QVERIFY(openHarness(&engine, "GxDateInput.qml", QStringLiteral("claro"), harness));
+    const auto closeWindow = qScopeGuard([&harness] { delete harness.window; });
+    auto* settings = engine.singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    QVERIFY(settings != nullptr);
+    const QString languageBefore = settings->language();
+    const auto restoreLanguage =
+        qScopeGuard([settings, languageBefore] { settings->setLanguage(languageBefore); });
+    settings->setLanguage(language);
+
+    QObject* root = harness.component;
+    root->setProperty("width", 300);
+    root->setProperty("height", 30);
+    harness.window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(harness.window));
+    root->setProperty("text", QStringLiteral("15/03/1990"));
+    QObject* popup = openCalendar(harness);
+    QVERIFY(popup != nullptr);
+    auto* content = popup->property("contentItem").value<QQuickItem*>();
+    auto* month = visualItem(harness.window, QStringLiteral("calendarMonth"));
+    QVERIFY(content != nullptr && month != nullptr);
+
+    // Every text whole and apart (Portuguese short names are whole words), once
+    // the row has placed its names in their columns.
+    QTRY_VERIFY(dayNamesAreLaidOut(harness.window));
+    const QStringList cut = cutTexts(content);
+    QVERIFY2(cut.isEmpty(), qPrintable(QStringLiteral("cut: ") + cut.join(QStringLiteral("; "))));
+
+    // The month and the day names, the week starting on Monday.
+    const CalendarTexts texts = calendarTexts(language);
+    QCOMPARE(month->property("text").toString(), texts.march1990);
+    const QList<QQuickItem*> names = dayNames(harness.window);
+    QCOMPARE(textsOf(names), texts.days);
+
+    // 1 March 1990 was a Thursday: its number sits under the fourth name.
+    QQuickItem* first = dayCell(harness.window, 1);
+    QVERIFY(first != nullptr);
+    const qreal centre = first->mapToScene(QPointF(first->width() / 2.0, 0)).x();
+    const qreal left = names.at(3)->mapToScene(QPointF()).x();
+    QVERIFY2(centre > left && centre < left + names.at(3)->width(),
+             qPrintable(QStringLiteral("day 1 at %1, %2 from %3 to %4")
+                            .arg(centre)
+                            .arg(names.at(3)->property("text").toString())
+                            .arg(left)
+                            .arg(left + names.at(3)->width())));
+
+    // Every month: no text cut or overlapping, and only characters of the
+    // embedded font (everyTextHasItsGlyphs does not see Qt's names).
+    const QRawFont bold(QStringLiteral(":/fonts/NotoSans-Bold.ttf"), 13);
+    QVERIFY(bold.isValid());
+    QStringList problems;
+    const auto checkGlyphs = [&bold, &problems](const QString& text) {
+        for (const char32_t character : text.toUcs4()) {
+            if (!bold.supportsCharacter(character))
+                problems << QStringLiteral("%1: no glyph for U+%2")
+                                .arg(text)
+                                .arg(quint32(character), 4, 16, QLatin1Char('0'));
+        }
+    };
+    for (const QString& name : textsOf(names))
+        checkGlyphs(name);
+    for (int shown = 0; shown < 12; ++shown) {
+        root->setProperty("shownMonth", shown);
+        QTest::qWait(30); // the grid lays out its new days
+        const QString header = month->property("text").toString();
+        checkGlyphs(header);
+        for (const QString& cut : cutTexts(content))
+            problems << QStringLiteral("%1: %2 cut").arg(header, cut);
+    }
+    QVERIFY2(problems.isEmpty(), qPrintable(problems.join(QStringLiteral("; "))));
+    root->setProperty("shownMonth", 2);
+    QTRY_COMPARE(month->property("text").toString(), texts.march1990);
+
+    // The text colour of the theme, readable on the calendar, in both themes.
+    const auto luminance = [](const QColor& c) {
+        return 0.2126 * c.redF() + 0.7152 * c.greenF() + 0.0722 * c.blueF();
+    };
+    for (const QString& mode : {QStringLiteral("claro"), QStringLiteral("oscuro")}) {
+        harness.shell->setProperty("themeMode", mode);
+        const QColor text = themeColor(&engine, "windowText");
+        const QColor background = themeColor(&engine, "fieldBackground");
+        QVERIFY(text.isValid() && background.isValid());
+        QVERIFY2(qAbs(luminance(text) - luminance(background)) > 0.4,
+                 qPrintable(QStringLiteral("%1: %2 on %3").arg(mode, text.name(), background.name())));
+        QTRY_COMPARE(month->property("color").value<QColor>(), text);
+        for (const QQuickItem* name : names)
+            QCOMPARE(name->property("color").value<QColor>(), text);
+    }
+    harness.shell->setProperty("themeMode", QStringLiteral("claro"));
+
+    // A language change applies at once, on the same month.
+    const QString other = language == QLatin1String("pt")   ? QStringLiteral("es")
+                          : language == QLatin1String("es") ? QStringLiteral("en")
+                                                            : QStringLiteral("pt");
+    settings->setLanguage(other);
+    QTRY_COMPARE(month->property("text").toString(), calendarTexts(other).march1990);
+    QCOMPARE(textsOf(dayNames(harness.window)), calendarTexts(other).days);
+    QCOMPARE(root->property("shownMonth").toInt(), 2);
+    QCOMPARE(root->property("shownYear").toInt(), 1990);
+    QVERIFY(popup->property("opened").toBool());
+
+    // Picking a day writes dd/MM/yyyy whatever the languages.
+    QQuickItem* target = dayCell(harness.window, 20);
+    QVERIFY(target != nullptr);
+    const QPointF targetCentre =
+        target->mapToScene(QPointF(target->width() / 2.0, target->height() / 2.0));
+    QTest::mouseClick(harness.window, Qt::LeftButton, Qt::NoModifier, targetCentre.toPoint());
+    QCOMPARE(root->property("text").toString(), QStringLiteral("20/03/1990"));
+    QTRY_VERIFY(!popup->property("visible").toBool());
 }
 
 void TestQmlComponents::comboInput() {
@@ -637,6 +888,9 @@ void TestQmlComponents::tabView() {
 int main(int argc, char** argv) {
     QGuiApplication::setQuitOnLastWindowClosed(false);
     QGuiApplication app(argc, argv);
+    // The application's style (main.cpp): Qt's default on Linux is Fusion,
+    // whose paddings would measure the controls differently.
+    QQuickStyle::setStyle(QStringLiteral("Basic"));
     gambasse::TestQmlComponents test;
     return QTest::qExec(&test, argc, argv);
 }

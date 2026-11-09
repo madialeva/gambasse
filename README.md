@@ -286,6 +286,13 @@ A new text is translated in the same change that adds it. The
 `translationcatalogs` test fails when a catalog has unfinished or empty entries
 or loses a `%n` placeholder, and when a `.qm` does not match its `.ts`.
 
+The calendar of the date fields follows the interface language too, with the
+month and day names of Qt's locale data, whatever the system's language:
+Portuguese takes the conventions of Guinea-Bissau (`pt_GW`), Spanish those of
+Spain (`es_ES`) and English those of the United Kingdom (`en_GB`), so the week
+always starts on Monday. The fields keep their `dd/MM/yyyy` dates in every
+language.
+
 The windows use fixed coordinates, so a longer text may not fit. The
 `everyTextShowsWhole` test of each screen fails when a text cannot be read whole
 in one of the three languages.

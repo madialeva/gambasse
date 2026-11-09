@@ -57,6 +57,12 @@ Item {
         shownYear = d.getFullYear();
     }
 
+    // Qt's month and day names are lower case in Portuguese and Spanish; the
+    // calendar shows them in sentence case, like the catalogs' titles.
+    function sentenceCase(text: string): string {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
     function pickDate(year, monthZeroBased, day) {
         const dd = String(day).padStart(2, "0");
         const mm = String(monthZeroBased + 1).padStart(2, "0");
@@ -235,14 +241,17 @@ Item {
                     focusPolicy: Qt.NoFocus
                     onClicked: root.shiftMonth(-1)
                 }
+                // The interface language's month name (Qt.formatDate with a
+                // format string is always English).
                 Text {
+                    objectName: "calendarMonth"
                     width: parent.width - 72
                     height: 32
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     color: Theme.windowText
                     font.bold: true
-                    text: Qt.formatDate(new Date(root.shownYear, root.shownMonth, 1), "MMMM yyyy")
+                    text: root.sentenceCase(InterfaceSettings.locale.standaloneMonthName(root.shownMonth, Locale.LongFormat)) + " " + root.shownYear
                 }
                 Button {
                     text: "\u203A"
@@ -251,18 +260,38 @@ Item {
                     onClicked: root.shiftMonth(1)
                 }
             }
+            // Both rows take the interface language's locale, which also starts
+            // the week on Monday, never the system's Qt.locale(). Without the
+            // Basic style's 6 px spacing a column is 33.7 px wide, room for the
+            // widest bold name ("Dom", 31 px); the rows must keep the same
+            // spacing so the names stay above their days.
             DayOfWeekRow {
+                id: dayRow
                 width: parent.width
-                locale: Qt.locale()
+                spacing: 0
+                locale: InterfaceSettings.locale
+                // Qt's short names are whole words in Portuguese ("segunda"):
+                // three letters are the usual abbreviation in all three
+                // languages.
+                delegate: Text {
+                    objectName: "dayName"
+                    required property string shortName
+                    text: root.sentenceCase(shortName.slice(0, 3))
+                    font: dayRow.font
+                    color: Theme.windowText
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
             MonthGrid {
                 id: monthGrid
                 objectName: "monthGrid"
                 width: parent.width
                 height: 180
+                spacing: 0
                 month: root.shownMonth
                 year: root.shownYear
-                locale: Qt.locale()
+                locale: InterfaceSettings.locale
                 delegate: Item {
                     id: cell
                     objectName: "dayCell"
