@@ -210,7 +210,12 @@ toolchain-cpp's `gcc-mingw` and `qt-mingw` (`Qt/6.12.0-mingw`, with the
 desktop kit as host) and checks that it imports only the DLLs of its list of
 Windows DLLs, the same list as guita's. A Qt module or plugin the application
 starts using also goes to `qt-mingw`'s list in toolchain-cpp and to the
-Windows plugin list of `GAMBASSE_STATIC`. The script's smoke test runs
+Windows plugin list of `GAMBASSE_STATIC`. The executable embeds its icon and
+version information (`resources/gambasse.rc.in`, with the version of
+`project()`), and the script fails without them. The icon of the running
+window still comes from `logo.svg` (`AppIcon`); `resources/img/logo.ico` is
+generated from it by `scripts/make-windows-icon.py` and committed, so whoever
+changes the logo regenerates it. The script's smoke test runs
 `--check-db` under Wine, offscreen, with a temporary prefix and home. For
 visual checks the executable runs under Wine on `Xvfb :99`, never on the
 user's desktop, with a temporary prefix (never `~/.wine`) without its colour

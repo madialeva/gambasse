@@ -241,6 +241,19 @@ target_link_libraries(Gambasse PRIVATE
     GambasseQmlplugin
 )
 
+# Windows: the icon of the Explorer and the shortcuts and the version of the file
+# properties, as resources of the executable. logo.ico comes from logo.svg, through
+# scripts/make-windows-icon.py. windres does not report what a .rc includes, so the
+# dependency on the icon is declared here.
+if(WIN32)
+    enable_language(RC)
+    set(_gambasse_icon "${CMAKE_CURRENT_SOURCE_DIR}/resources/img/logo.ico")
+    configure_file(resources/gambasse.rc.in gambasse.rc @ONLY)
+    target_sources(Gambasse PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/gambasse.rc")
+    set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/gambasse.rc" PROPERTIES
+        OBJECT_DEPENDS "${_gambasse_icon}")
+endif()
+
 # Static executable: the C++ runtime inside, and the Qt plugins it links, fixed
 # here. qmlimportscanner adds the QML modules' plugins.
 if(GAMBASSE_STATIC)
