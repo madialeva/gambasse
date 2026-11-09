@@ -89,6 +89,7 @@ private slots:
     void initTestCase();
     void themePersistsAndNotifies();
     void languagePersistsAndNotifies();
+    void localeFollowsTheLanguage();
     void qmlShellFollowsThemeInHot();
     void qmlLanguageSwitchesInHot();
     void qtStringsFollowTheLanguage();
@@ -181,6 +182,33 @@ void TestQmlFoundation::languagePersistsAndNotifies() {
 
     InterfaceSettings reloaded(nullptr); // persistence round trip
     QCOMPARE(reloaded.language(), QStringLiteral("es"));
+}
+
+// Each language stands for a fixed locale, whatever the system's: the calendar
+// takes its month and day names from it, and every week starts on Monday.
+void TestQmlFoundation::localeFollowsTheLanguage() {
+    InterfaceSettings settings(nullptr);
+    const QString previous = settings.language();
+    const auto restore = qScopeGuard([&settings, previous] { settings.setLanguage(previous); });
+    settings.setLanguage(QStringLiteral("en"));
+
+    QSignalSpy spy(&settings, &InterfaceSettings::languageChanged);
+    const QList<std::pair<QString, QString>> expected = {
+        {QStringLiteral("pt"), QStringLiteral("pt_GW")},
+        {QStringLiteral("es"), QStringLiteral("es_ES")},
+        {QStringLiteral("en"), QStringLiteral("en_GB")},
+        // Shown in English by the interface, so English for the calendar too.
+        {QStringLiteral("fr"), QStringLiteral("en_GB")},
+    };
+    int notifications = 0;
+    for (const auto& [language, locale] : expected) {
+        settings.setLanguage(language);
+        QCOMPARE(spy.count(), ++notifications); // one per change
+        QCOMPARE(settings.locale().name(), locale);
+        QCOMPARE(settings.locale().firstDayOfWeek(), Qt::Monday);
+        // The property reads the same value, for the views.
+        QCOMPARE(settings.property("locale").toLocale().name(), locale);
+    }
 }
 
 void TestQmlFoundation::qmlShellFollowsThemeInHot() {

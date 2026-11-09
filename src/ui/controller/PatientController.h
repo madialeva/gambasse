@@ -64,7 +64,6 @@ class PatientController : public QObject {
     Q_PROPERTY(bool canCreatePregnancy READ canCreatePregnancy NOTIFY availabilityChanged)
     Q_PROPERTY(QString sexHomeLabel READ sexHomeLabel NOTIFY headersChanged)
     Q_PROPERTY(QString sexMullerLabel READ sexMullerLabel NOTIFY headersChanged)
-    Q_PROPERTY(bool weekStartsMonday READ weekStartsMonday CONSTANT)
 public:
     explicit PatientController(QObject* parent = nullptr);
 
@@ -103,7 +102,6 @@ public:
     bool canCreatePregnancy() const;
     QString sexHomeLabel() const;
     QString sexMullerLabel() const;
-    bool weekStartsMonday() const; // first-day-of-week from the system locale
 
     // Reloads headers and language-dependent cells after a language change.
     Q_INVOKABLE void refreshLanguage();

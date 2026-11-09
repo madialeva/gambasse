@@ -3,7 +3,6 @@
 #include <QDate>
 #include <QDir>
 #include <QFileInfo>
-#include <QLocale>
 #include <QStandardPaths>
 #include <QUrl>
 
@@ -181,10 +180,6 @@ QString PatientController::sexHomeLabel() const {
 
 QString PatientController::sexMullerLabel() const {
     return sexLabel(Patient::Sex::Muller);
-}
-
-bool PatientController::weekStartsMonday() const {
-    return QLocale().firstDayOfWeek() == Qt::Monday;
 }
 
 void PatientController::refreshLanguage() {

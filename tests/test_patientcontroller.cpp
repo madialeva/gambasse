@@ -139,7 +139,7 @@ void TestPatientController::columnsAndHeadersFollowLanguage() {
     for (const QString& name : controller.columnNames())
         QVERIFY2(!name.isEmpty(), "every column has a translated header");
 
-    // Sex labels and the weekday convention are exposed for the date input.
+    // Sex labels are exposed for the sex selector.
     QVERIFY(!controller.sexHomeLabel().isEmpty());
     QVERIFY(!controller.sexMullerLabel().isEmpty());
     QCOMPARE(controller.sexLabelText(static_cast<int>(Patient::Sex::Home)),

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QLocale>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -18,6 +19,8 @@ namespace gambasse {
 // `InterfaceSettings`, created by the engine: that instance installs the
 // language catalog and retranslates the engine on every change before
 // announcing it, so views and controllers only react to languageChanged.
+// `locale` is the language's locale (interfaceLocale()): what the views use for
+// month and day names instead of the system's Qt.locale().
 // QtCore only (plus QML forward declarations): no Quick, testable without a
 // GUI.
 class InterfaceSettings : public QObject {
@@ -26,6 +29,7 @@ class InterfaceSettings : public QObject {
     QML_SINGLETON
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
+    Q_PROPERTY(QLocale locale READ locale NOTIFY languageChanged)
 public:
     // Bound to `engine`, the instance owns the application catalog and
     // retranslates that engine; with a null engine it only reads and persists
@@ -41,6 +45,7 @@ public:
     void setTheme(const QString& mode);
     QString language() const { return m_language; }
     void setLanguage(const QString& code);
+    QLocale locale() const;
 
 signals:
     void themeChanged();
