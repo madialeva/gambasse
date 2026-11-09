@@ -1,0 +1,34 @@
+// The resources of Gambasse.exe that Windows reads without running it: the icon of the
+// Explorer and the shortcuts, and the version of the file properties. CMake fills in
+// the version from project(... VERSION ...). FileDescription is the name Windows shows
+// for the running program (the Task Manager, for example), so it stays short.
+#include <winver.h>
+
+IDI_ICON1 ICON "@_gambasse_icon@"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        // US English, Unicode
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "Gambasse"
+            VALUE "FileVersion", "@PROJECT_VERSION@"
+            VALUE "LegalCopyright", "Copyright (c) 2026 Juan Franco"
+            VALUE "ProductName", "Gambasse"
+            VALUE "ProductVersion", "@PROJECT_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

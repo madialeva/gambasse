@@ -3,10 +3,11 @@
 # Gambasse from the windows preset (CMakePresets.json), cross-built on Linux with Qt,
 # its plugins and QML modules and the C++ runtime linked into the executable, which is
 # copied without symbols to build-windows/dist/Gambasse.exe. Then checks that the
-# executable imports only DLLs of Windows: it fails, naming them, on any DLL that is
-# not in the list below. Last, when Wine is installed, a smoke test in an empty
-# directory and a temporary Wine prefix, with no display: --check-db creates and
-# migrates a database (the SQLite driver and the embedded patches).
+# executable imports only DLLs of Windows, failing and naming them on any DLL that is
+# not in the list below, and that it embeds its icon and version information. Last,
+# when Wine is installed, a smoke test in an empty directory and a temporary Wine
+# prefix, with no display: --check-db creates and migrates a database (the SQLite
+# driver and the embedded patches).
 #
 #   scripts/build-windows.sh                       build, copy, check and try it
 #   scripts/build-windows.sh --check <executable>  only check <executable>
@@ -89,6 +90,15 @@ check() {
     echo ">> $exe imports only these DLLs of Windows:"
     # shellcheck disable=SC2001 # indents every line of a multi-line text
     sed 's/^/     /' <<<"$dlls"
+
+    # The resources Windows reads without running it (resources/gambasse.rc.in)
+    local resources
+    resources="$(LC_ALL=C "$TOOLS-windres" -i "$exe" -O rc)" || true
+    if [[ "$resources" != *RT_GROUP_ICON* || "$resources" != *VERSIONINFO* ]]; then
+        echo "error: $exe does not embed the icon and the version information" >&2
+        return 1
+    fi
+    echo ">> $exe embeds the icon and the version information"
 }
 
 # smoke_test <executable>: under Wine, if installed, a copy in an empty directory, with

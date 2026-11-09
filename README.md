@@ -161,17 +161,24 @@ scripts/build-windows.sh                         # build-windows/dist/Gambasse.e
 The script builds with the `windows` preset (`build-windows`, Release, no
 tests), copies the executable without symbols to
 `build-windows/dist/Gambasse.exe` and fails, naming them, if it imports a DLL
-that is not part of Windows 10 1809 (the oldest Windows Qt 6.12 supports).
+that is not part of Windows 10 1809 (the oldest Windows Qt 6.12 supports), and
+if it does not embed its icon and version information.
 When Wine is installed, it then tries a copy in an empty directory with a
 temporary Wine prefix: `--check-db` must create and migrate the database;
 without Wine it skips that test with a warning.
-`scripts/build-windows.sh --check <executable>` runs only the DLL check.
+`scripts/build-windows.sh --check <executable>` runs only the DLL and resource
+checks.
 
 `Gambasse.exe` takes 54 MB and needs Windows 10 1809 or later, with no Qt,
 MinGW or Visual C++ runtime installed. It keeps `config.ini`, `database.db`
 and `fotos/` beside itself, or in the directory given with `--base`, and
 creates the database on first run. The photo chooser is the native Windows
-dialog.
+dialog. The Explorer and the shortcuts show the application's logo, and the
+file properties show its name and version, which come from `CMakeLists.txt`.
+
+The icon is `resources/img/logo.ico`, committed so that the build needs no
+rasterizer. When `resources/img/logo.svg` changes, regenerate it with
+`scripts/make-windows-icon.py`, which needs `rsvg-convert` and Pillow.
 
 To update an installation made with an older package (a `gambasse.exe`
 launcher at the root and the application in `lib/`): back up the folder, copy

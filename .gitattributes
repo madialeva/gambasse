@@ -3,6 +3,7 @@
 # Binary artifacts must never be line-ending normalized.
 *.qm binary
 *.png binary
+*.ico binary
 *.jpg binary
 *.jpeg binary
 *.svg binary
