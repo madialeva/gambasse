@@ -3,10 +3,32 @@
 #include <QModelIndex>
 #include <QRegularExpression>
 
+#include <logic/TextOrder.h>
+
 namespace gambasse {
 
 ColumnFilterProxy::ColumnFilterProxy(QObject* parent)
     : QSortFilterProxyModel(parent) {}
+
+void ColumnFilterProxy::setSortLocale(const QLocale& locale) {
+    if (locale == m_sortLocale)
+        return;
+    m_sortLocale = locale;
+    // sort() does nothing while the column and the order stay the same;
+    // invalidate() sorts again and keeps the persistent indexes.
+    if (sortColumn() >= 0)
+        invalidate();
+}
+
+bool ColumnFilterProxy::lessThan(const QModelIndex& sourceLeft,
+                                 const QModelIndex& sourceRight) const {
+    const QVariant left = sourceLeft.data(sortRole());
+    const QVariant right = sourceRight.data(sortRole());
+    if (left.typeId() == QMetaType::QString && right.typeId() == QMetaType::QString)
+        return compareText(left.toString(), right.toString(), m_sortLocale) < 0;
+    // Numbers (code, age) by their value.
+    return QSortFilterProxyModel::lessThan(sourceLeft, sourceRight);
+}
 
 void ColumnFilterProxy::setColumnFilter(int column, const QString& text) {
     beginFilterChange();

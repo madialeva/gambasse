@@ -7,6 +7,7 @@
 #include <QUrl>
 
 #include <data/common/Database.h>
+#include <logic/InterfaceLocale.h>
 #include <logic/SexLabel.h>
 #include <ui/DateFormat.h>
 #include <ui/controller/AdultConsultationController.h>
@@ -43,8 +44,8 @@ PatientController::PatientController(QObject* parent) : QObject(parent) {
     m_model = new PatientsModel(this);
     m_proxy = new ColumnFilterProxy(this);
     m_proxy->setSourceModel(m_model);
-    m_proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
-    m_proxy->setSortLocaleAware(true);
+    // The interface language's alphabet, never the system's collation.
+    m_proxy->setSortLocale(interfaceLocale(AppSettings().language()));
 }
 
 bool PatientController::load() {
@@ -183,8 +184,34 @@ QString PatientController::sexMullerLabel() const {
 }
 
 void PatientController::refreshLanguage() {
-    m_model->refreshLanguage();
+    // InterfaceSettings stores the language before announcing it, so
+    // AppSettings already has the new one.
+    reorderKeepingSelection([this] {
+        m_proxy->setSortLocale(interfaceLocale(AppSettings().language()));
+        m_model->refreshLanguage(); // the sex labels may sort differently too
+    });
     emit headersChanged();
+}
+
+void PatientController::reorderKeepingSelection(const std::function<void()>& reorder) {
+    // Reordering keeps the model's rows, so the source row names the patient.
+    const int sourceRow = (m_currentProxyRow >= 0 && m_currentProxyRow < m_proxy->rowCount())
+                              ? m_proxy->mapToSource(m_proxy->index(m_currentProxyRow, 0)).row()
+                              : -1;
+    reorder();
+    if (sourceRow < 0)
+        return;
+    const QModelIndex moved = m_proxy->mapFromSource(m_model->index(sourceRow, 0));
+    if (!moved.isValid()) {
+        // A filter on a translated column can hide the patient.
+        clampSelection();
+        return;
+    }
+    if (moved.row() == m_currentProxyRow)
+        return;
+    // Same patient, so the detail stays as it is, unsaved edits included.
+    m_currentProxyRow = moved.row();
+    emit currentChanged();
 }
 
 void PatientController::setColumnFilter(int column, const QString& text) {
@@ -223,7 +250,7 @@ void PatientController::sortByColumn(int column) {
         m_sortColumn = column;
         m_sortOrder = Qt::AscendingOrder;
     }
-    m_proxy->sort(m_sortColumn, m_sortOrder);
+    reorderKeepingSelection([this] { m_proxy->sort(m_sortColumn, m_sortOrder); });
     emit sortChanged();
 }
 

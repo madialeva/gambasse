@@ -143,7 +143,11 @@ the `InterfaceSettings` singleton before loading a view, like `main.cpp`. A view
 that shows month or day names takes `InterfaceSettings.locale`, the interface
 language's locale (`pt_GW`, `es_ES` or `en_GB`, all starting the week on
 Monday), never `Qt.locale()`, which is the system's, nor `Qt.formatDate()` with
-a format string, which is always English. Qt's own strings the interface shows (the Linux file chooser)
+a format string, which is always English. Text is sorted with `compareText()`
+(`logic/TextOrder.h`) and the locale of `interfaceLocale()`, never with
+`setSortLocaleAware()`, `QCollator` or `localeAwareCompare()` in the
+application's code: they follow the system's collation and, in the static Qt
+kits, built without ICU, ignore the locale they are given. Qt's own strings the interface shows (the Linux file chooser)
 are translated by hand in `translations/qtstrings_<es|pt|en>.ts`, English
 included so the system-language Qt catalog never answers; add any new one the
 views come to show. Text uses LF; never line-ending-normalize binaries such as

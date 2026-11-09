@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QUrl>
 #include <QtQml/qqmlregistration.h>
+#include <functional>
 
 #include <data/model/Patient.h>
 #include <data/model/PatientsModel.h>
@@ -103,7 +104,8 @@ public:
     QString sexHomeLabel() const;
     QString sexMullerLabel() const;
 
-    // Reloads headers and language-dependent cells after a language change.
+    // Reloads headers and language-dependent cells after a language change,
+    // and sorts the grid in the new language's alphabetical order.
     Q_INVOKABLE void refreshLanguage();
     Q_INVOKABLE void setColumnFilter(int column, const QString& text);
     Q_INVOKABLE void clearFilters();
@@ -162,6 +164,10 @@ private:
     void clampSelection(); // valid row after filtering, detail always refreshed
     void updateAvailability();
     void reloadAndReselect(qlonglong patientId);
+    // Runs `reorder` (a sort, a language change) and moves the selection to
+    // the new row of the same patient, so the highlight, the detail and the
+    // actions keep naming it; the selection is a row number of the proxy.
+    void reorderKeepingSelection(const std::function<void()>& reorder);
 
     PatientsModel* m_model = nullptr;
     ColumnFilterProxy* m_proxy = nullptr;

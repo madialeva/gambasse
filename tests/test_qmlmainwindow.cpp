@@ -158,6 +158,7 @@ private slots:
     void savedPatientSurvivesReopening();
     void toolbarFollowsTheLanguage();
     void selectedRowIsPaintedHighlighted();
+    void sortingKeepsTheSelectedPatient();
     void detailGroupsShareTheWidth();
     void languageFlagKeepsItsColours();
     void detailPanelFitsTheWindow();
@@ -418,6 +419,66 @@ void TestQmlMainWindow::selectedRowIsPaintedHighlighted() {
     QTRY_COMPARE(m_controller->currentRow(), 2);
     QCOMPARE(m_controller->patientName(), QStringLiteral("QMLW_GAMA"));
     QCOMPARE(pixelAt(m_window, topLeft, 2), ThemeHighlight());
+}
+
+// Clicking a header keeps the selected patient: its row stays highlighted
+// wherever the sort takes it, and the panel and the delete confirmation name
+// the patient that Delete removes. Before, the highlight stayed on the row
+// number and Delete removed another patient than the one it named.
+void TestQmlMainWindow::sortingKeepsTheSelectedPatient() {
+    seedPatients();
+    openScreen();
+    QCOMPARE(m_controller->patientName(), QStringLiteral("QMLW_ALFA"));
+    const auto highlightedNames = [this] {
+        QStringList names;
+        for (QQuickItem* cell : visualItems(m_screen, QStringLiteral("gridCell"))) {
+            if (cell->isVisible() && cell->property("current").toBool()
+                && cell->property("column").toInt() == PatientsModel::ColumnName)
+                names.append(cell->property("display").toString());
+        }
+        return names;
+    };
+    QCOMPARE(highlightedNames(), QStringList{QStringLiteral("QMLW_ALFA")});
+
+    QQuickItem* nameHeader = nullptr;
+    for (QQuickItem* header : visualItems(m_screen, QStringLiteral("headerCell"))) {
+        if (header->property("index").toInt() == PatientsModel::ColumnName)
+            nameHeader = header;
+    }
+    QVERIFY(nameHeader != nullptr);
+    const auto shownName = [this](int row) {
+        for (QQuickItem* cell : visualItems(m_screen, QStringLiteral("gridCell"))) {
+            if (cell->isVisible() && cell->property("row").toInt() == row
+                && cell->property("column").toInt() == PatientsModel::ColumnName)
+                return cell->property("display").toString();
+        }
+        return QString();
+    };
+    clickIn(m_window, nameHeader); // descending: ALFA goes to the last row
+    QTRY_COMPARE(m_controller->sortOrder(), static_cast<int>(Qt::DescendingOrder));
+    QTRY_COMPARE(shownName(0), QStringLiteral("QMLW_GAMA")); // the grid shows the new order
+    QCOMPARE(shownName(2), QStringLiteral("QMLW_ALFA"));
+    QCOMPARE(highlightedNames(), QStringList{QStringLiteral("QMLW_ALFA")});
+    QCOMPARE(m_controller->currentRow(), 2);
+    QCOMPARE(item(QStringLiteral("nameInput"))->property("text").toString(),
+             QStringLiteral("QMLW_ALFA"));
+
+    clickIn(m_window, item(QStringLiteral("deleteButton")));
+    auto* confirm = m_screen->findChild<QObject*>(QStringLiteral("deleteConfirm"));
+    QVERIFY(confirm != nullptr);
+    QTRY_VERIFY(confirm->property("visible").toBool());
+    QVERIFY(confirm->property("messageText").toString().contains(QStringLiteral("\"QMLW_ALFA\"")));
+    auto* yesButton = confirm->findChild<QQuickItem*>(QStringLiteral("dialogYesButton"));
+    QVERIFY(yesButton != nullptr);
+    QTest::qWait(200); // let the modal overlay settle before aiming at the button
+    clickIn(m_window, yesButton);
+    QTRY_COMPARE(m_controller->gridModel()->rowCount(), 2);
+    QStringList left;
+    for (int row = 0; row < 2; ++row)
+        left.append(m_controller->gridModel()
+                        ->data(m_controller->gridModel()->index(row, PatientsModel::ColumnName))
+                        .toString());
+    QCOMPARE(left, QStringList({QStringLiteral("QMLW_GAMA"), QStringLiteral("QMLW_BETA")}));
 }
 
 void TestQmlMainWindow::detailGroupsShareTheWidth() {

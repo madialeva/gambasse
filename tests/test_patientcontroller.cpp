@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QImage>
+#include <QScopeGuard>
 #include <QSignalSpy>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -13,6 +14,7 @@
 #include <Paths.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
+#include <logic/AppSettings.h>
 #include <logic/ConsultationService.h>
 #include <logic/PatientService.h>
 #include <logic/PhotoManager.h>
@@ -80,6 +82,8 @@ private slots:
     void selectionLoadsDetail();
     void selectionIsKeptValidWhenFiltering();
     void sortTogglesOrderOnRepeat();
+    void sortKeepsTheSelectedPatient();
+    void languageReordersAndKeepsSelection();
     void addEditSaveAndReselect();
     void saveRejectsBlankNameAndDuplicates();
     void removeDeletesAndReselects();
@@ -240,6 +244,94 @@ void TestPatientController::sortTogglesOrderOnRepeat() {
     controller.sortByColumn(PatientsModel::ColumnAddress); // a new column resets the order
     QCOMPARE(controller.sortColumn(), PatientsModel::ColumnAddress);
     QCOMPARE(controller.sortOrder(), kAscending);
+}
+
+// Sorting moves the rows, not the selection: the highlighted row, the detail
+// and the actions stay on the same patient. Borrar used to delete the patient
+// the sort brought to the selected row while the panel showed the other.
+void TestPatientController::sortKeepsTheSelectedPatient() {
+    for (const char* name : {"ALFA", "BRAVO", "CHARLIE", "DELTA", "ECHO"})
+        QVERIFY(createPatient(m_service, QString::fromLatin1(name)));
+    PatientController controller;
+    QVERIFY(controller.load());
+    QCOMPARE(controller.patientName(), QStringLiteral("ALFA"));
+    QSignalSpy currentSpy(&controller, &PatientController::currentChanged);
+
+    controller.sortByColumn(PatientsModel::ColumnName); // descending: ALFA last
+    QCOMPARE(gridText(controller, 4, PatientsModel::ColumnName), QStringLiteral("ALFA"));
+    QCOMPARE(controller.currentRow(), 4);
+    QCOMPARE(controller.patientName(), QStringLiteral("ALFA"));
+    QVERIFY(currentSpy.count() > 0); // the grid moves its highlight
+
+    controller.sortByColumn(PatientsModel::ColumnId); // codes ascending: ALFA first
+    QCOMPARE(gridText(controller, controller.currentRow(), PatientsModel::ColumnName),
+             QStringLiteral("ALFA"));
+    QCOMPARE(controller.patientName(), QStringLiteral("ALFA"));
+
+    // Borrar deletes that patient and no other.
+    controller.sortByColumn(PatientsModel::ColumnId); // codes descending: ALFA last
+    QVERIFY(controller.removeCurrent());
+    QSqlQuery remaining(Database::instance().connection());
+    QVERIFY(remaining.exec(QStringLiteral("SELECT name FROM b01_patient ORDER BY name")));
+    QStringList names;
+    while (remaining.next())
+        names.append(remaining.value(0).toString());
+    QCOMPARE(names, QStringList({QStringLiteral("BRAVO"), QStringLiteral("CHARLIE"),
+                                 QStringLiteral("DELTA"), QStringLiteral("ECHO")}));
+}
+
+// The grid sorts in the interface language's alphabet: Ñ is a letter after N
+// in Spanish and an N in Portuguese. A language change sorts again on the same
+// column and keeps the selected patient, also while editing it.
+void TestPatientController::languageReordersAndKeepsSelection() {
+    for (const char* name : {"OLIVEIRA", "ÑANDÚ", "NUNO"})
+        QVERIFY(createPatient(m_service, QString::fromUtf8(name)));
+    const AppSettings settings;
+    const QString before = settings.language();
+    const auto restore = qScopeGuard([&settings, before] { settings.setLanguage(before); });
+    const auto names = [](PatientController& controller) {
+        QStringList shown;
+        for (int row = 0; row < controller.gridModel()->rowCount(); ++row)
+            shown.append(gridText(controller, row, PatientsModel::ColumnName));
+        return shown;
+    };
+    const QString enye = QString::fromUtf8("ÑANDÚ");
+
+    settings.setLanguage(QStringLiteral("es"));
+    PatientController controller;
+    QVERIFY(controller.load());
+    QCOMPARE(names(controller), QStringList({QStringLiteral("NUNO"), enye, QStringLiteral("OLIVEIRA")}));
+    controller.selectRow(1);
+    QCOMPARE(controller.patientName(), enye);
+
+    // Portuguese, as InterfaceSettings stores it before announcing it.
+    QSignalSpy currentSpy(&controller, &PatientController::currentChanged);
+    settings.setLanguage(QStringLiteral("pt"));
+    controller.refreshLanguage();
+    QCOMPARE(names(controller), QStringList({enye, QStringLiteral("NUNO"), QStringLiteral("OLIVEIRA")}));
+    QCOMPARE(controller.sortColumn(), PatientsModel::ColumnName);
+    QCOMPARE(controller.sortOrder(), kAscending);
+    QCOMPARE(controller.currentRow(), 0);
+    QCOMPARE(controller.patientName(), enye);
+    QVERIFY(currentSpy.count() > 0);
+
+    // While editing: the same patient is edited and keeps the highlight.
+    controller.startEdit();
+    QVERIFY(controller.editing());
+    settings.setLanguage(QStringLiteral("es"));
+    controller.refreshLanguage();
+    QCOMPARE(controller.currentRow(), 1);
+    QCOMPARE(gridText(controller, controller.currentRow(), PatientsModel::ColumnName), enye);
+    QCOMPARE(controller.saveDraft(enye, controller.patientSex(), controller.birthDateText(),
+                                  controller.ageRange(), QStringLiteral("rua nova"),
+                                  controller.cohabitants(), controller.contactPerson(),
+                                  controller.siblingCount()),
+             kSaved);
+    QSqlQuery stored(Database::instance().connection());
+    QVERIFY(stored.exec(QStringLiteral("SELECT name FROM b01_patient WHERE address = 'rua nova'")));
+    QVERIFY(stored.next());
+    QCOMPARE(stored.value(0).toString(), enye);
+    QVERIFY(!stored.next());
 }
 
 void TestPatientController::addEditSaveAndReselect() {
