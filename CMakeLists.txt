@@ -110,6 +110,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/ClinicalContext.cpp
     src/logic/ClinicalContext.h
     src/logic/ConsultationService.h
+    src/logic/InterfaceLocale.cpp
+    src/logic/InterfaceLocale.h
     src/logic/PatientService.cpp
     src/logic/PatientService.h
     src/logic/PediatricConsultationLabels.cpp
@@ -124,6 +126,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/PhotoManager.h
     src/logic/SexLabel.cpp
     src/logic/SexLabel.h
+    src/logic/TextOrder.cpp
+    src/logic/TextOrder.h
 )
 target_include_directories(GambasseCore PUBLIC src)
 target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Gui Qt6::Sql)

@@ -33,6 +33,13 @@ add_dependencies(test_startuperror Gambasse)
 # Data and business rules.
 gambasse_add_test(schemamigrator LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(appsettings LIBS GambasseCore)
+# The patient list order, compared with ICU's when the Qt kit has it (the
+# desktop kit, as in the CI): Qt only declares it among its private features.
+gambasse_add_test(textorder LIBS GambasseCore)
+get_target_property(QT_CORE_PRIVATE_FEATURES Qt6::Core QT_ENABLED_PRIVATE_FEATURES)
+if("icu" IN_LIST QT_CORE_PRIVATE_FEATURES)
+    target_compile_definitions(test_textorder PRIVATE GAMBASSE_QT_HAS_ICU)
+endif()
 gambasse_add_test(photomanager LIBS GambasseCore)
 gambasse_add_test(patientservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(clinicalcontext LIBS GambasseCore SOURCES ${SCHEMA_QRC})

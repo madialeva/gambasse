@@ -9,6 +9,7 @@
 #include <QQmlEngine>
 
 #include <Paths.h>
+#include <logic/InterfaceLocale.h>
 
 namespace {
 // The windows use fixed coordinates, so the font travels inside the executable
@@ -74,6 +75,10 @@ void InterfaceSettings::setLanguage(const QString& code) {
     // patient grid headers) already reads the new language.
     applyLanguage();
     emit languageChanged();
+}
+
+QLocale InterfaceSettings::locale() const {
+    return interfaceLocale(m_language);
 }
 
 void InterfaceSettings::applyLanguage() {

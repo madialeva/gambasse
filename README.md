@@ -261,9 +261,9 @@ libgl1-mesa-dri libglx-mesa0 libegl-mesa0 libfreetype6 libfontconfig1 zlib1g
 fonts-dejavu-core
 ```
 
-Built without ICU, the executable sorts the patient list with the C library's
-collation of the system locale, which gives the same order as the development
-build; it prints a notice about it on the standard error.
+The executable is built without ICU, which the application does not need: it
+sorts the patient list with an order of its own (see Internationalization), the
+same as the development build's on every system.
 
 ## Diagnostics
 
@@ -285,6 +285,22 @@ lrelease translations/gambasse_pt.ts -qm translations/gambasse_pt.qm
 A new text is translated in the same change that adds it. The
 `translationcatalogs` test fails when a catalog has unfinished or empty entries
 or loses a `%n` placeholder, and when a `.qm` does not match its `.ts`.
+
+The calendar of the date fields follows the interface language too, with the
+month and day names of Qt's locale data, whatever the system's language:
+Portuguese takes the conventions of Guinea-Bissau (`pt_GW`), Spanish those of
+Spain (`es_ES`) and English those of the United Kingdom (`en_GB`), so the week
+always starts on Monday. The fields keep their `dd/MM/yyyy` dates in every
+language.
+
+The patient list is sorted alphabetically in the interface language, the same
+in every build and on every system: case does not count, an accented letter
+sorts with its base letter (`CESAR CÉSAR CUNHA`), and `Ñ` is a letter of its
+own after `N` in Spanish and an `N` in Portuguese and English. The application
+does this with its own comparison (`src/logic/TextOrder.cpp`), on Qt's Unicode
+tables, because Qt's collation follows the system's and, without ICU, as in the
+self-contained executables, ignores the locale it is given. Changing the
+language sorts the list again and keeps the selected patient.
 
 The windows use fixed coordinates, so a longer text may not fit. The
 `everyTextShowsWhole` test of each screen fails when a text cannot be read whole
