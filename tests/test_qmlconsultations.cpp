@@ -192,6 +192,7 @@ private slots:
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
     void popupsFollowTheZoom();
+    void bodyDiagramIsRenderedAtItsZoomedSize();
 };
 
 void TestQmlConsultations::initTestCase() {
@@ -868,6 +869,23 @@ void TestQmlConsultations::popupsFollowTheZoom() {
                  && qAbs(drawn.center().y() - size.height() / 2.0) <= 1,
              qPrintable(zoomtest::describe(drawn)));
     QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+}
+
+
+// The body diagram is rendered at the size it is seen, so a zoomed window
+// shows it sharp, not as an enlarged bitmap.
+void TestQmlConsultations::bodyDiagramIsRenderedAtItsZoomedSize() {
+    open(screenData().at(0), 0, zoomtest::wideArea); // adult
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickItem* image = inConsultation(QStringLiteral("bodyRegions"));
+    QVERIFY(image != nullptr);
+    QCOMPARE(image->property("sourceSize").toSize(), QSize(240, 295));
+    settings()->setLetterSize(20);
+    QTRY_COMPARE(consultationWindow()->size(), zoomtest::zoomOf(consultationWindow())->windowSize());
+    QCOMPARE(image->property("sourceSize").toSize(),
+             QSize(qCeil(240 * 20 / 13.0), qCeil(295 * 20 / 13.0)));
+    // Laid out as at the base size: only the rendering grew.
+    QCOMPARE(QSizeF(image->width(), image->height()), QSizeF(240, 295));
 }
 
 } // namespace gambasse

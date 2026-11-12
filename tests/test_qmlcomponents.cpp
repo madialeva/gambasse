@@ -210,6 +210,7 @@ private:
 private slots:
     void initTestCase();
     void popupsOfAZoomedWindowPickTheirSide();
+    void symbolsAreDrawnWithShapes();
     void textInput();
     void numberInput();
     void dateInput();
@@ -933,6 +934,56 @@ void TestQmlComponents::popupsOfAZoomedWindowPickTheirSide() {
         QCOMPARE(zoomtest::isBelow(calendar, date), below);
         QVERIFY(QMetaObject::invokeMethod(calendar, "close"));
         QTRY_VERIFY(!calendar->property("visible").toBool());
+    }
+}
+
+
+// The combo arrow and the calendar icon are shapes, not Canvas bitmaps, so a
+// zoomed window draws them sharp. At the base size they keep the measures of
+// the Widgets glyphs and the colour of the theme, and follow a theme switch.
+void TestQmlComponents::symbolsAreDrawnWithShapes() {
+    QQmlApplicationEngine engine;
+    Harness combo;
+    QVERIFY(openHarness(&engine, "GxComboInput.qml", QStringLiteral("claro"), combo));
+    combo.component->setProperty("width", 200);
+    combo.component->setProperty("height", 22);
+    combo.window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(combo.window));
+    auto* arrow = visualItem(combo.window, QStringLiteral("comboArrow"));
+    QVERIFY(arrow != nullptr);
+    QCOMPARE(QSizeF(arrow->width(), arrow->height()), QSizeF(7, 4));
+    QList<qreal> rows;
+    for (QQuickItem* row : arrow->childItems())
+        rows.append(row->width());
+    QCOMPARE(rows, (QList<qreal>{7, 5, 3, 1}));
+
+    Harness date;
+    QVERIFY(openHarness(&engine, "GxDateInput.qml", QStringLiteral("claro"), date));
+    date.component->setProperty("width", 200);
+    date.component->setProperty("height", 22);
+    date.window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(date.window));
+    auto* icon = visualItem(date.window, QStringLiteral("calendarIcon"));
+    QVERIFY(icon != nullptr);
+    QCOMPARE(QSizeF(icon->width(), icon->height()), QSizeF(16, 16));
+    auto* page = visualItem(date.window, QStringLiteral("calendarPage"));
+    QVERIFY(page != nullptr);
+
+    const QList<std::tuple<QString, QColor, QColor>> themes = {
+        {QStringLiteral("claro"), QColor(QStringLiteral("#6B6B6B")), QColor(QStringLiteral("#1A1A1A"))},
+        {QStringLiteral("oscuro"), QColor(QStringLiteral("#BABABA")), QColor(Qt::white)},
+    };
+    for (const auto& [mode, arrowColour, iconColour] : themes) {
+        combo.shell->setProperty("themeMode", mode);
+        date.shell->setProperty("themeMode", mode);
+        for (QQuickItem* row : arrow->childItems())
+            QCOMPARE(row->property("color").value<QColor>(), arrowColour);
+        QCOMPARE(page->property("border").value<QObject*>()->property("color").value<QColor>(),
+                 iconColour);
+        // Painted where it is laid out: the widest row of the arrow, whole
+        // pixels on the base size.
+        const QPoint spot = arrow->mapToScene(QPointF(3.5, 0.5)).toPoint();
+        QTRY_COMPARE(combo.window->grabWindow().pixelColor(spot), arrowColour);
     }
 }
 

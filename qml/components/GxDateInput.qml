@@ -186,37 +186,53 @@ Item {
                     color: "transparent"
                 }
                 // Same 16 px glyph UxDateField paints: an outlined page with a
-                // solid header and two rings.
-                contentItem: Canvas {
-                    id: calendarIcon
-                    onPaint: {
-                        const ctx = getContext("2d");
-                        ctx.reset();
-                        ctx.strokeStyle = Theme.windowText;
-                        ctx.fillStyle = Theme.windowText;
-                        ctx.lineWidth = 1.2;
-                        ctx.beginPath();
-                        ctx.roundedRect(2, 3, 12, 11, 1.5, 1.5);
-                        ctx.stroke();
-                        ctx.fillRect(2, 3, 12, 3);
-                        ctx.strokeRect(2, 3, 12, 3);
-                        ctx.beginPath();
-                        ctx.moveTo(5, 1);
-                        ctx.lineTo(5, 4);
-                        ctx.moveTo(11, 1);
-                        ctx.lineTo(11, 4);
-                        ctx.stroke();
+                // solid header and two rings. Drawn with shapes (the 1.2 px
+                // strokes of the original) so it stays sharp in a zoomed
+                // window.
+                contentItem: Item {
+                    objectName: "calendarIcon"
+                    implicitWidth: 16
+                    implicitHeight: 16
+                    Rectangle {
+                        objectName: "calendarPage"
+                        x: 1.4
+                        y: 2.4
+                        width: 13.2
+                        height: 12.2
+                        radius: 2.1
+                        color: "transparent"
+                        border.color: Theme.windowText
+                        border.width: 1.2
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 1.4
+                        y: 2.4
+                        width: 13.2
+                        height: 4.2
+                        color: Theme.windowText
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 4.4
+                        y: 1
+                        width: 1.2
+                        height: 3
+                        color: Theme.windowText
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 10.4
+                        y: 1
+                        width: 1.2
+                        height: 3
+                        color: Theme.windowText
+                        antialiasing: true
                     }
                 }
                 onClicked: root.openCalendar()
             }
             onTextEdited: root.textEdited()
-            Connections {
-                target: Theme
-                function onDarkChanged() {
-                    calendarIcon.requestPaint();
-                }
-            }
         }
     }
 

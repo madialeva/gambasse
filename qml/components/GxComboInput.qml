@@ -23,6 +23,12 @@ Item {
     // Emitted when the user picks an entry (never on a programmatic change).
     signal valueSelected
 
+    // Scale of the list: a popup does not inherit the scale of a zoomed
+    // history or consultation window, so it takes it from the window.
+    readonly property real zoomFactor: (Window.window as FormWindow)?.zoomFactor ?? 1
+    // Height of the window, at its own scale.
+    readonly property real windowHeight: Window.height
+
     function addItem(text, value) {
         comboModel.append({
             "text": text,
@@ -124,7 +130,7 @@ Item {
                 id: dropDown
                 objectName: "comboPopup"
                 readonly property int maxVisibleEntries: 10
-                readonly property real zoomFactor: (combo.Window.window as FormWindow)?.zoomFactor ?? 1
+                readonly property real zoomFactor: root.zoomFactor
                 // Height the entries want, and the room of the side picked,
                 // at the base size.
                 readonly property real wantedHeight: Math.min(combo.count, dropDown.maxVisibleEntries) * combo.entryHeight + topPadding + bottomPadding
@@ -143,7 +149,7 @@ Item {
                 function pickSide() {
                     const top = combo.mapToItem(null, 0, 0).y;
                     const bottom = combo.mapToItem(null, 0, combo.height).y;
-                    const below = (combo.Window.height - bottom) / dropDown.zoomFactor - dropDown.bottomMargin;
+                    const below = (root.windowHeight - bottom) / dropDown.zoomFactor - dropDown.bottomMargin;
                     const over = top / dropDown.zoomFactor - dropDown.topMargin;
                     dropDown.above = dropDown.wantedHeight > below && over > below;
                     dropDown.room = dropDown.above ? over : below;
@@ -308,25 +314,41 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 background: null
             }
-            // 7-5-3-1 px triangle centred 11 px left of the right border.
-            indicator: Canvas {
-                id: arrow
+            // 7-5-3-1 px triangle centred 11 px left of the right border,
+            // drawn with shapes so it stays sharp in a zoomed window.
+            indicator: Item {
+                objectName: "comboArrow"
                 x: combo.width - 15
                 y: Math.floor((combo.height - 4) / 2)
                 width: 7
                 height: 4
-                onPaint: {
-                    const ctx = getContext("2d");
-                    ctx.reset();
-                    ctx.fillStyle = Theme.comboArrow;
-                    for (let row = 0; row < 4; ++row)
-                        ctx.fillRect(row, row, 7 - 2 * row, 1);
+                Rectangle {
+                    x: 0
+                    y: 0
+                    width: 7
+                    height: 1
+                    color: Theme.comboArrow
                 }
-                Connections {
-                    target: Theme
-                    function onDarkChanged() {
-                        arrow.requestPaint();
-                    }
+                Rectangle {
+                    x: 1
+                    y: 1
+                    width: 5
+                    height: 1
+                    color: Theme.comboArrow
+                }
+                Rectangle {
+                    x: 2
+                    y: 2
+                    width: 3
+                    height: 1
+                    color: Theme.comboArrow
+                }
+                Rectangle {
+                    x: 3
+                    y: 3
+                    width: 1
+                    height: 1
+                    color: Theme.comboArrow
                 }
             }
         }

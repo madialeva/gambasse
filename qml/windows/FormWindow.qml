@@ -77,6 +77,7 @@ Window {
             height: Theme.titleBarHeight
             title: root.screenTitle
             closeOnly: true
+            zoomFactor: zoom.factor
         }
     }
 }

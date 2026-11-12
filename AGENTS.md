@@ -151,6 +151,10 @@ A popup does not inherit the scale of the item it belongs to: one shown by a
 child window (a dialog, a combo list, the calendar) takes `scale` from the
 window's `zoomFactor` with `transformOrigin: Popup.TopLeft`, and picks its side
 itself instead of trusting Qt's flip, which misplaces a scaled popup.
+A symbol is drawn with shapes (`Rectangle`), never with `Canvas`, whose bitmap
+a zoomed window would show blurred; an image in a child window multiplies its
+`sourceSize` by the zoom factor, rounded up, so it is rendered at the size it
+is seen.
 A character that font lacks fails `everyTextHasItsGlyphs`: draw the symbol
 instead. A QML test creates the `InterfaceSettings` singleton before loading a
 view, like `main.cpp`. A view

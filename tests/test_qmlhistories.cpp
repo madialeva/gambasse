@@ -164,6 +164,7 @@ private slots:
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
     void popupsFollowTheZoom();
+    void titleBarLogoIsRenderedAtItsZoomedSize();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -783,6 +784,30 @@ void TestQmlHistories::popupsFollowTheZoom() {
                  && qAbs(drawn.center().y() - window->height() / 2.0) <= 1,
              qPrintable(zoomtest::describe(drawn)));
     QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+}
+
+
+// The logo of a zoomed title bar is rendered at the height it is seen and
+// laid out as at the base size; the main window's logo does not change.
+void TestQmlHistories::titleBarLogoIsRenderedAtItsZoomedSize() {
+    open(screenData().at(0), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickItem* logo = visualChild(inHistory(QStringLiteral("historyTitleBar")),
+                                   QStringLiteral("logoImage"));
+    QQuickItem* mainLogo = visualChild(child(m_window, QStringLiteral("titleBar")),
+                                       QStringLiteral("logoImage"));
+    QVERIFY(logo != nullptr && mainLogo != nullptr);
+    const QSizeF laidOut(logo->width(), logo->height());
+    QCOMPARE(laidOut.height(), 24.0);
+    QCOMPARE(QSizeF(mainLogo->width(), mainLogo->height()), laidOut);
+
+    m_settings->setLetterSize(20);
+    QTRY_COMPARE(historyQuickWindow()->size(), zoomtest::zoomOf(historyWindow())->windowSize());
+    QCOMPARE(logo->property("sourceSize").toSize().height(), qCeil(24 * 20 / 13.0));
+    QVERIFY(qAbs(logo->width() - laidOut.width()) < 0.5);
+    QCOMPARE(logo->height(), 24.0);
+    QCOMPARE(mainLogo->property("sourceSize").toSize().height(), 24);
+    QCOMPARE(QSizeF(mainLogo->width(), mainLogo->height()), laidOut);
 }
 
 } // namespace gambasse

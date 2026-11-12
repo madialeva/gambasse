@@ -18,6 +18,10 @@ Item {
     // the window that shows the bar owns the dialog.
     property bool showHelp: false
     signal aboutRequested
+    // Scale of the window the bar is drawn in (the zoom of a history or
+    // consultation window): the logo is rendered at the size it is seen and
+    // the tooltips, popups that do not inherit it, are scaled by it.
+    property real zoomFactor: 1
     // config.ini is free text, so the code is checked before building any URL
     // (a wrong one used to point at a non-existing flag image).
     // Window.window is an attached property and only resolves on Items, so the
@@ -91,7 +95,11 @@ Item {
         Image {
             objectName: "logoImage"
             source: "qrc:/img/logo.svg"
-            sourceSize.height: 24
+            // Rendered at the height it is seen, laid out 24 px high.
+            sourceSize.height: Math.ceil(24 * root.zoomFactor)
+            height: 24
+            width: implicitWidth / root.zoomFactor
+            fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
         }
         Text {
