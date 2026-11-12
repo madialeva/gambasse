@@ -41,28 +41,31 @@ inline bool isControl(const QQuickItem* item) {
     return isTextInput(item) || isButton(item) || item->inherits("QQuickComboBox");
 }
 
-// Where a control is drawn: the rows of check boxes are closer than their
-// height, but their paddings are empty.
-inline QRectF drawnRect(const QQuickItem* control) {
-    const qreal top = isButton(control) ? control->property("topPadding").toReal() : 0;
-    const qreal bottom = isButton(control) ? control->property("bottomPadding").toReal() : 0;
-    const QPointF start = control->mapToScene(QPointF(0, top));
-    return QRectF(start, QSizeF(control->width(), control->height() - top - bottom));
+// Where a control is drawn, in the coordinates of `top`: the rows of check
+// boxes are closer than their height, but their paddings are empty. Measured in
+// `top`, not in the window, so a zoomed window (whose stage is scaled) is
+// checked with the same measures as at its base size.
+inline QRectF drawnRect(const QQuickItem* control, const QQuickItem* top) {
+    const qreal padTop = isButton(control) ? control->property("topPadding").toReal() : 0;
+    const qreal padBottom = isButton(control) ? control->property("bottomPadding").toReal() : 0;
+    return control->mapRectToItem(
+        top, QRectF(0, padTop, control->width(), control->height() - padTop - padBottom));
 }
 
-// Where a text is drawn: its natural width from where it starts, around its
-// vertical centre. Its own item may be narrower.
-inline QRectF drawnRect(QQuickItem* item, qreal wanted) {
+// Where a text is drawn, in the coordinates of `top`: its natural width from
+// where it starts, around its vertical centre. Its own item may be narrower.
+inline QRectF drawnRect(QQuickItem* item, qreal wanted, const QQuickItem* top) {
     const qreal padding = item->property("leftPadding").toReal();
     const qreal height = item->property("contentHeight").toReal();
-    const QPointF start = item->mapToScene(QPointF(padding, (item->height() - height) / 2.0));
-    return QRectF(start, QSizeF(wanted - padding, height));
+    return item->mapRectToItem(
+        top, QRectF(padding, (item->height() - height) / 2.0, wanted - padding, height));
 }
 
 } // namespace visibletext
 
 // The texts under `top` that cannot be read whole: squeezed below their width,
-// running past a group that clips them, or lying under another control.
+// running past a group that clips them, or lying under another control. For a
+// zoomed history or consultation window, `top` is its stage.
 inline QStringList cutTexts(QQuickItem* top) {
     using namespace visibletext;
     QStringList cut;
@@ -110,7 +113,7 @@ inline QStringList cutTexts(QQuickItem* top) {
             // A title sits on the border of its group on purpose (the badge
             // test of each form looks after it).
             if (item->objectName() != QLatin1String("groupTitle"))
-                texts.append({text, drawnRect(item, wanted), item});
+                texts.append({text, drawnRect(item, wanted, top), item});
         }
         for (QQuickItem* kid : item->childItems())
             walk(kid);
@@ -125,7 +128,7 @@ inline QStringList cutTexts(QQuickItem* top) {
         for (QQuickItem* control : controls) {
             if (isAncestor(control, piece.item))
                 continue;
-            if (overlap(piece.rect, drawnRect(control)))
+            if (overlap(piece.rect, drawnRect(control, top)))
                 report(piece.text);
         }
         for (const Piece& other : texts) {

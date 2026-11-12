@@ -137,9 +137,19 @@ match its `.ts`. The windows use fixed coordinates, so the `everyTextShowsWhole`
 test of each screen fails when a text cannot be read whole in one of the three
 languages. Those measures hold everywhere because the font is embedded
 (`resources/fonts/`, Noto Sans at 13 px, without hinting, installed by
-`InterfaceSettings`), and `ctest` runs with no system font. A character that font
-lacks fails `everyTextHasItsGlyphs`: draw the symbol instead. A QML test creates
-the `InterfaceSettings` singleton before loading a view, like `main.cpp`. A view
+`InterfaceSettings`), and `ctest` runs with no system font. The history and
+consultation windows derive from `qml/windows/FormWindow.qml`, which zooms
+them: their title bar, form and buttons live in its `stage`, laid out at the
+13 px base size and scaled as a whole by the letter size the user chooses
+(13-26 px, `InterfaceSettings.letterSize`, `letra/pixeles` in `config.ini`)
+divided by 13. Zooming never multiplies coordinates or font sizes: a text whole
+at the base size is whole at any size, and the zoomed `everyTextShowsWhole`
+tests measure in the stage. `ZoomController` (C++) picks the size each window
+shows from its screen's available area and places the window; the tests fix
+that area, because the offscreen screen (800×800) is smaller than the windows.
+A character that font lacks fails `everyTextHasItsGlyphs`: draw the symbol
+instead. A QML test creates the `InterfaceSettings` singleton before loading a
+view, like `main.cpp`. A view
 that shows month or day names takes `InterfaceSettings.locale`, the interface
 language's locale (`pt_GW`, `es_ES` or `en_GB`, all starting the week on
 Monday), never `Qt.locale()`, which is the system's, nor `Qt.formatDate()` with

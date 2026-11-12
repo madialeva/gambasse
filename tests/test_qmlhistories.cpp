@@ -6,9 +6,12 @@
 #include <QSqlQuery>
 #include <QTemporaryDir>
 #include <QtTest>
+#include <functional>
+#include <tuple>
 
 #include <Paths.h>
 #include <VisibleTextChecks.h>
+#include <ZoomTestSupport.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -125,8 +128,15 @@ private:
     void cleanup();
     bool createPatient(const ScreenData& data);
     int storedHistories(const QString& table);
-    void open(const ScreenData& data);
+    // Opens the history of `data`; with an `area`, the child windows take it
+    // as their available area before the window is first placed.
+    void open(const ScreenData& data, const QRect& area = QRect());
+    void openHistoryOf(const ScreenData& data);
     void removeAll();
+    QList<QObject*> childWindows() const;
+    QQuickWindow* historyQuickWindow() const {
+        return qobject_cast<QQuickWindow*>(historyWindow());
+    }
 
 private slots:
     void initTestCase();
@@ -144,6 +154,15 @@ private slots:
     void everyTextShowsWhole_data();
     void everyTextShowsWhole();
     void pregnancyExamGainsARow();
+    void zoomScalesTheWindow_data();
+    void zoomScalesTheWindow();
+    void zoomKeepsTheState();
+    void screenHoldsTheSizeBack();
+    void smallScreenKeepsTheBaseSize();
+    void sizeIsRememberedAcrossWindowsAndRuns();
+    void windowIsPlacedOverTheMainOne();
+    void everyTextShowsWholeZoomed_data();
+    void everyTextShowsWholeZoomed();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -218,6 +237,7 @@ void TestQmlHistories::openScreen() {
         InterfaceSettings baseline(nullptr);
         baseline.setTheme(QStringLiteral("claro"));
         baseline.setLanguage(QStringLiteral("en"));
+        baseline.setLetterSize(13);
     }
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
@@ -237,10 +257,20 @@ void TestQmlHistories::openScreen() {
     QVERIFY(QTest::qWaitForWindowExposed(m_window));
 }
 
-void TestQmlHistories::open(const ScreenData& data) {
+QList<QObject*> TestQmlHistories::childWindows() const {
+    return {historyWindow(), m_screen->findChild<QObject*>(QStringLiteral("consultationWindow"))};
+}
+
+void TestQmlHistories::open(const ScreenData& data, const QRect& area) {
     removeAll();
     QVERIFY(createPatient(data));
     openScreen();
+    if (area.isValid())
+        zoomtest::setArea(childWindows(), area);
+    openHistoryOf(data);
+}
+
+void TestQmlHistories::openHistoryOf(const ScreenData& data) {
     if (data.screenId == QLatin1String("pediatric"))
         m_controller->openPediatricHistory();
     else
@@ -485,6 +515,198 @@ void TestQmlHistories::pregnancyExamGainsARow() {
         QVERIFY2(row != nullptr, name);
         QVERIFY2(row->mapToItem(tabs, QPointF(0, row->height())).y() <= tabs->height(), name);
     }
+}
+
+
+void TestQmlHistories::zoomScalesTheWindow_data() {
+    newHistoryCannotBeDeleted_data();
+}
+
+// The whole window is its base layout scaled: the window, the title bar and
+// every control grow by the same factor and keep their places.
+void TestQmlHistories::zoomScalesTheWindow() {
+    QFETCH(int, row);
+    open(screenData().at(row), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickWindow* window = historyQuickWindow();
+    QQuickItem* stage = zoomtest::stageOf(window);
+    QVERIFY(stage != nullptr);
+    QCOMPARE(window->size(), QSize(1020, 608));
+    QCOMPARE(stage->scale(), 1.0);
+
+    QQuickItem* bar = inHistory(QStringLiteral("historyTitleBar"));
+    QQuickItem* save = inHistory(QStringLiteral("saveHistoryButton"));
+    QQuickItem* allergies = visualChild(inHistory(QStringLiteral("historyForm")),
+                                        screenData().at(row).textField);
+    QVERIFY(bar && save && allergies);
+    const QRectF barBase = zoomtest::sceneRect(bar);
+    const QRectF saveBase = zoomtest::sceneRect(save);
+    const QRectF fieldBase = zoomtest::sceneRect(allergies);
+
+    m_settings->setLetterSize(15);
+    QTRY_COMPARE(window->size(), QSize(1177, 702));
+    const qreal factor = 15.0 / 13.0;
+    QCOMPARE(stage->scale(), factor);
+    for (const auto& [name, item, base] :
+         {std::tuple{"title bar", bar, barBase}, std::tuple{"save", save, saveBase},
+          std::tuple{"field", allergies, fieldBase}}) {
+        const QRectF now = zoomtest::sceneRect(item);
+        QVERIFY2(zoomtest::sameScaled(base, now, factor),
+                 qPrintable(QStringLiteral("%1: %2 from %3")
+                                .arg(QLatin1String(name), zoomtest::describe(now),
+                                     zoomtest::describe(base))));
+    }
+
+    m_settings->setLetterSize(13);
+    QTRY_COMPARE(window->size(), QSize(1020, 608));
+    QCOMPARE(stage->scale(), 1.0);
+    QCOMPARE(zoomtest::sceneRect(save), saveBase);
+}
+
+// A zoom changes how the window looks, never what it holds.
+void TestQmlHistories::zoomKeepsTheState() {
+    const ScreenData data = screenData().at(1); // pregnancy: it has tabs
+    open(data, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickWindow* window = historyQuickWindow();
+    QQuickItem* form = inHistory(QStringLiteral("historyForm"));
+    QQuickItem* tabs = nullptr;
+    const std::function<void(QQuickItem*)> findTabs = [&](QQuickItem* item) {
+        if (tabs == nullptr && item->property("titles").isValid()
+            && item->property("currentIndex").isValid())
+            tabs = item;
+        for (QQuickItem* kid : item->childItems())
+            findTabs(kid);
+    };
+    findTabs(form);
+    QVERIFY(tabs != nullptr);
+    tabs->setProperty("currentIndex", 1);
+
+    QQuickItem* field = visualChild(visualChild(form, data.textField), QStringLiteral("field"));
+    QVERIFY(field != nullptr);
+    field->forceActiveFocus();
+    QTRY_VERIFY(field->hasActiveFocus());
+    for (const char key : {'a', 'b', 'c'})
+        QTest::keyClick(window, key);
+    QCOMPARE(history()->value(data.textField).toString(), QStringLiteral("abc"));
+
+    m_settings->setLetterSize(16);
+    QTRY_COMPARE(window->size(), zoomtest::zoomOf(window)->windowSize());
+    QCOMPARE(field->property("text").toString(), QStringLiteral("abc"));
+    QCOMPARE(history()->value(data.textField).toString(), QStringLiteral("abc"));
+    QVERIFY(field->hasActiveFocus());
+    QCOMPARE(tabs->property("currentIndex").toInt(), 1);
+    QVERIFY(history()->isNew()); // nothing was saved
+}
+
+// A tall window shows the largest size its screen holds; the chosen one stays.
+void TestQmlHistories::screenHoldsTheSizeBack() {
+    removeAll();
+    QVERIFY(createPatient(screenData().at(0)));
+    openScreen();
+    m_settings->setLetterSize(17);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    zoomtest::setArea(childWindows(), zoomtest::laptopArea);
+    openHistoryOf(screenData().at(0));
+    QQuickWindow* window = historyQuickWindow();
+    QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 15);
+    QTRY_COMPARE(window->size(), QSize(1177, 702));
+    QCOMPARE(m_settings->letterSize(), 17);
+}
+
+void TestQmlHistories::smallScreenKeepsTheBaseSize() {
+    open(screenData().at(0), QRect(0, 0, 1024, 560));
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    m_settings->setLetterSize(20);
+    QQuickWindow* window = historyQuickWindow();
+    QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 13);
+    QTest::qWait(50);
+    QCOMPARE(window->size(), QSize(1020, 608));
+    QCOMPARE(zoomtest::stageOf(window)->scale(), 1.0);
+}
+
+// One letter size for every child window, kept in config.ini for the next run.
+void TestQmlHistories::sizeIsRememberedAcrossWindowsAndRuns() {
+    open(screenData().at(0), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] {
+        if (m_settings != nullptr)
+            m_settings->setLetterSize(13);
+    });
+    zoomtest::zoomOf(historyWindow())->zoomIn();
+    zoomtest::zoomOf(historyWindow())->zoomIn();
+    QCOMPARE(m_settings->letterSize(), 15);
+    historyQuickWindow()->close();
+    // The consultation window of the same shell follows.
+    QObject* consultation = m_screen->findChild<QObject*>(QStringLiteral("consultationWindow"));
+    QCOMPARE(zoomtest::zoomOf(consultation)->shownLetterSize(), 15);
+
+    // A new run reads it back.
+    cleanup();
+    m_engine = new QQmlApplicationEngine();
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                                 QStringLiteral("InterfaceSettings"));
+    m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
+    QVERIFY(!m_engine->rootObjects().isEmpty());
+    m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+    m_controller = m_window->property("patientController").value<PatientController*>();
+    m_screen = child(m_window, QStringLiteral("mainView"));
+    QVERIFY(m_screen != nullptr);
+    QCOMPARE(m_settings->letterSize(), 15);
+    zoomtest::setArea(childWindows(), zoomtest::wideArea);
+    QCOMPARE(zoomtest::zoomOf(historyWindow())->shownLetterSize(), 15);
+}
+
+// Centred over the main window the first time and after every zoom change;
+// where the user left it otherwise.
+void TestQmlHistories::windowIsPlacedOverTheMainOne() {
+    const ScreenData data = screenData().at(0);
+    removeAll();
+    QVERIFY(createPatient(data));
+    openScreen();
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    m_window->setPosition(400, 200);
+    QTRY_COMPARE(m_window->position(), QPoint(400, 200));
+    zoomtest::setArea(childWindows(), zoomtest::wideArea);
+    openHistoryOf(data);
+    QQuickWindow* window = historyQuickWindow();
+    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+
+    // Dragged, closed and opened again: where it was left.
+    QVERIFY(zoomtest::dragTo(window, QPoint(30, 40)));
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    openHistoryOf(data);
+    QCOMPARE(window->position(), QPoint(30, 40));
+
+    // A zoom centres it again, with its new size.
+    QVERIFY(zoomtest::dragTo(window, QPoint(30, 40)));
+    zoomtest::zoomOf(window)->zoomIn();
+    QTRY_COMPARE(window->size(), QSize(1099, 655));
+    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+}
+
+void TestQmlHistories::everyTextShowsWholeZoomed_data() {
+    everyTextShowsWhole_data();
+}
+
+// Zooming scales the layout as it is, so every text that reads whole at the
+// base size reads whole at 17 px: measured in the stage, nothing may move.
+void TestQmlHistories::everyTextShowsWholeZoomed() {
+    QFETCH(int, row);
+    QFETCH(QString, language);
+    open(screenData().at(row), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] {
+        m_settings->setLetterSize(13);
+        m_settings->setLanguage(QStringLiteral("en"));
+    });
+    m_settings->setLanguage(language);
+    m_settings->setLetterSize(17);
+    QQuickWindow* window = historyQuickWindow();
+    QTRY_COMPARE(window->size(), zoomtest::zoomOf(window)->windowSize());
+    QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 17);
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse

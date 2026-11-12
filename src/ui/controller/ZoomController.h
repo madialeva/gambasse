@@ -27,7 +27,8 @@ namespace gambasse {
 class ZoomController : public QObject {
     Q_OBJECT
     QML_ELEMENT
-    Q_PROPERTY(InterfaceSettings* settings READ settings WRITE setSettings NOTIFY settingsChanged)
+    Q_PROPERTY(gambasse::InterfaceSettings* settings READ settings WRITE setSettings NOTIFY
+                   settingsChanged)
     Q_PROPERTY(QWindow* window READ window WRITE setWindow NOTIFY windowChanged)
     // Size of the window at the base letter size, title bar and frame included.
     Q_PROPERTY(QSize baseSize READ baseSize WRITE setBaseSize NOTIFY baseSizeChanged)
