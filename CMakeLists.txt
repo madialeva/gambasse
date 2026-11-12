@@ -178,6 +178,8 @@ qt_add_qml_module(GambasseQml
         src/ui/controller/PregnancyConsultationController.h
         src/ui/controller/PregnancyHistoryController.cpp
         src/ui/controller/PregnancyHistoryController.h
+        src/ui/controller/ZoomController.cpp
+        src/ui/controller/ZoomController.h
         src/ui/filter/ColumnFilterProxy.cpp
         src/ui/filter/ColumnFilterProxy.h
     QML_FILES

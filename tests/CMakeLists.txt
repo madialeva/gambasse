@@ -62,6 +62,7 @@ target_compile_definitions(test_translationcatalogs PRIVATE
 # Controllers and view helpers.
 gambasse_add_test(columnfilterproxy LIBS ${QML_LIBS})
 gambasse_add_test(patientcontroller LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${IMAGES_QRC} ${I18N_QRC})
+gambasse_add_test(zoomcontroller LIBS ${QML_LIBS})
 
 # QML foundation, control library and screens.
 gambasse_add_test(qmlfoundation LIBS ${QML_LIBS} SOURCES ${SCHEMA_QRC} ${I18N_QRC} ${IMAGES_QRC})
