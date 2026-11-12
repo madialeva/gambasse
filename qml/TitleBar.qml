@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import Gambasse
@@ -18,6 +19,14 @@ Item {
     // the window that shows the bar owns the dialog.
     property bool showHelp: false
     signal aboutRequested
+    // Optional zoom buttons (history and consultation windows). Like the Help
+    // menu, the bar only announces the click: FormWindow zooms, and tells the
+    // bar which way it still can.
+    property bool showZoom: false
+    property bool canZoomIn: true
+    property bool canZoomOut: true
+    signal zoomInRequested
+    signal zoomOutRequested
     // Scale of the window the bar is drawn in (the zoom of a history or
     // consultation window): the logo is rendered at the size it is seen and
     // the tooltips, popups that do not inherit it, are scaled by it.
@@ -134,8 +143,68 @@ Item {
         background: Rectangle {
             color: button.hovered ? (button.pressed ? button.pressedColor : button.hoverColor) : "transparent"
         }
-        ToolTip.text: tip
-        ToolTip.visible: hovered
+        // Its own tooltip, not the attached one shared by the application:
+        // it is scaled with a zoomed window (a popup does not inherit the
+        // scale) and shown under the button, as the bar is at the top edge.
+        ToolTip {
+            objectName: "windowButtonTip"
+            text: button.tip
+            visible: button.hovered && button.tip !== ""
+            x: (button.width - width) / 2
+            y: button.height
+            scale: root.zoomFactor
+            transformOrigin: Popup.TopLeft
+        }
+    }
+
+    // Magnifying glass of the zoom buttons, with a plus or a minus in its
+    // lens. Drawn: the interface font has no such symbol, and shapes stay
+    // sharp in a zoomed window.
+    component Magnifier: Item {
+        id: glyph
+        property bool plus: true
+        property color colour: Theme.windowText
+        Rectangle {
+            id: lens
+            objectName: "magnifierLens"
+            x: Math.floor(glyph.width / 2) - 7
+            y: Math.floor(glyph.height / 2) - 7
+            width: 12
+            height: 12
+            radius: 6
+            color: "transparent"
+            border.color: glyph.colour
+            border.width: 2
+            antialiasing: true
+        }
+        // Handle, from the rim of the lens down to the right.
+        Rectangle {
+            x: lens.x + 10.2
+            y: lens.y + 9.0
+            width: 6
+            height: 2.4
+            radius: 1
+            rotation: 45
+            transformOrigin: Item.Left
+            color: glyph.colour
+            antialiasing: true
+        }
+        Rectangle {
+            x: lens.x + 3
+            y: lens.y + 5
+            width: 6
+            height: 2
+            color: glyph.colour
+        }
+        Rectangle {
+            objectName: "magnifierPlus"
+            visible: glyph.plus
+            x: lens.x + 5
+            y: lens.y + 3
+            width: 2
+            height: 6
+            color: glyph.colour
+        }
     }
 
     Row {
@@ -294,6 +363,30 @@ Item {
                     border.color: Theme.windowText
                     border.width: 2
                 }
+            }
+        }
+        WindowButton {
+            id: zoomOutButton
+            objectName: "zoomOutButton"
+            tip: qsTr("Zoom out")
+            visible: root.showZoom
+            enabled: root.canZoomOut
+            onClicked: root.zoomOutRequested()
+            contentItem: Magnifier {
+                plus: false
+                colour: zoomOutButton.enabled ? Theme.windowText : Theme.mutedText
+            }
+        }
+        WindowButton {
+            id: zoomInButton
+            objectName: "zoomInButton"
+            tip: qsTr("Zoom in")
+            visible: root.showZoom
+            enabled: root.canZoomIn
+            onClicked: root.zoomInRequested()
+            contentItem: Magnifier {
+                plus: true
+                colour: zoomInButton.enabled ? Theme.windowText : Theme.mutedText
             }
         }
         WindowButton {

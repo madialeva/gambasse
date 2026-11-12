@@ -78,6 +78,31 @@ Window {
             title: root.screenTitle
             closeOnly: true
             zoomFactor: zoom.factor
+            showZoom: true
+            canZoomIn: zoom.canZoomIn
+            canZoomOut: zoom.canZoomOut
+            onZoomInRequested: zoom.zoomIn()
+            onZoomOutRequested: zoom.zoomOut()
+        }
+
+        // Keyboard zoom. Inside the stage, not on the window: an open dialog,
+        // combo list or calendar then blocks them, so a popup placed for one
+        // size never sees the window change under it. Written by hand rather
+        // than StandardKey, which depends on the platform theme.
+        Shortcut {
+            sequences: ["Ctrl++", "Ctrl+="]
+            onActivated: zoom.zoomIn()
+            onActivatedAmbiguously: zoom.zoomIn()
+        }
+        Shortcut {
+            sequences: ["Ctrl+-"]
+            onActivated: zoom.zoomOut()
+            onActivatedAmbiguously: zoom.zoomOut()
+        }
+        Shortcut {
+            sequences: ["Ctrl+0"]
+            onActivated: zoom.reset()
+            onActivatedAmbiguously: zoom.reset()
         }
     }
 }

@@ -25,6 +25,9 @@ Item {
     // Scale of the calendar: a popup does not inherit the scale of a zoomed
     // history or consultation window, so it takes it from the window.
     readonly property real zoomFactor: (root.Window.window as FormWindow)?.zoomFactor ?? 1
+    // An open calendar was placed for the previous size: a zoom closes it, as
+    // a click elsewhere would.
+    onZoomFactorChanged: calendarPopup.close()
 
     function fieldBackground() {
         if (field.activeFocus)

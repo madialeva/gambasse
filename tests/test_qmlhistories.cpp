@@ -1,5 +1,7 @@
 #include <QGuiApplication>
+#include <QDir>
 #include <QQmlApplicationEngine>
+#include <QSettings>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QSqlError>
@@ -165,6 +167,10 @@ private slots:
     void everyTextShowsWholeZoomed();
     void popupsFollowTheZoom();
     void titleBarLogoIsRenderedAtItsZoomedSize();
+    void zoomButtonsAndShortcuts();
+    void zoomLimits();
+    void zoomUnderPopups();
+    void zoomTooltipsFollowTheZoom();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -808,6 +814,182 @@ void TestQmlHistories::titleBarLogoIsRenderedAtItsZoomedSize() {
     QCOMPARE(logo->height(), 24.0);
     QCOMPARE(mainLogo->property("sourceSize").toSize().height(), 24);
     QCOMPARE(QSizeF(mainLogo->width(), mainLogo->height()), laidOut);
+}
+
+
+namespace {
+QQuickItem* barButton(QObject* window, const char* name) {
+    QQuickItem* bar = child(window, QStringLiteral("historyTitleBar"));
+    return bar != nullptr ? bar->findChild<QQuickItem*>(QLatin1String(name)) : nullptr;
+}
+} // namespace
+
+// The zoom buttons and the keyboard change the letter size by one pixel,
+// without taking the focus or the text of the field being edited, and the
+// size lands in config.ini.
+void TestQmlHistories::zoomButtonsAndShortcuts() {
+    const ScreenData data = screenData().at(0);
+    open(data, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickWindow* window = historyQuickWindow();
+    ZoomController* zoom = zoomtest::zoomOf(window);
+    QQuickItem* field = visualChild(visualChild(inHistory(QStringLiteral("historyForm")),
+                                                data.textField),
+                                    QStringLiteral("field"));
+    QVERIFY(field != nullptr);
+    field->forceActiveFocus();
+    QTRY_VERIFY(field->hasActiveFocus());
+    for (const char key : {'a', 'b', 'c'})
+        QTest::keyClick(window, key);
+
+    clickIn(barButton(window, "zoomInButton"));
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QCOMPARE(field->property("text").toString(), QStringLiteral("abc"));
+    QVERIFY(field->hasActiveFocus());
+
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 15);
+    QTest::keyClick(window, Qt::Key_Equal, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 16);
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier | Qt::KeypadModifier);
+    QCOMPARE(zoom->shownLetterSize(), 17);
+    QTest::keyClick(window, Qt::Key_Minus, Qt::ControlModifier | Qt::KeypadModifier);
+    QCOMPARE(zoom->shownLetterSize(), 16);
+    QTest::keyClick(window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 15);
+    clickIn(barButton(window, "zoomOutButton"));
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QCOMPARE(field->property("text").toString(), QStringLiteral("abc"));
+    QVERIFY(field->hasActiveFocus());
+
+    const QSettings config(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")),
+                           QSettings::IniFormat);
+    QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 14);
+
+    QTest::keyClick(window, Qt::Key_0, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 13);
+    QTRY_COMPARE(window->size(), QSize(1020, 608));
+}
+
+// At either end, or where the screen holds the window back, the button of
+// that way is disabled and the keyboard changes nothing, the place included.
+void TestQmlHistories::zoomLimits() {
+    open(screenData().at(0), zoomtest::laptopArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickWindow* window = historyQuickWindow();
+    ZoomController* zoom = zoomtest::zoomOf(window);
+    QQuickItem* zoomIn = barButton(window, "zoomInButton");
+    QQuickItem* zoomOut = barButton(window, "zoomOutButton");
+    QVERIFY(zoomIn && zoomOut);
+
+    QVERIFY(!zoomOut->isEnabled());
+    QVERIFY(zoomIn->isEnabled());
+    QTest::keyClick(window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(m_settings->letterSize(), 13);
+
+    // 1366x728 holds the pediatric history at 15 px at most.
+    m_settings->setLetterSize(15);
+    QTRY_COMPARE(window->size(), QSize(1177, 702));
+    QVERIFY(!zoomIn->isEnabled());
+    QVERIFY(zoomtest::dragTo(window, QPoint(20, 10)));
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    clickIn(zoomIn);
+    QTest::qWait(50);
+    QCOMPARE(m_settings->letterSize(), 15);
+    QCOMPARE(window->position(), QPoint(20, 10));
+    QCOMPARE(window->size(), QSize(1177, 702));
+
+    // 26 px on a screen that holds it.
+    zoom->setAvailableArea(QRect(0, 0, 4000, 3000));
+    m_settings->setLetterSize(26);
+    QCOMPARE(zoom->shownLetterSize(), 26);
+    QVERIFY(!zoomIn->isEnabled());
+    QVERIFY(zoomOut->isEnabled());
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(m_settings->letterSize(), 26);
+}
+
+// With a combo list or a calendar open, a zoom button closes it and zooms,
+// while the keyboard does not zoom; with a confirmation open, neither does.
+void TestQmlHistories::zoomUnderPopups() {
+    open(screenData().at(0), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    QQuickWindow* window = historyQuickWindow();
+    ZoomController* zoom = zoomtest::zoomOf(window);
+    QQuickItem* combo = visualChild(inHistory(QStringLiteral("historyForm")),
+                                    QStringLiteral("comboBox"));
+    QVERIFY(combo != nullptr);
+    auto* list = combo->property("popup").value<QObject*>();
+
+    QVERIFY(QMetaObject::invokeMethod(list, "open"));
+    QTRY_VERIFY(list->property("opened").toBool());
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 13);
+    clickIn(barButton(window, "zoomInButton"));
+    QTRY_VERIFY(!list->property("visible").toBool());
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+
+    QObject* calendar = inHistory(QStringLiteral("historyForm"))
+                            ->findChild<QObject*>(QStringLiteral("calendarPopup"));
+    QVERIFY(calendar != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(calendar->parent(), "openCalendar"));
+    QTRY_VERIFY(calendar->property("opened").toBool());
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 14);
+    clickIn(barButton(window, "zoomInButton"));
+    QTRY_VERIFY(!calendar->property("visible").toBool());
+    QTRY_COMPARE(zoom->shownLetterSize(), 15);
+
+    QObject* confirm = historyWindow()->findChild<QObject*>(QStringLiteral("deleteHistoryConfirm"));
+    confirm->setProperty("messageText", QStringLiteral("Delete?"));
+    confirm->setProperty("yesNo", true);
+    QVERIFY(QMetaObject::invokeMethod(confirm, "present"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QTest::keyClick(window, Qt::Key_Minus, Qt::ControlModifier);
+    clickIn(barButton(window, "zoomInButton"));
+    clickIn(barButton(window, "zoomOutButton"));
+    QTest::qWait(50);
+    QCOMPARE(zoom->shownLetterSize(), 15);
+    QVERIFY(confirm->property("visible").toBool());
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+}
+
+// The tooltips of the bar buttons are scaled like the window and shown under
+// their button.
+void TestQmlHistories::zoomTooltipsFollowTheZoom() {
+    open(screenData().at(0), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    m_settings->setLetterSize(17);
+    QQuickWindow* window = historyQuickWindow();
+    QTRY_COMPARE(window->contentItem()->size(), QSizeF(zoomtest::zoomOf(window)->windowSize()));
+    const qreal factor = 17.0 / 13.0;
+    for (const char* name : {"zoomInButton", "zoomOutButton", "closeButton"}) {
+        QQuickItem* button = barButton(window, name);
+        QVERIFY(button != nullptr);
+        auto* tip = button->findChild<QObject*>(QStringLiteral("windowButtonTip"));
+        QVERIFY(tip != nullptr);
+        // Controls follow the platform's hover effects, which offscreen has
+        // off.
+        button->setProperty("hoverEnabled", true);
+        QTest::mouseMove(window, centerOf(button));
+        QTRY_VERIFY(tip->property("opened").toBool());
+        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(tip));
+        const QRectF field = zoomtest::sceneRect(button);
+        QVERIFY2(qAbs(drawn.top() - field.bottom()) < 0.6,
+                 qPrintable(QStringLiteral("%1: %2 under %3")
+                                .arg(QLatin1String(name), zoomtest::describe(drawn),
+                                     zoomtest::describe(field))));
+        QVERIFY(qAbs(drawn.width() - tip->property("width").toReal() * factor) < 0.6);
+        QVERIFY(drawn.right() <= window->width() + 0.5);
+        // Centred under its button where the window leaves room (Close sits
+        // against the right edge).
+        if (qstrcmp(name, "closeButton") != 0)
+            QVERIFY2(qAbs(drawn.center().x() - field.center().x()) < 0.6,
+                     qPrintable(zoomtest::describe(drawn)));
+        QTest::mouseMove(window, QPoint(500, 400));
+        QTRY_VERIFY(!tip->property("visible").toBool());
+    }
 }
 
 } // namespace gambasse

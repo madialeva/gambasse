@@ -1,5 +1,7 @@
 #include <QGuiApplication>
+#include <QDir>
 #include <QQmlApplicationEngine>
+#include <QSettings>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QSqlError>
@@ -193,6 +195,8 @@ private slots:
     void everyTextShowsWholeZoomed();
     void popupsFollowTheZoom();
     void bodyDiagramIsRenderedAtItsZoomedSize();
+    void zoomButtonsAndShortcuts_data();
+    void zoomButtonsAndShortcuts();
 };
 
 void TestQmlConsultations::initTestCase() {
@@ -886,6 +890,51 @@ void TestQmlConsultations::bodyDiagramIsRenderedAtItsZoomedSize() {
              QSize(qCeil(240 * 20 / 13.0), qCeil(295 * 20 / 13.0)));
     // Laid out as at the base size: only the rendering grew.
     QCOMPARE(QSizeF(image->width(), image->height()), QSizeF(240, 295));
+}
+
+
+void TestQmlConsultations::zoomButtonsAndShortcuts_data() {
+    opensWithANewConsultation_data();
+}
+
+// The zoom buttons and the keyboard of each consultation window, with the
+// reason being typed: the text and the focus stay, the size is saved.
+void TestQmlConsultations::zoomButtonsAndShortcuts() {
+    QFETCH(int, row);
+    open(screenData().at(row), 0, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickWindow* window = consultationWindow();
+    ZoomController* zoom = zoomtest::zoomOf(window);
+    QQuickItem* bar = inConsultation(QStringLiteral("consultationTitleBar"));
+    auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
+    auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
+    QVERIFY(zoomIn != nullptr && zoomOut != nullptr);
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
+    QVERIFY(!zoomOut->isEnabled());
+
+    // The reason field has the focus when a new consultation starts.
+    QQuickItem* focused = window->activeFocusItem();
+    QVERIFY(focused != nullptr);
+    for (const char key : {'a', 'b', 'c'})
+        QTest::keyClick(window, key);
+    const QString typed = focused->property("text").toString();
+    QVERIFY(typed.endsWith(QStringLiteral("abc")));
+
+    clickIn(zoomIn);
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 15);
+    QCOMPARE(window->activeFocusItem(), focused);
+    QCOMPARE(focused->property("text").toString(), typed);
+    clickIn(zoomOut);
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QTRY_COMPARE(window->size(), zoom->windowSize());
+
+    const QSettings config(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")),
+                           QSettings::IniFormat);
+    QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 14);
+    QTest::keyClick(window, Qt::Key_0, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 13);
 }
 
 } // namespace gambasse

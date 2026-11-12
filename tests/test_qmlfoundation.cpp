@@ -14,6 +14,7 @@
 #include <QTemporaryDir>
 #include <QTranslator>
 #include <QtTest>
+#include <tuple>
 
 #include <Paths.h>
 #include <ui/AppIcon.h>
@@ -114,6 +115,7 @@ private slots:
     void titleBarChrome();
     void titleBarStandsOut();
     void titleBarWindowButtons();
+    void titleBarZoomButtons();
     void titleBarDrag();
     void windowEdgeResize();
 };
@@ -971,6 +973,92 @@ void TestQmlFoundation::windowEdgeResize() {
     QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(203, 300));
     QCOMPARE(window->width(), 960);
     QCOMPARE(window->x(), 100 + (978 - 960));
+}
+
+
+// The zoom buttons of the history and consultation windows: shown only when
+// the bar is asked to, left of Close and as tall as the bar, with their
+// tooltips in the interface language, a drawn magnifier in the theme colour
+// (muted when the window cannot zoom that way) and one request per click.
+void TestQmlFoundation::titleBarZoomButtons() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QObject* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
+    auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
+    auto* closeButton = bar->findChild<QQuickItem*>(QStringLiteral("closeButton"));
+    QVERIFY(zoomIn != nullptr && zoomOut != nullptr && closeButton != nullptr);
+    // The main window's bar has none.
+    QVERIFY(!zoomIn->isVisible());
+    QVERIFY(!zoomOut->isVisible());
+
+    bar->setProperty("closeOnly", true);
+    bar->setProperty("showZoom", true);
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
+    const auto left = [](QQuickItem* item) { return item->mapToScene(QPointF()).x(); };
+    // The row lays the buttons out on its next polish.
+    QTRY_VERIFY(left(zoomOut) < left(zoomIn));
+    QVERIFY(left(zoomIn) < left(closeButton));
+    for (QQuickItem* button : {zoomIn, zoomOut}) {
+        QCOMPARE(button->mapToScene(QPointF()).y(), 0.0);
+        QCOMPARE(button->height(), 40.0);
+    }
+    QVERIFY(zoomIn->findChild<QQuickItem*>(QStringLiteral("magnifierPlus"))->isVisible());
+    QVERIFY(!zoomOut->findChild<QQuickItem*>(QStringLiteral("magnifierPlus"))->isVisible());
+
+    // Tooltips in the three languages.
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLanguage(QStringLiteral("en")); });
+    const QList<std::tuple<QString, QString, QString>> tips = {
+        {QStringLiteral("en"), QStringLiteral("Zoom in"), QStringLiteral("Zoom out")},
+        {QStringLiteral("es"), QStringLiteral("Ampliar"), QStringLiteral("Reducir")},
+        {QStringLiteral("pt"), QStringLiteral("Ampliar"), QStringLiteral("Reduzir")},
+    };
+    for (const auto& [language, in, out] : tips) {
+        settings->setLanguage(language);
+        QCOMPARE(zoomIn->property("tip").toString(), in);
+        QCOMPARE(zoomOut->property("tip").toString(), out);
+    }
+    settings->setLanguage(QStringLiteral("en"));
+
+    // One request per click.
+    QSignalSpy inSpy(bar, SIGNAL(zoomInRequested()));
+    QSignalSpy outSpy(bar, SIGNAL(zoomOutRequested()));
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomIn));
+    QTRY_COMPARE(inSpy.count(), 1);
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomOut));
+    QTRY_COMPARE(outSpy.count(), 1);
+    QCOMPARE(inSpy.count(), 1);
+
+    // The theme colour, muted when the window cannot zoom that way.
+    const auto lensColour = [](QQuickItem* button) {
+        QObject* border = button->findChild<QQuickItem*>(QStringLiteral("magnifierLens"))
+                              ->property("border")
+                              .value<QObject*>();
+        return border->property("color").value<QColor>();
+    };
+    for (const auto& [mode, text, muted] :
+         {std::tuple{"claro", "#1A1A1A", "#A6A6A6"}, std::tuple{"oscuro", "#FFFFFF", "#969696"}}) {
+        settings->setTheme(QLatin1String(mode));
+        bar->setProperty("canZoomIn", true);
+        bar->setProperty("canZoomOut", true);
+        QCOMPARE(lensColour(zoomIn), QColor(QLatin1String(text)));
+        QCOMPARE(lensColour(zoomOut), QColor(QLatin1String(text)));
+        bar->setProperty("canZoomIn", false);
+        bar->setProperty("canZoomOut", false);
+        QVERIFY(!zoomIn->isEnabled());
+        QVERIFY(!zoomOut->isEnabled());
+        QCOMPARE(lensColour(zoomIn), QColor(QLatin1String(muted)));
+        QCOMPARE(lensColour(zoomOut), QColor(QLatin1String(muted)));
+    }
+    settings->setTheme(QStringLiteral("claro"));
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomIn));
+    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomOut));
+    QTest::qWait(50);
+    QCOMPARE(inSpy.count(), 1);
+    QCOMPARE(outSpy.count(), 1);
 }
 
 } // namespace gambasse

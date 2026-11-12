@@ -28,6 +28,9 @@ Item {
     readonly property real zoomFactor: (Window.window as FormWindow)?.zoomFactor ?? 1
     // Height of the window, at its own scale.
     readonly property real windowHeight: Window.height
+    // An open list was placed for the previous size: a zoom closes it, as a
+    // click elsewhere would.
+    onZoomFactorChanged: combo.popup.close()
 
     function addItem(text, value) {
         comboModel.append({
