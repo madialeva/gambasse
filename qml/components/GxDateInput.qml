@@ -22,6 +22,9 @@ Item {
     // Month shown by the calendar popup (0-based month, like Date).
     property int shownYear: new Date().getFullYear()
     property int shownMonth: new Date().getMonth()
+    // Scale of the calendar: a popup does not inherit the scale of a zoomed
+    // history or consultation window, so it takes it from the window.
+    readonly property real zoomFactor: (root.Window.window as FormWindow)?.zoomFactor ?? 1
 
     function fieldBackground() {
         if (field.activeFocus)
@@ -42,13 +45,16 @@ Item {
             shownMonth = today.getMonth();
         }
         calendarPopup.open();
-        // Under the field, or above it when the panel leaves no room below.
+        // Under the field, or above it when the panel leaves no room below,
+        // measured with the size it is drawn at.
         const overlay = calendarPopup.parent;
+        const width = calendarPopup.width * root.zoomFactor;
+        const height = calendarPopup.height * root.zoomFactor;
         const below = root.mapToItem(overlay, 0, root.height);
-        const left = root.mapToItem(overlay, 0, 0).x;
-        const fitsBelow = below.y + calendarPopup.height + 4 <= overlay.height;
-        calendarPopup.x = Math.max(4, Math.min(left, overlay.width - calendarPopup.width - 4));
-        calendarPopup.y = fitsBelow ? below.y : Math.max(4, below.y - root.height - calendarPopup.height);
+        const above = root.mapToItem(overlay, 0, 0);
+        const fitsBelow = below.y + height + 4 <= overlay.height;
+        calendarPopup.x = Math.max(4, Math.min(above.x, overlay.width - width - 4));
+        calendarPopup.y = fitsBelow ? below.y : Math.max(4, above.y - height);
     }
 
     function shiftMonth(delta) {
@@ -220,6 +226,8 @@ Item {
         id: calendarPopup
         objectName: "calendarPopup"
         parent: Overlay.overlay
+        scale: root.zoomFactor
+        transformOrigin: Popup.TopLeft
         width: 260
         height: 280
         modal: false

@@ -76,4 +76,40 @@ inline void setArea(const QList<QObject*>& windows, const QRect& area) {
     }
 }
 
+// The item a popup draws: its background fills it.
+inline QQuickItem* drawnItemOf(QObject* popup) {
+    return popup->property("background").value<QQuickItem*>();
+}
+
+// What is wrong with a popup drawn against `anchor` (a combo or a date field)
+// in a zoomed window: it must touch the anchor, below or above it, measure
+// `baseWidth` scaled by `factor`, and lie whole inside the window.
+inline QString popupProblems(QObject* popup, QQuickItem* anchor, qreal baseWidth,
+                             qreal factor) {
+    QQuickItem* drawn = drawnItemOf(popup);
+    if (drawn == nullptr)
+        return QStringLiteral("no background");
+    const QRectF rect = sceneRect(drawn);
+    const QRectF field = sceneRect(anchor);
+    const QSizeF window = anchor->window()->size();
+    QStringList problems;
+    const auto near = [](qreal a, qreal b) { return qAbs(a - b) < 0.6; };
+    if (!near(rect.top(), field.bottom()) && !near(rect.bottom(), field.top()))
+        problems << QStringLiteral("not against its field: %1 for %2")
+                        .arg(describe(rect), describe(field));
+    if (!near(rect.width(), baseWidth * factor))
+        problems << QStringLiteral("width %1 instead of %2")
+                        .arg(rect.width())
+                        .arg(baseWidth * factor);
+    if (rect.left() < -0.5 || rect.top() < -0.5 || rect.right() > window.width() + 0.5
+        || rect.bottom() > window.height() + 0.5)
+        problems << QStringLiteral("outside the window: %1").arg(describe(rect));
+    return problems.join(QStringLiteral("; "));
+}
+
+// Whether a popup opened under its field, rather than above it.
+inline bool isBelow(QObject* popup, QQuickItem* anchor) {
+    return sceneRect(drawnItemOf(popup)).top() >= sceneRect(anchor).bottom() - 0.6;
+}
+
 } // namespace gambasse::zoomtest

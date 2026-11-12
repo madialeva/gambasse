@@ -163,11 +163,13 @@ FormWindow {
         id: messageDialog
         objectName: "consultationMessageDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
     GxDialog {
         id: deleteConfirm
         objectName: "deleteConsultationConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.remove()) {
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the consultation."));

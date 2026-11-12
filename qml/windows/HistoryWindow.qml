@@ -148,11 +148,13 @@ FormWindow {
         id: messageDialog
         objectName: "historyMessageDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
     GxDialog {
         id: deleteConfirm
         objectName: "deleteHistoryConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.remove()) {
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the history."));

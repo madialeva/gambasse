@@ -163,6 +163,7 @@ private slots:
     void windowIsPlacedOverTheMainOne();
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
+    void popupsFollowTheZoom();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -707,6 +708,81 @@ void TestQmlHistories::everyTextShowsWholeZoomed() {
     QTest::qWait(100);
     const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
     QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+
+// Every combo list and calendar of the pediatric history, and its
+// confirmation, at 17 px: scaled like the window, against their field and
+// inside the window.
+void TestQmlHistories::popupsFollowTheZoom() {
+    open(screenData().at(0), zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    m_settings->setLetterSize(17);
+    QQuickWindow* window = historyQuickWindow();
+    QTRY_COMPARE(window->size(), QSize(1334, 796));
+    QTRY_COMPARE(window->contentItem()->size(), QSizeF(1334, 796));
+    const qreal factor = 17.0 / 13.0;
+    QQuickItem* form = inHistory(QStringLiteral("historyForm"));
+
+    QList<QQuickItem*> combos;
+    const std::function<void(QQuickItem*)> findCombos = [&](QQuickItem* item) {
+        if (item->objectName() == QLatin1String("comboBox") && item->isVisible())
+            combos.append(item);
+        for (QQuickItem* kid : item->childItems())
+            findCombos(kid);
+    };
+    findCombos(form);
+    QVERIFY(combos.size() >= 5);
+    int below = 0;
+    int above = 0;
+    for (QQuickItem* combo : combos) {
+        auto* popup = combo->property("popup").value<QObject*>();
+        QVERIFY(popup != nullptr);
+        QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+        QTRY_VERIFY(popup->property("opened").toBool());
+        const QString problems = zoomtest::popupProblems(popup, combo, combo->width(), factor);
+        QVERIFY2(problems.isEmpty(), qPrintable(problems));
+        QCOMPARE(popup->property("scale").toReal(), factor);
+        ++(zoomtest::isBelow(popup, combo) ? below : above);
+        QVERIFY(QMetaObject::invokeMethod(popup, "close"));
+        QTRY_VERIFY(!popup->property("visible").toBool());
+    }
+    // Every list of this form fits under its combo, as at the base size: the
+    // room is the same once scaled (a list above its combo is checked in
+    // test_qmlcomponents).
+    QCOMPARE(below, combos.size());
+    QCOMPARE(above, 0);
+
+    const QList<QObject*> calendars =
+        form->findChildren<QObject*>(QStringLiteral("calendarPopup"));
+    QVERIFY(!calendars.isEmpty());
+    for (QObject* calendar : calendars) {
+        auto* date = qobject_cast<QQuickItem*>(calendar->parent());
+        QVERIFY(date != nullptr);
+        if (!date->isVisible())
+            continue;
+        QVERIFY(QMetaObject::invokeMethod(date, "openCalendar"));
+        QTRY_VERIFY(calendar->property("opened").toBool());
+        const QString problems = zoomtest::popupProblems(
+            calendar, date, calendar->property("width").toReal(), factor);
+        QVERIFY2(problems.isEmpty(), qPrintable(problems));
+        QVERIFY(QMetaObject::invokeMethod(calendar, "close"));
+        QTRY_VERIFY(!calendar->property("visible").toBool());
+    }
+
+    // The confirmation: centred in the window, scaled like it.
+    QObject* confirm = historyWindow()->findChild<QObject*>(QStringLiteral("deleteHistoryConfirm"));
+    QVERIFY(confirm != nullptr);
+    confirm->setProperty("messageText", QStringLiteral("Delete?"));
+    confirm->setProperty("yesNo", true);
+    QVERIFY(QMetaObject::invokeMethod(confirm, "present"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(confirm));
+    QVERIFY(qAbs(drawn.width() - 420 * factor) < 0.6);
+    QVERIFY2(qAbs(drawn.center().x() - window->width() / 2.0) <= 1
+                 && qAbs(drawn.center().y() - window->height() / 2.0) <= 1,
+             qPrintable(zoomtest::describe(drawn)));
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
 }
 
 } // namespace gambasse

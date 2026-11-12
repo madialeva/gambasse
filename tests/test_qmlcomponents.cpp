@@ -18,6 +18,7 @@
 
 #include <Paths.h>
 #include <VisibleTextChecks.h>
+#include <ZoomTestSupport.h>
 #include <ui/InterfaceSettings.h>
 
 namespace gambasse {
@@ -208,6 +209,7 @@ private:
 
 private slots:
     void initTestCase();
+    void popupsOfAZoomedWindowPickTheirSide();
     void textInput();
     void numberInput();
     void dateInput();
@@ -880,6 +882,57 @@ void TestQmlComponents::tabView() {
         root->setProperty("tabPadding", 5);
         QTRY_COMPARE(tabs[2]->width(), wide - 16);
         delete harness.window;
+    }
+}
+
+
+// In a zoomed child window, a combo list and a calendar are scaled like the
+// window and stay against their field: below it when they fit, above it
+// otherwise (Qt's own flip misplaces a scaled popup).
+void TestQmlComponents::popupsOfAZoomedWindowPickTheirSide() {
+    QQmlApplicationEngine engine;
+    auto* settings = engine.singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    QVERIFY(settings != nullptr);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    QQmlComponent component(
+        &engine, QUrl::fromLocalFile(QStringLiteral(QML_FIXTURE_DIR "/ZoomedPopups.qml")));
+    std::unique_ptr<QObject> root(component.create());
+    QVERIFY2(root != nullptr, qPrintable(component.errorString()));
+    auto* window = qobject_cast<QQuickWindow*>(root.get());
+    QVERIFY(window != nullptr);
+    zoomtest::zoomOf(window)->setAvailableArea(zoomtest::wideArea);
+    settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QVERIFY(QMetaObject::invokeMethod(window, "showPlaced"));
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    QTRY_COMPARE(window->contentItem()->size(), QSizeF(zoomtest::zoomOf(window)->windowSize()));
+
+    for (const auto& [name, below] : {std::pair{"topCombo", true}, std::pair{"lowCombo", false}}) {
+        auto* input = window->findChild<QQuickItem*>(QLatin1String(name));
+        QVERIFY(input != nullptr);
+        auto* combo = input->findChild<QQuickItem*>(QStringLiteral("comboBox"));
+        auto* popup = combo->property("popup").value<QObject*>();
+        QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+        QTRY_VERIFY(popup->property("opened").toBool());
+        const QString problems = zoomtest::popupProblems(popup, combo, combo->width(), factor);
+        QVERIFY2(problems.isEmpty(), qPrintable(QStringLiteral("%1: %2").arg(name, problems)));
+        QCOMPARE(zoomtest::isBelow(popup, combo), below);
+        QVERIFY(QMetaObject::invokeMethod(popup, "close"));
+        QTRY_VERIFY(!popup->property("visible").toBool());
+    }
+    for (const auto& [name, below] : {std::pair{"topDate", true}, std::pair{"lowDate", false}}) {
+        auto* date = window->findChild<QQuickItem*>(QLatin1String(name));
+        QVERIFY(date != nullptr);
+        auto* calendar = date->findChild<QObject*>(QStringLiteral("calendarPopup"));
+        QVERIFY(QMetaObject::invokeMethod(date, "openCalendar"));
+        QTRY_VERIFY(calendar->property("opened").toBool());
+        const QString problems = zoomtest::popupProblems(
+            calendar, date, calendar->property("width").toReal(), factor);
+        QVERIFY2(problems.isEmpty(), qPrintable(QStringLiteral("%1: %2").arg(name, problems)));
+        QCOMPARE(zoomtest::isBelow(calendar, date), below);
+        QVERIFY(QMetaObject::invokeMethod(calendar, "close"));
+        QTRY_VERIFY(!calendar->property("visible").toBool());
     }
 }
 

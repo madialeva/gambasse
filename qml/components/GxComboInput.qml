@@ -114,16 +114,40 @@ Item {
             // entries do not fit. The Basic popup only had a scroll indicator,
             // visible while scrolling, so a long list (the active
             // ingredients) gave no hint that it went on.
+            // In a zoomed history or consultation window the list is scaled
+            // like the window (a popup does not inherit the scale of its
+            // combo), from its top left corner so it stays against the combo.
+            // Qt's own flip misplaces a scaled popup, so the list picks its
+            // side when it opens: below when it fits, above otherwise, and
+            // the larger one, with fewer rows shown, when it fits in neither.
             popup: Popup {
                 id: dropDown
                 objectName: "comboPopup"
                 readonly property int maxVisibleEntries: 10
-                y: combo.height
+                readonly property real zoomFactor: (combo.Window.window as FormWindow)?.zoomFactor ?? 1
+                // Height the entries want, and the room of the side picked,
+                // at the base size.
+                readonly property real wantedHeight: Math.min(combo.count, dropDown.maxVisibleEntries) * combo.entryHeight + topPadding + bottomPadding
+                property bool above: false
+                property real room: wantedHeight
+                scale: dropDown.zoomFactor
+                transformOrigin: Popup.TopLeft
+                y: dropDown.above ? -height : combo.height
                 width: combo.width
-                height: Math.min(Math.min(combo.count, dropDown.maxVisibleEntries) * combo.entryHeight + topPadding + bottomPadding, combo.Window.height - topMargin - bottomMargin)
+                height: Math.min(dropDown.wantedHeight, dropDown.room)
                 topMargin: 6
                 bottomMargin: 6
                 padding: 1
+                onAboutToShow: dropDown.pickSide()
+
+                function pickSide() {
+                    const top = combo.mapToItem(null, 0, 0).y;
+                    const bottom = combo.mapToItem(null, 0, combo.height).y;
+                    const below = (combo.Window.height - bottom) / dropDown.zoomFactor - dropDown.bottomMargin;
+                    const over = top / dropDown.zoomFactor - dropDown.topMargin;
+                    dropDown.above = dropDown.wantedHeight > below && over > below;
+                    dropDown.room = dropDown.above ? over : below;
+                }
                 contentItem: ListView {
                     id: dropDownList
                     objectName: "comboPopupList"

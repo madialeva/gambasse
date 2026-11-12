@@ -191,6 +191,7 @@ private slots:
     void zoomElsewhereCentresTheWindowOnOpen();
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
+    void popupsFollowTheZoom();
 };
 
 void TestQmlConsultations::initTestCase() {
@@ -830,6 +831,43 @@ void TestQmlConsultations::everyTextShowsWholeZoomed() {
     QTest::qWait(100);
     const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
     QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+
+// At 17 px, the diagnosis list of the pediatric consultation and the delete
+// confirmation are scaled like the window: the list against its combo, the
+// confirmation centred.
+void TestQmlConsultations::popupsFollowTheZoom() {
+    open(screenData().at(2), 0, zoomtest::wideArea); // pediatric
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    settings()->setLetterSize(17);
+    QQuickWindow* window = consultationWindow();
+    const QSizeF size(zoomtest::zoomOf(window)->windowSize());
+    QTRY_COMPARE(window->contentItem()->size(), size);
+    const qreal factor = 17.0 / 13.0;
+
+    QQuickItem* combo = inConsultation(QStringLiteral("comboBox"));
+    QVERIFY(combo != nullptr);
+    auto* popup = combo->property("popup").value<QObject*>();
+    QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+    QTRY_VERIFY(popup->property("opened").toBool());
+    const QString problems = zoomtest::popupProblems(popup, combo, combo->width(), factor);
+    QVERIFY2(problems.isEmpty(), qPrintable(problems));
+    QVERIFY(QMetaObject::invokeMethod(popup, "close"));
+    QTRY_VERIFY(!popup->property("visible").toBool());
+
+    QObject* confirm = window->findChild<QObject*>(QStringLiteral("deleteConsultationConfirm"));
+    QVERIFY(confirm != nullptr);
+    confirm->setProperty("messageText", QStringLiteral("Delete?"));
+    confirm->setProperty("yesNo", true);
+    QVERIFY(QMetaObject::invokeMethod(confirm, "present"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(confirm));
+    QVERIFY(qAbs(drawn.width() - 420 * factor) < 0.6);
+    QVERIFY2(qAbs(drawn.center().x() - size.width() / 2.0) <= 1
+                 && qAbs(drawn.center().y() - size.height() / 2.0) <= 1,
+             qPrintable(zoomtest::describe(drawn)));
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
 }
 
 } // namespace gambasse
