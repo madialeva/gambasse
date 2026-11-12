@@ -128,6 +128,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/SexLabel.h
     src/logic/TextOrder.cpp
     src/logic/TextOrder.h
+    src/logic/ZoomLevels.cpp
+    src/logic/ZoomLevels.h
 )
 target_include_directories(GambasseCore PUBLIC src)
 target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Gui Qt6::Sql)

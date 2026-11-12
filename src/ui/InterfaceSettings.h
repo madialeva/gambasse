@@ -20,7 +20,10 @@ namespace gambasse {
 // language catalog and retranslates the engine on every change before
 // announcing it, so views and controllers only react to languageChanged.
 // `locale` is the language's locale (interfaceLocale()): what the views use for
-// month and day names instead of the system's Qt.locale().
+// month and day names instead of the system's Qt.locale(). `letterSize` is the
+// letter size chosen for the zoom of the history and consultation windows (13
+// to 26 px), one for all of them; each window shows the largest that fits its
+// screen (ZoomController).
 // QtCore only (plus QML forward declarations): no Quick, testable without a
 // GUI.
 class InterfaceSettings : public QObject {
@@ -30,6 +33,7 @@ class InterfaceSettings : public QObject {
     Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
     Q_PROPERTY(QLocale locale READ locale NOTIFY languageChanged)
+    Q_PROPERTY(int letterSize READ letterSize WRITE setLetterSize NOTIFY letterSizeChanged)
 public:
     // Bound to `engine`, the instance owns the application catalog and
     // retranslates that engine; with a null engine it only reads and persists
@@ -46,10 +50,14 @@ public:
     QString language() const { return m_language; }
     void setLanguage(const QString& code);
     QLocale locale() const;
+    int letterSize() const { return m_letterSize; }
+    // Brought into the zoom range, then persisted.
+    void setLetterSize(int pixels);
 
 signals:
     void themeChanged();
     void languageChanged();
+    void letterSizeChanged();
 
 private:
     // Installs the catalogs for the current language and refreshes every
@@ -67,6 +75,7 @@ private:
     QPointer<QQmlEngine> m_engine;
     QString m_theme;
     QString m_language;
+    int m_letterSize;
 };
 
 } // namespace gambasse

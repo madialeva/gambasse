@@ -10,6 +10,7 @@
 
 #include <Paths.h>
 #include <logic/InterfaceLocale.h>
+#include <logic/ZoomLevels.h>
 
 namespace {
 // The windows use fixed coordinates, so the font travels inside the executable
@@ -40,7 +41,7 @@ namespace gambasse {
 
 InterfaceSettings::InterfaceSettings(QQmlEngine* engine, QObject* parent)
     : QObject(parent), m_engine(engine), m_theme(m_store.theme()),
-      m_language(m_store.language()) {
+      m_language(m_store.language()), m_letterSize(m_store.letterSize()) {
     if (m_theme != QStringLiteral("oscuro"))
         m_theme = QStringLiteral("claro");
 }
@@ -75,6 +76,15 @@ void InterfaceSettings::setLanguage(const QString& code) {
     // patient grid headers) already reads the new language.
     applyLanguage();
     emit languageChanged();
+}
+
+void InterfaceSettings::setLetterSize(int pixels) {
+    const int clamped = zoom::clampLetterSize(pixels);
+    if (clamped == m_letterSize)
+        return;
+    m_letterSize = clamped;
+    m_store.setLetterSize(m_letterSize);
+    emit letterSizeChanged();
 }
 
 QLocale InterfaceSettings::locale() const {

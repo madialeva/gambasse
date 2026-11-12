@@ -90,6 +90,7 @@ private slots:
     void themePersistsAndNotifies();
     void languagePersistsAndNotifies();
     void localeFollowsTheLanguage();
+    void letterSizePersistsAndNotifies();
     void qmlShellFollowsThemeInHot();
     void qmlLanguageSwitchesInHot();
     void qtStringsFollowTheLanguage();
@@ -182,6 +183,34 @@ void TestQmlFoundation::languagePersistsAndNotifies() {
 
     InterfaceSettings reloaded(nullptr); // persistence round trip
     QCOMPARE(reloaded.language(), QStringLiteral("es"));
+}
+
+// The zoom letter size of the history and consultation windows: one for the
+// whole application, persisted and kept inside 13-26 px.
+void TestQmlFoundation::letterSizePersistsAndNotifies() {
+    InterfaceSettings settings(nullptr);
+    QCOMPARE(settings.letterSize(), 13); // config.ini default
+    const auto restore = qScopeGuard([&settings] { settings.setLetterSize(13); });
+
+    QSignalSpy spy(&settings, &InterfaceSettings::letterSizeChanged);
+    settings.setLetterSize(15);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(settings.letterSize(), 15);
+
+    settings.setLetterSize(15); // same value: no signal
+    QCOMPARE(spy.count(), 1);
+
+    InterfaceSettings reloaded(nullptr); // persistence round trip
+    QCOMPARE(reloaded.letterSize(), 15);
+
+    settings.setLetterSize(40); // brought into the range
+    QCOMPARE(settings.letterSize(), 26);
+    QCOMPARE(spy.count(), 2);
+    settings.setLetterSize(5);
+    QCOMPARE(settings.letterSize(), 13);
+    QCOMPARE(spy.count(), 3);
+    settings.setLetterSize(-1); // already at the base: no signal
+    QCOMPARE(spy.count(), 3);
 }
 
 // Each language stands for a fixed locale, whatever the system's: the calendar

@@ -40,6 +40,8 @@ get_target_property(QT_CORE_PRIVATE_FEATURES Qt6::Core QT_ENABLED_PRIVATE_FEATUR
 if("icu" IN_LIST QT_CORE_PRIVATE_FEATURES)
     target_compile_definitions(test_textorder PRIVATE GAMBASSE_QT_HAS_ICU)
 endif()
+# Zoom rules of the history and consultation windows.
+gambasse_add_test(zoomlevels LIBS GambasseCore)
 gambasse_add_test(photomanager LIBS GambasseCore)
 gambasse_add_test(patientservice LIBS GambasseCore SOURCES ${SCHEMA_QRC})
 gambasse_add_test(clinicalcontext LIBS GambasseCore SOURCES ${SCHEMA_QRC})
