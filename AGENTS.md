@@ -147,6 +147,10 @@ at the base size is whole at any size, and the zoomed `everyTextShowsWhole`
 tests measure in the stage. `ZoomController` (C++) picks the size each window
 shows from its screen's available area and places the window; the tests fix
 that area, because the offscreen screen (800×800) is smaller than the windows.
+Nor does offscreen enforce a window's size limits, as a window manager does: a
+test of a child window's size also checks its minimum and maximum
+(`zoomtest::isFixedAt`), or a limit left behind only shows on a real desktop,
+as a window taller than its form.
 A popup does not inherit the scale of the item it belongs to: one shown by a
 child window (a dialog, a combo list, the calendar) takes `scale` from the
 window's `zoomFactor` with `transformOrigin: Popup.TopLeft`, and picks its side

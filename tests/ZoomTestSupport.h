@@ -50,6 +50,23 @@ inline QString describe(const QRectF& rect) {
         .arg(rect.height());
 }
 
+// A child window cannot be resized: its minimum and maximum sizes are its
+// size. A window manager enforces them, which the offscreen platform does not,
+// so a limit left behind would only show on a real desktop, as a window larger
+// than its contents.
+inline bool isFixedAt(const QWindow* window, QSize size) {
+    return window->size() == size && window->minimumSize() == size
+           && window->maximumSize() == size;
+}
+
+inline QString describeLimits(const QWindow* window) {
+    const auto text = [](QSize size) {
+        return QStringLiteral("%1x%2").arg(size.width()).arg(size.height());
+    };
+    return QStringLiteral("size %1, minimum %2, maximum %3")
+        .arg(text(window->size()), text(window->minimumSize()), text(window->maximumSize()));
+}
+
 // The centre of `child` over the centre of `main`, to the pixel.
 inline bool centredOver(const QWindow* child, const QWindow* main) {
     const QPoint delta = child->geometry().center() - main->geometry().center();

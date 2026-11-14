@@ -56,8 +56,8 @@ public:
 
     int shownLetterSize() const { return m_shown; }
     qreal factor() const;
-    QSize windowSize() const;
-    bool canZoomIn() const;
+    QSize windowSize() const { return m_windowSize; }
+    bool canZoomIn() const { return m_canZoomIn; }
     bool canZoomOut() const;
 
     // One pixel larger or smaller than the size shown, and back to the base
@@ -93,6 +93,11 @@ private:
     QRect m_fixedArea;
     QRect m_screenArea;
     int m_shown;
+    // What zoomChanged last announced with the size shown: the window binds
+    // its size and its size limits to the first, the title bar its zoom in
+    // button to the second.
+    QSize m_windowSize;
+    bool m_canZoomIn = false;
     // The size shown when the window was last placed, 0 before the first time.
     int m_placedSize = 0;
     QMetaObject::Connection m_settingsConnection;

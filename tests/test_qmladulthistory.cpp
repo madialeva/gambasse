@@ -125,6 +125,7 @@ private slots:
     void boundsAndDatesAreCoercedOnSave();
     void everyTextShowsWhole_data();
     void everyTextShowsWhole();
+    void lowWindowOpensAtItsOwnSize();
     void lowWindowShowsALargerSize();
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
@@ -455,6 +456,29 @@ void TestQmlAdultHistory::titleBadgesLeaveControlsClear() {
 }
 
 
+// The adult history is the lowest history: its window is as tall as its form
+// from the first time it opens, limits included, and takes the height of the
+// pediatric one when the same window shows it afterwards.
+void TestQmlAdultHistory::lowWindowOpensAtItsOwnSize() {
+    QVERIFY(createPatient());
+    openScreen();
+    zoomtest::setArea({historyWindow()}, zoomtest::wideArea);
+    QVERIFY(openHistory() != nullptr);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 430)),
+             qPrintable(zoomtest::describeLimits(window)));
+    QCOMPARE(zoomtest::stageOf(window)->height(), 430.0);
+
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    window->setProperty("screenId", QStringLiteral("pediatric"));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 608)),
+             qPrintable(zoomtest::describeLimits(window)));
+    window->setProperty("screenId", QStringLiteral("adult"));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 430)),
+             qPrintable(zoomtest::describeLimits(window)));
+}
+
 // The adult history is lower than the pediatric one, so the same screen holds
 // a larger letter for it.
 void TestQmlAdultHistory::lowWindowShowsALargerSize() {
@@ -467,6 +491,8 @@ void TestQmlAdultHistory::lowWindowShowsALargerSize() {
     auto* window = qobject_cast<QQuickWindow*>(historyWindow());
     QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 17);
     QTRY_COMPARE(window->size(), QSize(1334, 563));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1334, 563)),
+             qPrintable(zoomtest::describeLimits(window)));
     QCOMPARE(zoomtest::stageOf(window)->scale(), 17.0 / 13.0);
 }
 

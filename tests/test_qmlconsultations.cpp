@@ -765,7 +765,8 @@ void TestQmlConsultations::zoomScalesTheWindow() {
     QQuickItem* stage = zoomtest::stageOf(window);
     QVERIFY(stage != nullptr);
     const bool low = screenData().at(row).screenId == QLatin1String("pregnancy");
-    QCOMPARE(window->size(), QSize(1020, low ? 388 : 608));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, low ? 388 : 608)),
+             qPrintable(zoomtest::describeLimits(window)));
     QCOMPARE(stage->scale(), 1.0);
 
     QList<QQuickItem*> items;
@@ -780,6 +781,8 @@ void TestQmlConsultations::zoomScalesTheWindow() {
 
     settings()->setLetterSize(15);
     QTRY_COMPARE(window->size(), low ? QSize(1177, 448) : QSize(1177, 702));
+    QVERIFY2(zoomtest::isFixedAt(window, window->size()),
+             qPrintable(zoomtest::describeLimits(window)));
     QCOMPARE(stage->scale(), 15.0 / 13.0);
     for (int i = 0; i < items.size(); ++i) {
         const QRectF now = zoomtest::sceneRect(items.at(i));

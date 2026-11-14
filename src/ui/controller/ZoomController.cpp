@@ -9,7 +9,8 @@
 namespace gambasse {
 
 ZoomController::ZoomController(QObject* parent)
-    : QObject(parent), m_shown(zoom::baseLetterSize) {
+    : QObject(parent), m_shown(zoom::baseLetterSize),
+      m_windowSize(zoom::windowSize(m_baseSize, m_shown)) {
     followScreen();
 }
 
@@ -65,16 +66,6 @@ qreal ZoomController::factor() const {
     return zoom::factor(m_shown);
 }
 
-QSize ZoomController::windowSize() const {
-    return zoom::windowSize(m_baseSize, m_shown);
-}
-
-bool ZoomController::canZoomIn() const {
-    if (m_shown >= zoom::maximumLetterSize)
-        return false;
-    return zoom::fittingLetterSize(m_baseSize, m_shown + 1, availableArea().size()) > m_shown;
-}
-
 bool ZoomController::canZoomOut() const {
     return m_shown > zoom::baseLetterSize;
 }
@@ -112,10 +103,20 @@ void ZoomController::placeForShow() {
 void ZoomController::recompute() {
     const int wanted = m_settings ? m_settings->letterSize() : zoom::baseLetterSize;
     const int shown = zoom::fittingLetterSize(m_baseSize, wanted, availableArea().size());
-    const QSize before = windowSize();
-    const bool changed = shown != m_shown;
+    const QSize size = zoom::windowSize(m_baseSize, shown);
+    const bool canZoomIn =
+        shown < zoom::maximumLetterSize
+        && zoom::fittingLetterSize(m_baseSize, shown + 1, availableArea().size()) > shown;
+    // Against what was last announced, not against the inputs, which have
+    // already changed when this runs: a form of another height changes the
+    // window size at the same letter size, and a larger screen the room to
+    // zoom in without changing either.
+    const bool sizeChanged = size != m_windowSize;
+    const bool changed = shown != m_shown || sizeChanged || canZoomIn != m_canZoomIn;
     m_shown = shown;
-    if (changed || before != windowSize())
+    m_windowSize = size;
+    m_canZoomIn = canZoomIn;
+    if (changed)
         emit zoomChanged();
     // The bindings of the window have taken the new size by now; a visible
     // window is placed again at once, a hidden one when it is shown.
@@ -124,8 +125,8 @@ void ZoomController::recompute() {
     if (m_shown != m_placedSize) {
         m_placedSize = m_shown;
         applyGeometry(inArea(centred(windowSize())));
-    } else if (before != windowSize()) {
-        applyGeometry(inArea(QRect(m_window->position(), windowSize())));
+    } else if (sizeChanged) {
+        applyGeometry(inArea(QRect(m_window->position(), m_windowSize)));
     }
 }
 

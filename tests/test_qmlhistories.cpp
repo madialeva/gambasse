@@ -539,7 +539,8 @@ void TestQmlHistories::zoomScalesTheWindow() {
     QQuickWindow* window = historyQuickWindow();
     QQuickItem* stage = zoomtest::stageOf(window);
     QVERIFY(stage != nullptr);
-    QCOMPARE(window->size(), QSize(1020, 608));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 608)),
+             qPrintable(zoomtest::describeLimits(window)));
     QCOMPARE(stage->scale(), 1.0);
 
     QQuickItem* bar = inHistory(QStringLiteral("historyTitleBar"));
@@ -553,6 +554,8 @@ void TestQmlHistories::zoomScalesTheWindow() {
 
     m_settings->setLetterSize(15);
     QTRY_COMPARE(window->size(), QSize(1177, 702));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1177, 702)),
+             qPrintable(zoomtest::describeLimits(window)));
     const qreal factor = 15.0 / 13.0;
     QCOMPARE(stage->scale(), factor);
     for (const auto& [name, item, base] :

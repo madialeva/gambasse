@@ -27,6 +27,8 @@ private slots:
     void zoomOutFromASizeHeldBackByTheScreen();
     void windowsShareTheChosenSize();
     void smallerAreaShrinksTheWindow();
+    void baseSizeChangeIsAnnounced();
+    void roomToZoomInIsAnnounced();
     void firstShowIsCentred();
     void showsAgainWhereItWasLeft();
     void zoomCentresAVisibleWindow();
@@ -190,6 +192,46 @@ void TestZoomController::smallerAreaShrinksTheWindow() {
     QCOMPARE(m_settings->letterSize(), 17); // the choice is not lost
     h.zoom.setAvailableArea(wideArea);
     QCOMPARE(h.zoom.shownLetterSize(), 17);
+}
+
+// One window shows forms of different heights (the adult history is lower
+// than the pediatric one): its size follows the form at the same letter size,
+// and whoever binds to it, as the window does with its size limits, is told.
+void TestZoomController::baseSizeChangeIsAnnounced() {
+    Harness h(m_settings, tallWindow, wideArea);
+    QSignalSpy spy(&h.zoom, &ZoomController::zoomChanged);
+    h.zoom.setBaseSize(lowWindow);
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(h.zoom.windowSize(), lowWindow);
+    QCOMPARE(h.zoom.shownLetterSize(), 13);
+    h.zoom.setBaseSize(lowWindow); // same size: nothing to tell
+    QCOMPARE(spy.count(), 1);
+
+    m_settings->setLetterSize(15);
+    QCOMPARE(spy.count(), 2);
+    h.zoom.setBaseSize(tallWindow);
+    QCOMPARE(spy.count(), 3);
+    QCOMPARE(h.zoom.windowSize(), QSize(1177, 702));
+}
+
+// The zoom in button follows the room the screen leaves, also when a change
+// of that room leaves the size shown as it was.
+void TestZoomController::roomToZoomInIsAnnounced() {
+    Harness h(m_settings, tallWindow, QRect(0, 0, 1024, 700));
+    QVERIFY(!h.zoom.canZoomIn()); // 14 px would be 1099 px wide
+    QSignalSpy spy(&h.zoom, &ZoomController::zoomChanged);
+    h.zoom.setAvailableArea(wideArea);
+    QCOMPARE(h.zoom.shownLetterSize(), 13);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(h.zoom.canZoomIn());
+    h.zoom.setAvailableArea(QRect(0, 0, 1024, 700));
+    QCOMPARE(spy.count(), 2);
+    QVERIFY(!h.zoom.canZoomIn());
+    // A lower form in the same window has room again.
+    h.zoom.setAvailableArea(QRect(0, 0, 1100, 620));
+    QVERIFY(!h.zoom.canZoomIn());
+    h.zoom.setBaseSize(lowWindow);
+    QVERIFY(h.zoom.canZoomIn());
 }
 
 void TestZoomController::firstShowIsCentred() {
