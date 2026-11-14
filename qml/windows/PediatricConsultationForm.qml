@@ -433,7 +433,8 @@ Item {
                     x: 85
                     y: 82
                     width: 111
-                    height: 20
+                    // As tall as the saturation field beside it.
+                    height: 21
                     field: "coughDays"
                     type: "number"
                     labelText: qsTr("Days:")

@@ -196,6 +196,8 @@ private slots:
     void popupsFollowTheZoom();
     void bodyDiagramIsRenderedAtItsZoomedSize();
     void zoomButtonsAndShortcuts_data();
+    void everyFieldHasAFormHeight_data();
+    void everyFieldHasAFormHeight();
     void zoomButtonsAndShortcuts();
 };
 
@@ -938,6 +940,21 @@ void TestQmlConsultations::zoomButtonsAndShortcuts() {
     QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 14);
     QTest::keyClick(window, Qt::Key_0, Qt::ControlModifier);
     QCOMPARE(zoom->shownLetterSize(), 13);
+}
+
+void TestQmlConsultations::everyFieldHasAFormHeight_data() {
+    opensWithANewConsultation_data();
+}
+
+// Every input box is as tall as a form field, also under a caption: the
+// health disorders and the first lesion row of the adult form put theirs
+// above in 38 px.
+void TestQmlConsultations::everyFieldHasAFormHeight() {
+    QFETCH(int, row);
+    open(screenData().at(row));
+    const QStringList odd =
+        oddFieldHeightsOnEveryTab(inConsultation(QStringLiteral("consultationForm")));
+    QVERIFY2(odd.isEmpty(), qPrintable(odd.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse

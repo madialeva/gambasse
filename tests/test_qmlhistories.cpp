@@ -171,6 +171,8 @@ private slots:
     void zoomLimits();
     void zoomUnderPopups();
     void zoomTooltipsFollowTheZoom();
+    void everyFieldHasAFormHeight_data();
+    void everyFieldHasAFormHeight();
 };
 
 void TestQmlHistories::initTestCase() {
@@ -993,6 +995,19 @@ void TestQmlHistories::zoomTooltipsFollowTheZoom() {
         QTest::mouseMove(window, QPoint(500, 400));
         QTRY_VERIFY(!tip->property("visible").toBool());
     }
+}
+
+void TestQmlHistories::everyFieldHasAFormHeight_data() {
+    newHistoryCannotBeDeleted_data();
+}
+
+// Every input box is as tall as a form field, also under a caption (the
+// supplement rows of the pediatric history).
+void TestQmlHistories::everyFieldHasAFormHeight() {
+    QFETCH(int, row);
+    open(screenData().at(row));
+    const QStringList odd = oddFieldHeightsOnEveryTab(inHistory(QStringLiteral("historyForm")));
+    QVERIFY2(odd.isEmpty(), qPrintable(odd.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse

@@ -84,8 +84,10 @@ Item {
         rows: root.labelPosition === "above" ? 2 : 1
         columns: root.labelPosition === "above" ? 1 : 2
         columnSpacing: 6
-        // QVBoxLayout spacing between a caption above and its field.
-        rowSpacing: 6
+        // QVBoxLayout spacing between a caption above and its field. A short
+        // input (38 px: the 18 px caption line and a 21 px field) gives it up
+        // first, so the field keeps the height of the form's other fields.
+        rowSpacing: root.labelPosition === "above" ? Math.max(0, Math.min(6, root.height - Theme.formFieldHeight - Math.ceil(caption.implicitHeight))) : 6
         Text {
             id: caption
             text: root.labelText
@@ -116,10 +118,12 @@ Item {
             Layout.fillHeight: true
             Layout.preferredHeight: Theme.fieldHeight
             // The Widgets field keeps its 22 px height inside a taller input,
-            // centred beside its label or under it when the label is above.
-            // Under a caption a short input squeezes the field, not the
-            // caption (38 px: 14 caption + 6 + 18 field).
-            Layout.maximumHeight: root.labelPosition === "above" ? Math.min(Theme.fieldHeight, root.height - 6 - Math.ceil(caption.implicitHeight)) : Theme.fieldHeight
+            // centred beside its label. Under a caption it keeps the height of
+            // the form's fields: the spacing above it gives way first, then
+            // the caption, whose line has room to spare above and below its
+            // letters.
+            Layout.maximumHeight: root.labelPosition === "above" ? Math.min(Theme.formFieldHeight, root.height) : Theme.fieldHeight
+            Layout.minimumHeight: root.labelPosition === "above" ? Math.min(Theme.formFieldHeight, root.height) : 0
             // Preferred at its minimum and grown by fillWidth, so a long label
             // cannot squeeze it away (QLineEdit::minimumSizeHint in Widgets).
             Layout.minimumWidth: Theme.fieldMinimumWidth + calendarButton.width

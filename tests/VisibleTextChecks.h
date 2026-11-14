@@ -139,9 +139,34 @@ inline QStringList cutTexts(QQuickItem* top) {
     return cut;
 }
 
-// cutTexts() on every page of every tab view under `top`, each language being
-// the caller's: pages that are not current are not visible.
-inline QStringList cutTextsOnEveryTab(QQuickItem* top) {
+// The input boxes under `top` (text, number and date fields, combo boxes)
+// whose height is not the 21-22 px of a form field, with the controller field
+// they belong to and their height. A box squeezed by its caption above it would
+// show a text line cut at the top and the bottom.
+inline QStringList oddFieldHeights(QQuickItem* top) {
+    QStringList odd;
+    const std::function<void(QQuickItem*, QString)> walk = [&](QQuickItem* item, QString field) {
+        if (!item->isVisible())
+            return;
+        const QString name = item->property("field").toString();
+        if (!name.isEmpty())
+            field = name;
+        const bool box = item->objectName() == QLatin1String("comboBox")
+                         || (item->objectName() == QLatin1String("field")
+                             && item->inherits("QQuickTextInput"));
+        if (box && (item->height() < 20.5 || item->height() > 22.5))
+            odd.append(QStringLiteral("%1 (%2 px)").arg(field).arg(item->height()));
+        for (QQuickItem* kid : item->childItems())
+            walk(kid, field);
+    };
+    walk(top, QString());
+    return odd;
+}
+
+// `check` on every page of every tab view under `top`, each language being the
+// caller's: pages that are not current are not visible.
+inline QStringList onEveryTab(QQuickItem* top,
+                              const std::function<QStringList(QQuickItem*)>& check) {
     QList<QQuickItem*> tabViews;
     const std::function<void(QQuickItem*)> find = [&](QQuickItem* item) {
         if (item->property("titles").isValid() && item->property("currentIndex").isValid())
@@ -151,11 +176,11 @@ inline QStringList cutTextsOnEveryTab(QQuickItem* top) {
     };
     find(top);
 
-    QStringList cut = cutTexts(top);
-    const auto add = [&cut](const QStringList& more) {
+    QStringList found = check(top);
+    const auto add = [&found](const QStringList& more) {
         for (const QString& text : more) {
-            if (!cut.contains(text))
-                cut.append(text);
+            if (!found.contains(text))
+                found.append(text);
         }
     };
     for (QQuickItem* view : tabViews) {
@@ -165,12 +190,22 @@ inline QStringList cutTextsOnEveryTab(QQuickItem* top) {
             view->setProperty("currentIndex", i);
             // Layouts inside a page settle once it shows.
             QTest::qWait(30);
-            add(cutTexts(top));
+            add(check(top));
         }
         view->setProperty("currentIndex", current);
         QTest::qWait(30);
     }
-    return cut;
+    return found;
+}
+
+// cutTexts() on every page of every tab view under `top`.
+inline QStringList cutTextsOnEveryTab(QQuickItem* top) {
+    return onEveryTab(top, cutTexts);
+}
+
+// oddFieldHeights() on every page of every tab view under `top`.
+inline QStringList oddFieldHeightsOnEveryTab(QQuickItem* top) {
+    return onEveryTab(top, oddFieldHeights);
 }
 
 } // namespace gambasse

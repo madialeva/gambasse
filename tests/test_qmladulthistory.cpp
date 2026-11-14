@@ -126,6 +126,7 @@ private slots:
     void everyTextShowsWhole_data();
     void everyTextShowsWhole();
     void lowWindowOpensAtItsOwnSize();
+    void everyFieldHasAFormHeight();
     void lowWindowShowsALargerSize();
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
@@ -518,6 +519,15 @@ void TestQmlAdultHistory::everyTextShowsWholeZoomed() {
     QTest::qWait(100);
     const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
     QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+// Every input box is as tall as a form field.
+void TestQmlAdultHistory::everyFieldHasAFormHeight() {
+    QVERIFY(createPatient());
+    openScreen();
+    QVERIFY(openHistory() != nullptr);
+    const QStringList odd = oddFieldHeightsOnEveryTab(inHistory(QStringLiteral("historyForm")));
+    QVERIFY2(odd.isEmpty(), qPrintable(odd.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse
