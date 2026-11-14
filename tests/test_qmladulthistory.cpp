@@ -10,6 +10,7 @@
 
 #include <Paths.h>
 #include <VisibleTextChecks.h>
+#include <ZoomTestSupport.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -124,6 +125,11 @@ private slots:
     void boundsAndDatesAreCoercedOnSave();
     void everyTextShowsWhole_data();
     void everyTextShowsWhole();
+    void lowWindowOpensAtItsOwnSize();
+    void everyFieldHasAFormHeight();
+    void lowWindowShowsALargerSize();
+    void everyTextShowsWholeZoomed_data();
+    void everyTextShowsWholeZoomed();
 };
 
 void TestQmlAdultHistory::initTestCase() {
@@ -181,6 +187,7 @@ void TestQmlAdultHistory::openScreen() {
         InterfaceSettings baseline(nullptr);
         baseline.setTheme(QStringLiteral("claro"));
         baseline.setLanguage(QStringLiteral("en"));
+        baseline.setLetterSize(13);
     }
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
@@ -447,6 +454,80 @@ void TestQmlAdultHistory::titleBadgesLeaveControlsClear() {
     QVERIFY(form != nullptr);
     const QString problems = badgeProblems(form);
     QVERIFY2(problems.isEmpty(), qPrintable(problems));
+}
+
+
+// The adult history is the lowest history: its window is as tall as its form
+// from the first time it opens, limits included, and takes the height of the
+// pediatric one when the same window shows it afterwards.
+void TestQmlAdultHistory::lowWindowOpensAtItsOwnSize() {
+    QVERIFY(createPatient());
+    openScreen();
+    zoomtest::setArea({historyWindow()}, zoomtest::wideArea);
+    QVERIFY(openHistory() != nullptr);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 430)),
+             qPrintable(zoomtest::describeLimits(window)));
+    QCOMPARE(zoomtest::stageOf(window)->height(), 430.0);
+
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    window->setProperty("screenId", QStringLiteral("pediatric"));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 608)),
+             qPrintable(zoomtest::describeLimits(window)));
+    window->setProperty("screenId", QStringLiteral("adult"));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 430)),
+             qPrintable(zoomtest::describeLimits(window)));
+}
+
+// The adult history is lower than the pediatric one, so the same screen holds
+// a larger letter for it.
+void TestQmlAdultHistory::lowWindowShowsALargerSize() {
+    QVERIFY(createPatient());
+    openScreen();
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    m_settings->setLetterSize(17);
+    zoomtest::setArea({historyWindow()}, zoomtest::laptopArea);
+    QVERIFY(openHistory() != nullptr);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), QSize(1334, 563));
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1334, 563)),
+             qPrintable(zoomtest::describeLimits(window)));
+    QCOMPARE(zoomtest::stageOf(window)->scale(), 17.0 / 13.0);
+}
+
+void TestQmlAdultHistory::everyTextShowsWholeZoomed_data() {
+    everyTextShowsWhole_data();
+}
+
+// Measured in the stage at 17 px, every text reads whole as at the base size.
+void TestQmlAdultHistory::everyTextShowsWholeZoomed() {
+    QFETCH(QString, language);
+    QVERIFY(createPatient());
+    openScreen();
+    const auto restore = qScopeGuard([this] {
+        m_settings->setLetterSize(13);
+        m_settings->setLanguage(QStringLiteral("en"));
+    });
+    zoomtest::setArea({historyWindow()}, zoomtest::wideArea);
+    QVERIFY(openHistory() != nullptr);
+    m_settings->setLanguage(language);
+    m_settings->setLetterSize(17);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QTRY_COMPARE(window->size(), QSize(1334, 563));
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+// Every input box is as tall as a form field.
+void TestQmlAdultHistory::everyFieldHasAFormHeight() {
+    QVERIFY(createPatient());
+    openScreen();
+    QVERIFY(openHistory() != nullptr);
+    const QStringList odd = oddFieldHeightsOnEveryTab(inHistory(QStringLiteral("historyForm")));
+    QVERIFY2(odd.isEmpty(), qPrintable(odd.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse

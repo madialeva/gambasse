@@ -3,18 +3,17 @@ import QtQuick.Controls
 import Gambasse
 
 // Modal shell shared by the three history screens (pediatric, adult and
-// pregnancy): frameless window with the close-only title bar, the form loaded
-// in the middle and the Delete / Save / Exit row at the bottom, exactly like
-// the Widgets history dialogs. The controller decides what the form shows and
-// performs the persistence; this window only wires the buttons and the
+// pregnancy): the frame of FormWindow (close-only title bar and zoom), the form
+// loaded in the middle and the Delete / Save / Exit row at the bottom, exactly
+// like the Widgets history dialogs. The controller decides what the form shows
+// and performs the persistence; this window only wires the buttons and the
 // confirmation.
-Window {
+FormWindow {
     id: root
 
     // PediatricHistoryController, AdultHistoryController or
     // PregnancyHistoryController, created by PatientController.
     property HistoryController controller: null
-    property string screenTitle: ""
     // Which history this window shows ("pediatric", "adult", "pregnancy").
     // Not named "screen": Window already declares a read-only screen
     // property (the QScreen), which cannot be replaced.
@@ -35,24 +34,9 @@ Window {
     // refresh what it offers (Window.closed is not a QML signal).
     signal historyChanged
 
-    visible: false
-    modality: Qt.WindowModal
-    flags: Qt.FramelessWindowHint
-    title: root.screenTitle
-    color: Theme.windowBackground
-    // Same fixed frame as the Widgets dialogs: 6 px side margins around a
-    // 1008 px content area, the 32 px title bar on top and 6 px below it.
-    readonly property int contentWidth: 1008
-    readonly property int contentHeight: root.screenId === "adult" ? 383 : 561
-    readonly property int frameMargin: 6
-    readonly property int windowWidth: contentWidth + 2 * frameMargin
-    readonly property int windowHeight: Theme.titleBarHeight + contentHeight + frameMargin
-    width: windowWidth
-    height: windowHeight
-    minimumWidth: windowWidth
-    maximumWidth: windowWidth
-    minimumHeight: windowHeight
-    maximumHeight: windowHeight
+    titleBarName: "historyTitleBar"
+    // The adult history is lower than the other two.
+    contentHeight: root.screenId === "adult" ? 383 : 561
     // The Delete / Save / Exit row sits inside the content area, at the
     // coordinates the .cpp files give each button.
     readonly property rect deleteButtonRect: root.screenId === "pediatric" ? Qt.rect(570, 524, 134, 32) : (root.screenId === "pregnancy" ? Qt.rect(565, 524, 137, 32) : Qt.rect(560, 348, 137, 32))
@@ -67,8 +51,7 @@ Window {
     // Shows the screen. Called on every open: a controller that is already
     // loaded does not change `ready`, so onReadyChanged alone is not enough.
     function present() {
-        root.show();
-        root.requestActivate();
+        root.showPlaced();
         // Like the Widgets windows, the first editable field (the opening
         // date: the patient name is display only) starts with the focus.
         // The tab chain after the loader starts inside the loaded form.
@@ -96,19 +79,6 @@ Window {
         deleteConfirm.titleText = qsTr("Delete history");
         deleteConfirm.yesNo = true;
         deleteConfirm.present();
-    }
-
-    TitleBar {
-        id: titleBar
-        objectName: "historyTitleBar"
-        // Edge to edge like the main window; only the content keeps the side
-        // margins.
-        x: 0
-        y: 0
-        width: root.width
-        height: Theme.titleBarHeight
-        title: root.screenTitle
-        closeOnly: true
     }
 
     // The form owns the whole content area (1008 x contentHeight): it places
@@ -178,11 +148,13 @@ Window {
         id: messageDialog
         objectName: "historyMessageDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
     GxDialog {
         id: deleteConfirm
         objectName: "deleteHistoryConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.remove()) {
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the history."));

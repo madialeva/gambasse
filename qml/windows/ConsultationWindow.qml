@@ -3,18 +3,17 @@ import QtQuick.Controls
 import Gambasse
 
 // Modal shell shared by the three consultation screens (pediatric, adult and
-// pregnancy): frameless window with the close-only title bar, the form loaded
-// in the middle and the four buttons (Exit / Save / New / Delete) at the
+// pregnancy): the frame of FormWindow (close-only title bar and zoom), the form
+// loaded in the middle and the four buttons (Exit / Save / New / Delete) at the
 // coordinates of each original form. Unlike a history, saving keeps the
 // window open: the controller keeps the list and the edited consultation,
 // this window only wires the buttons, the confirmation and the messages.
-Window {
+FormWindow {
     id: root
 
     // PediatricConsultationController, AdultConsultationController or
     // PregnancyConsultationController, created by PatientController.
     property ConsultationController controller: null
-    property string screenTitle: ""
     // Which consultation this window shows ("pediatric", "adult",
     // "pregnancy"). Not named "screen": Window already declares one.
     property string screenId: ""
@@ -22,24 +21,9 @@ Window {
     property var formComponent: null
     readonly property bool ready: controller !== null && controller.loaded
 
-    visible: false
-    modality: Qt.WindowModal
-    flags: Qt.FramelessWindowHint
-    title: root.screenTitle
-    color: Theme.windowBackground
-    // Same fixed frame as the history windows: 6 px side margins around the
-    // 1008 px content area, the title bar on top and 6 px below it.
-    readonly property int contentWidth: 1008
-    readonly property int contentHeight: root.screenId === "pregnancy" ? 341 : 561
-    readonly property int frameMargin: 6
-    readonly property int windowWidth: contentWidth + 2 * frameMargin
-    readonly property int windowHeight: Theme.titleBarHeight + contentHeight + frameMargin
-    width: windowWidth
-    height: windowHeight
-    minimumWidth: windowWidth
-    maximumWidth: windowWidth
-    minimumHeight: windowHeight
-    maximumHeight: windowHeight
+    titleBarName: "consultationTitleBar"
+    // The pregnancy consultation is lower than the other two.
+    contentHeight: root.screenId === "pregnancy" ? 341 : 561
     // The buttons sit inside the content area, at the coordinates of each
     // original designer.
     readonly property rect exitButtonRect: root.screenId === "pregnancy" ? Qt.rect(735, 300, 103, 32) : (root.screenId === "pediatric" ? Qt.rect(837, 388, 158, 32) : Qt.rect(842, 399, 158, 32))
@@ -55,8 +39,7 @@ Window {
     // Shows the screen. Called on every open: a controller that is already
     // loaded does not change `ready`, so onReadyChanged alone is not enough.
     function present() {
-        root.show();
-        root.requestActivate();
+        root.showPlaced();
         root.focusReason();
     }
 
@@ -102,19 +85,6 @@ Window {
         deleteConfirm.titleText = qsTr("Delete consultation");
         deleteConfirm.yesNo = true;
         deleteConfirm.present();
-    }
-
-    TitleBar {
-        id: titleBar
-        objectName: "consultationTitleBar"
-        // Edge to edge like the main window; only the content keeps the side
-        // margins.
-        x: 0
-        y: 0
-        width: root.width
-        height: Theme.titleBarHeight
-        title: root.screenTitle
-        closeOnly: true
     }
 
     // The form owns the whole content area (1008 x contentHeight): it places
@@ -193,11 +163,13 @@ Window {
         id: messageDialog
         objectName: "consultationMessageDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
     GxDialog {
         id: deleteConfirm
         objectName: "deleteConsultationConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.remove()) {
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the consultation."));

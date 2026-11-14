@@ -1,5 +1,7 @@
 #include <QGuiApplication>
+#include <QDir>
 #include <QQmlApplicationEngine>
+#include <QSettings>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QSqlError>
@@ -11,6 +13,7 @@
 
 #include <Paths.h>
 #include <VisibleTextChecks.h>
+#include <ZoomTestSupport.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
 #include <logic/PatientService.h>
@@ -144,7 +147,13 @@ private:
     qlonglong m_patientId = 0;
 
     void openScreen();
-    void open(const ScreenData& data, int storedBefore = 0);
+    // With an `area`, the child windows take it as their available area before
+    // the consultation window is first placed.
+    void open(const ScreenData& data, int storedBefore = 0, const QRect& area = QRect());
+    InterfaceSettings* settings() const {
+        return m_engine->singletonInstance<InterfaceSettings*>(QStringLiteral("Gambasse"),
+                                                               QStringLiteral("InterfaceSettings"));
+    }
     void openConsultation(const ScreenData& data);
     QQuickWindow* consultationWindow() const;
     QQuickItem* inConsultation(const QString& name) const;
@@ -179,6 +188,17 @@ private slots:
     void bodyDiagramLettersFollowTheLanguage_data();
     void bodyDiagramLettersFollowTheLanguage();
     void bodyDiagramFollowsItsSize();
+    void zoomScalesTheWindow_data();
+    void zoomScalesTheWindow();
+    void zoomElsewhereCentresTheWindowOnOpen();
+    void everyTextShowsWholeZoomed_data();
+    void everyTextShowsWholeZoomed();
+    void popupsFollowTheZoom();
+    void bodyDiagramIsRenderedAtItsZoomedSize();
+    void zoomButtonsAndShortcuts_data();
+    void everyFieldHasAFormHeight_data();
+    void everyFieldHasAFormHeight();
+    void zoomButtonsAndShortcuts();
 };
 
 void TestQmlConsultations::initTestCase() {
@@ -241,6 +261,7 @@ void TestQmlConsultations::openScreen() {
         InterfaceSettings baseline(nullptr);
         baseline.setTheme(QStringLiteral("claro"));
         baseline.setLanguage(QStringLiteral("en"));
+        baseline.setLetterSize(13);
     }
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
@@ -259,7 +280,7 @@ void TestQmlConsultations::openScreen() {
 
 // A patient with the history the consultations need, `storedBefore`
 // consultations already saved, the main screen and the consultation screen.
-void TestQmlConsultations::open(const ScreenData& data, int storedBefore) {
+void TestQmlConsultations::open(const ScreenData& data, int storedBefore, const QRect& area) {
     QSqlQuery erase(Database::instance().connection());
     QVERIFY(erase.exec(QStringLiteral("DELETE FROM b01_patient")));
     Patient p;
@@ -286,6 +307,10 @@ void TestQmlConsultations::open(const ScreenData& data, int storedBefore) {
         QVERIFY2(c.exec(), qPrintable(c.lastError().text()));
     }
     openScreen();
+    if (area.isValid())
+        zoomtest::setArea({m_screen->findChild<QObject*>(QStringLiteral("historyWindow")),
+                           consultationWindow()},
+                          area);
     openConsultation(data);
 }
 
@@ -726,6 +751,210 @@ void TestQmlConsultations::pediatricTabsShowWholeCaptions() {
                                 .arg(QLatin1String(name)).arg(right).arg(tabs->width())));
     }
     settings->setLanguage(QStringLiteral("en"));
+}
+
+
+void TestQmlConsultations::zoomScalesTheWindow_data() {
+    opensWithANewConsultation_data();
+}
+
+// The whole window is its base layout scaled, the four buttons included.
+void TestQmlConsultations::zoomScalesTheWindow() {
+    QFETCH(int, row);
+    open(screenData().at(row), 0, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickWindow* window = consultationWindow();
+    QQuickItem* stage = zoomtest::stageOf(window);
+    QVERIFY(stage != nullptr);
+    const bool low = screenData().at(row).screenId == QLatin1String("pregnancy");
+    QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, low ? 388 : 608)),
+             qPrintable(zoomtest::describeLimits(window)));
+    QCOMPARE(stage->scale(), 1.0);
+
+    QList<QQuickItem*> items;
+    for (const char* name : {"consultationTitleBar", "exitConsultationButton",
+                             "saveConsultationButton", "newConsultationButton",
+                             "deleteConsultationButton", "consultationForm"})
+        items.append(inConsultation(QLatin1String(name)));
+    QVERIFY(!items.contains(nullptr));
+    QList<QRectF> base;
+    for (QQuickItem* item : items)
+        base.append(zoomtest::sceneRect(item));
+
+    settings()->setLetterSize(15);
+    QTRY_COMPARE(window->size(), low ? QSize(1177, 448) : QSize(1177, 702));
+    QVERIFY2(zoomtest::isFixedAt(window, window->size()),
+             qPrintable(zoomtest::describeLimits(window)));
+    QCOMPARE(stage->scale(), 15.0 / 13.0);
+    for (int i = 0; i < items.size(); ++i) {
+        const QRectF now = zoomtest::sceneRect(items.at(i));
+        QVERIFY2(zoomtest::sameScaled(base.at(i), now, 15.0 / 13.0),
+                 qPrintable(QStringLiteral("%1: %2 from %3")
+                                .arg(items.at(i)->objectName(), zoomtest::describe(now),
+                                     zoomtest::describe(base.at(i)))));
+    }
+}
+
+// A zoom made while the consultation window is closed (in a history window)
+// centres it over the main window when it opens again.
+void TestQmlConsultations::zoomElsewhereCentresTheWindowOnOpen() {
+    const ScreenData data = screenData().at(0);
+    open(data, 0, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickWindow* window = consultationWindow();
+    QVERIFY(zoomtest::dragTo(m_window, QPoint(400, 200)));
+    QVERIFY(zoomtest::dragTo(window, QPoint(10, 10)));
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+
+    // Opened again with the same size: where it was left.
+    openConsultation(data);
+    QCOMPARE(window->position(), QPoint(10, 10));
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+
+    settings()->setLetterSize(16);
+    QCOMPARE(window->position(), QPoint(10, 10)); // hidden: not moved yet
+    openConsultation(data);
+    QTRY_COMPARE(window->size(), zoomtest::zoomOf(window)->windowSize());
+    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+}
+
+void TestQmlConsultations::everyTextShowsWholeZoomed_data() {
+    everyTextShowsWhole_data();
+}
+
+// Measured in the stage at 17 px, every text reads whole as at the base size.
+void TestQmlConsultations::everyTextShowsWholeZoomed() {
+    QFETCH(int, row);
+    QFETCH(QString, language);
+    open(screenData().at(row), 0, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] {
+        settings()->setLetterSize(13);
+        settings()->setLanguage(QStringLiteral("en"));
+    });
+    settings()->setLanguage(language);
+    settings()->setLetterSize(17);
+    QQuickWindow* window = consultationWindow();
+    QCOMPARE(zoomtest::zoomOf(window)->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), zoomtest::zoomOf(window)->windowSize());
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(zoomtest::stageOf(window));
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
+
+
+// At 17 px, the diagnosis list of the pediatric consultation and the delete
+// confirmation are scaled like the window: the list against its combo, the
+// confirmation centred.
+void TestQmlConsultations::popupsFollowTheZoom() {
+    open(screenData().at(2), 0, zoomtest::wideArea); // pediatric
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    settings()->setLetterSize(17);
+    QQuickWindow* window = consultationWindow();
+    const QSizeF size(zoomtest::zoomOf(window)->windowSize());
+    QTRY_COMPARE(window->contentItem()->size(), size);
+    const qreal factor = 17.0 / 13.0;
+
+    QQuickItem* combo = inConsultation(QStringLiteral("comboBox"));
+    QVERIFY(combo != nullptr);
+    auto* popup = combo->property("popup").value<QObject*>();
+    QVERIFY(QMetaObject::invokeMethod(popup, "open"));
+    QTRY_VERIFY(popup->property("opened").toBool());
+    const QString problems = zoomtest::popupProblems(popup, combo, combo->width(), factor);
+    QVERIFY2(problems.isEmpty(), qPrintable(problems));
+    QVERIFY(QMetaObject::invokeMethod(popup, "close"));
+    QTRY_VERIFY(!popup->property("visible").toBool());
+
+    QObject* confirm = window->findChild<QObject*>(QStringLiteral("deleteConsultationConfirm"));
+    QVERIFY(confirm != nullptr);
+    confirm->setProperty("messageText", QStringLiteral("Delete?"));
+    confirm->setProperty("yesNo", true);
+    QVERIFY(QMetaObject::invokeMethod(confirm, "present"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(confirm));
+    QVERIFY(qAbs(drawn.width() - 420 * factor) < 0.6);
+    QVERIFY2(qAbs(drawn.center().x() - size.width() / 2.0) <= 1
+                 && qAbs(drawn.center().y() - size.height() / 2.0) <= 1,
+             qPrintable(zoomtest::describe(drawn)));
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+}
+
+
+// The body diagram is rendered at the size it is seen, so a zoomed window
+// shows it sharp, not as an enlarged bitmap.
+void TestQmlConsultations::bodyDiagramIsRenderedAtItsZoomedSize() {
+    open(screenData().at(0), 0, zoomtest::wideArea); // adult
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickItem* image = inConsultation(QStringLiteral("bodyRegions"));
+    QVERIFY(image != nullptr);
+    QCOMPARE(image->property("sourceSize").toSize(), QSize(240, 295));
+    settings()->setLetterSize(20);
+    QTRY_COMPARE(consultationWindow()->size(), zoomtest::zoomOf(consultationWindow())->windowSize());
+    QCOMPARE(image->property("sourceSize").toSize(),
+             QSize(qCeil(240 * 20 / 13.0), qCeil(295 * 20 / 13.0)));
+    // Laid out as at the base size: only the rendering grew.
+    QCOMPARE(QSizeF(image->width(), image->height()), QSizeF(240, 295));
+}
+
+
+void TestQmlConsultations::zoomButtonsAndShortcuts_data() {
+    opensWithANewConsultation_data();
+}
+
+// The zoom buttons and the keyboard of each consultation window, with the
+// reason being typed: the text and the focus stay, the size is saved.
+void TestQmlConsultations::zoomButtonsAndShortcuts() {
+    QFETCH(int, row);
+    open(screenData().at(row), 0, zoomtest::wideArea);
+    const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+    QQuickWindow* window = consultationWindow();
+    ZoomController* zoom = zoomtest::zoomOf(window);
+    QQuickItem* bar = inConsultation(QStringLiteral("consultationTitleBar"));
+    auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
+    auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
+    QVERIFY(zoomIn != nullptr && zoomOut != nullptr);
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
+    QVERIFY(!zoomOut->isEnabled());
+
+    // The reason field has the focus when a new consultation starts.
+    QQuickItem* focused = window->activeFocusItem();
+    QVERIFY(focused != nullptr);
+    for (const char key : {'a', 'b', 'c'})
+        QTest::keyClick(window, key);
+    const QString typed = focused->property("text").toString();
+    QVERIFY(typed.endsWith(QStringLiteral("abc")));
+
+    clickIn(zoomIn);
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QTest::keyClick(window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 15);
+    QCOMPARE(window->activeFocusItem(), focused);
+    QCOMPARE(focused->property("text").toString(), typed);
+    clickIn(zoomOut);
+    QTRY_COMPARE(zoom->shownLetterSize(), 14);
+    QTRY_COMPARE(window->size(), zoom->windowSize());
+
+    const QSettings config(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")),
+                           QSettings::IniFormat);
+    QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 14);
+    QTest::keyClick(window, Qt::Key_0, Qt::ControlModifier);
+    QCOMPARE(zoom->shownLetterSize(), 13);
+}
+
+void TestQmlConsultations::everyFieldHasAFormHeight_data() {
+    opensWithANewConsultation_data();
+}
+
+// Every input box is as tall as a form field, also under a caption: the
+// health disorders and the first lesion row of the adult form put theirs
+// above in 38 px.
+void TestQmlConsultations::everyFieldHasAFormHeight() {
+    QFETCH(int, row);
+    open(screenData().at(row));
+    const QStringList odd =
+        oddFieldHeightsOnEveryTab(inConsultation(QStringLiteral("consultationForm")));
+    QVERIFY2(odd.isEmpty(), qPrintable(odd.join(QStringLiteral(" | "))));
 }
 
 } // namespace gambasse

@@ -128,6 +128,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/SexLabel.h
     src/logic/TextOrder.cpp
     src/logic/TextOrder.h
+    src/logic/ZoomLevels.cpp
+    src/logic/ZoomLevels.h
 )
 target_include_directories(GambasseCore PUBLIC src)
 target_link_libraries(GambasseCore PUBLIC Qt6::Core Qt6::Gui Qt6::Sql)
@@ -176,6 +178,8 @@ qt_add_qml_module(GambasseQml
         src/ui/controller/PregnancyConsultationController.h
         src/ui/controller/PregnancyHistoryController.cpp
         src/ui/controller/PregnancyHistoryController.h
+        src/ui/controller/ZoomController.cpp
+        src/ui/controller/ZoomController.h
         src/ui/filter/ColumnFilterProxy.cpp
         src/ui/filter/ColumnFilterProxy.h
     QML_FILES
@@ -201,6 +205,7 @@ qt_add_qml_module(GambasseQml
         qml/components/GxActionButton.qml
         qml/dialogs/AboutDialog.qml
         qml/dialogs/PhotoDialog.qml
+        qml/windows/FormWindow.qml
         qml/windows/HistoryWindow.qml
         qml/windows/ConsultationWindow.qml
         qml/windows/ConsultationList.qml

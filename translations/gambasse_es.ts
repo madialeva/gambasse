@@ -1025,216 +1025,216 @@
 <context>
     <name>AdultConsultationForm</name>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="77"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="80"/>
         <source>Personal data</source>
         <translation>Datos personales</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="86"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="89"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="98"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="101"/>
         <source>Date:</source>
         <translation>Fecha:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="109"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="112"/>
         <source>Consultation list</source>
         <translation>Lista de consultas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="130"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="133"/>
         <source>Reason for consultation</source>
         <translation>Motivo de la consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="152"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="155"/>
         <source>Lesion</source>
         <translation>Lesión</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="178"/>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="195"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="181"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="198"/>
         <source>R</source>
         <extracomment>First letter of the patient&apos;s right side, on the body diagram</extracomment>
         <translation>D</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="184"/>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="190"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="187"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="193"/>
         <source>L</source>
         <extracomment>First letter of the patient&apos;s left side, on the body diagram</extracomment>
         <translation>I</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="225"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="228"/>
         <source>Region</source>
         <translation>Región</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="234"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="237"/>
         <source>Impairment</source>
         <translation>Perjuicio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="253"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="256"/>
         <source>Physical examination</source>
         <translation>Exploración física</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="262"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="265"/>
         <source>Respiratory</source>
         <translation>Respiratorio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="269"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="272"/>
         <source>Nasal flaring</source>
         <translation>Aleteo nasal</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="276"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="279"/>
         <source>Stridor</source>
         <translation>Estridor</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="283"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="286"/>
         <source>Wheezing</source>
         <translation>Sibilancias</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="290"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="293"/>
         <source>Retraction</source>
         <translation>Tiraje</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="300"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="303"/>
         <source>Circulatory</source>
         <translation>Circulatorio</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="307"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="310"/>
         <source>Arrhythmia</source>
         <translation>Arritmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="314"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="317"/>
         <source>Capillary refill</source>
         <translation>Relleno capilar</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="321"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="324"/>
         <source>No radial pulse</source>
         <translation>Ausencia de pulso radial</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="328"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="331"/>
         <source>Edema</source>
         <translation>Edemas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="338"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="341"/>
         <source>Skin and mucosa</source>
         <translation>Piel y mucosas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="345"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="348"/>
         <source>Skin fold &gt; 2&quot;</source>
         <translation>Pliegue cutáneo &gt; 2&quot;</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="352"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="355"/>
         <source>Pale mucosa</source>
         <translation>Mucosas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="359"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="362"/>
         <source>Enophthalmos</source>
         <translation>Enoftalmia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="366"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="369"/>
         <source>Pale palms</source>
         <translation>Palmas pálidas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="376"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="379"/>
         <source>Endocrine-metabolic</source>
         <translation>Endocrino-metabólico</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="383"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="386"/>
         <source>Organomegaly</source>
         <translation>Organomegalia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="399"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="402"/>
         <source>Lymphadenopathy</source>
         <translation>Adenopatías</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="418"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="421"/>
         <source>Elimination</source>
         <translation>Eliminación</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="425"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="428"/>
         <source>Secretion</source>
         <translation>Secreción</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="432"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="435"/>
         <source>Stool changes</source>
         <translation>Heces alteradas</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="439"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="442"/>
         <source>Cough</source>
         <translation>Tos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="455"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="458"/>
         <source>Urine changes</source>
         <translation>Orina alterada</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="471"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="474"/>
         <source>Vomiting</source>
         <translation>Vómitos</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="481"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="484"/>
         <source>Health disorders</source>
         <translation>Trastornos de la salud</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="491"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="494"/>
         <source>Dehydration degree:</source>
         <translation>Deshidratación, grado:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="502"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="505"/>
         <source>Malnutrition degree:</source>
         <translation>Desnutrición, grado:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="513"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="516"/>
         <source>Others:</source>
         <translation>Otros:</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="524"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="527"/>
         <source>Conduct</source>
         <translation>Conducta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="531"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="534"/>
         <source>Irritable</source>
         <translation>Irritable</translation>
     </message>
     <message>
-        <location filename="../qml/windows/AdultConsultationForm.qml" line="540"/>
+        <location filename="../qml/windows/AdultConsultationForm.qml" line="543"/>
         <source>Other:</source>
         <translation>Otra:</translation>
     </message>
@@ -1577,44 +1577,44 @@
 <context>
     <name>ConsultationWindow</name>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="88"/>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="203"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="71"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="175"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="88"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="71"/>
         <source>Could not save the consultation.</source>
         <translation>No se pudo guardar la consulta.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="101"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="84"/>
         <source>Delete the consultation of %1?</source>
         <translation>¿Borrar la consulta del %1?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="102"/>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="185"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="85"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="155"/>
         <source>Delete consultation</source>
         <translation>Borrar consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="155"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="125"/>
         <source>Exit</source>
         <translation>Salir</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="164"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="134"/>
         <source>Save consultation</source>
         <translation>Guardar consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="174"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="144"/>
         <source>New consultation</source>
         <translation>Nueva consulta</translation>
     </message>
     <message>
-        <location filename="../qml/windows/ConsultationWindow.qml" line="203"/>
+        <location filename="../qml/windows/ConsultationWindow.qml" line="175"/>
         <source>Could not delete the consultation.</source>
         <translation>No se pudo borrar la consulta.</translation>
     </message>
@@ -1765,17 +1765,17 @@
 <context>
     <name>GxDialog</name>
     <message>
-        <location filename="../qml/components/GxDialog.qml" line="68"/>
+        <location filename="../qml/components/GxDialog.qml" line="74"/>
         <source>OK</source>
         <translation>Aceptar</translation>
     </message>
     <message>
-        <location filename="../qml/components/GxDialog.qml" line="77"/>
+        <location filename="../qml/components/GxDialog.qml" line="83"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="../qml/components/GxDialog.qml" line="86"/>
+        <location filename="../qml/components/GxDialog.qml" line="92"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -1783,49 +1783,49 @@
 <context>
     <name>HistoryWindow</name>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="26"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="25"/>
         <source>Delete the pediatric history of &quot;%1&quot;?</source>
         <translation>¿Borrar la historia pediátrica de &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="28"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="27"/>
         <source>Delete the pregnancy history of &quot;%1&quot;?</source>
         <translation>¿Borrar la historia de embarazo de &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="29"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="28"/>
         <source>Delete the adult history of &quot;%1&quot;?</source>
         <translation>¿Borrar la historia de adulto de &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
-        <location filename="../qml/windows/HistoryWindow.qml" line="188"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="68"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="160"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="85"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="68"/>
         <source>Could not save the history.</source>
         <translation>No se pudo guardar la historia.</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="96"/>
-        <location filename="../qml/windows/HistoryWindow.qml" line="151"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="79"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="121"/>
         <source>Delete history</source>
         <translation>Borrar historia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="162"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="132"/>
         <source>Save history</source>
         <translation>Guardar historia</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="172"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="142"/>
         <source>Exit</source>
         <translation>Salir</translation>
     </message>
     <message>
-        <location filename="../qml/windows/HistoryWindow.qml" line="188"/>
+        <location filename="../qml/windows/HistoryWindow.qml" line="160"/>
         <source>Could not delete the history.</source>
         <translation>No se pudo borrar la historia.</translation>
     </message>
@@ -3850,72 +3850,82 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../qml/TitleBar.qml" line="143"/>
+        <location filename="../qml/TitleBar.qml" line="220"/>
         <source>Help</source>
         <translation>Ayuda</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="151"/>
+        <location filename="../qml/TitleBar.qml" line="228"/>
         <source>About</source>
         <translation>Información</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="163"/>
-        <location filename="../qml/TitleBar.qml" line="193"/>
+        <location filename="../qml/TitleBar.qml" line="240"/>
+        <location filename="../qml/TitleBar.qml" line="270"/>
         <source>Spanish</source>
         <translation>Español</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="165"/>
-        <location filename="../qml/TitleBar.qml" line="201"/>
+        <location filename="../qml/TitleBar.qml" line="242"/>
+        <location filename="../qml/TitleBar.qml" line="278"/>
         <source>Portuguese</source>
         <translation>Portugués</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="166"/>
-        <location filename="../qml/TitleBar.qml" line="209"/>
+        <location filename="../qml/TitleBar.qml" line="243"/>
+        <location filename="../qml/TitleBar.qml" line="286"/>
         <source>English</source>
         <translation>Inglés</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="185"/>
+        <location filename="../qml/TitleBar.qml" line="262"/>
         <source>Language</source>
         <translation>Idioma</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="224"/>
-        <location filename="../qml/TitleBar.qml" line="240"/>
+        <location filename="../qml/TitleBar.qml" line="301"/>
+        <location filename="../qml/TitleBar.qml" line="317"/>
         <source>Dark</source>
         <translation>Oscuro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="224"/>
-        <location filename="../qml/TitleBar.qml" line="233"/>
+        <location filename="../qml/TitleBar.qml" line="301"/>
+        <location filename="../qml/TitleBar.qml" line="310"/>
         <source>Light</source>
         <translation>Claro</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="225"/>
+        <location filename="../qml/TitleBar.qml" line="302"/>
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="251"/>
+        <location filename="../qml/TitleBar.qml" line="328"/>
         <source>Minimize</source>
         <translation>Minimizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="259"/>
+        <location filename="../qml/TitleBar.qml" line="336"/>
         <source>Restore</source>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="259"/>
+        <location filename="../qml/TitleBar.qml" line="336"/>
         <source>Maximize</source>
         <translation>Maximizar</translation>
     </message>
     <message>
-        <location filename="../qml/TitleBar.qml" line="295"/>
+        <location filename="../qml/TitleBar.qml" line="371"/>
+        <source>Zoom out</source>
+        <translation>Reducir</translation>
+    </message>
+    <message>
+        <location filename="../qml/TitleBar.qml" line="383"/>
+        <source>Zoom in</source>
+        <translation>Ampliar</translation>
+    </message>
+    <message>
+        <location filename="../qml/TitleBar.qml" line="396"/>
         <source>Close</source>
         <translation>Cerrar</translation>
     </message>

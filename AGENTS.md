@@ -137,9 +137,31 @@ match its `.ts`. The windows use fixed coordinates, so the `everyTextShowsWhole`
 test of each screen fails when a text cannot be read whole in one of the three
 languages. Those measures hold everywhere because the font is embedded
 (`resources/fonts/`, Noto Sans at 13 px, without hinting, installed by
-`InterfaceSettings`), and `ctest` runs with no system font. A character that font
-lacks fails `everyTextHasItsGlyphs`: draw the symbol instead. A QML test creates
-the `InterfaceSettings` singleton before loading a view, like `main.cpp`. A view
+`InterfaceSettings`), and `ctest` runs with no system font. The history and
+consultation windows derive from `qml/windows/FormWindow.qml`, which zooms
+them: their title bar, form and buttons live in its `stage`, laid out at the
+13 px base size and scaled as a whole by the letter size the user chooses
+(13-26 px, `InterfaceSettings.letterSize`, `letra/pixeles` in `config.ini`)
+divided by 13. Zooming never multiplies coordinates or font sizes: a text whole
+at the base size is whole at any size, and the zoomed `everyTextShowsWhole`
+tests measure in the stage. `ZoomController` (C++) picks the size each window
+shows from its screen's available area and places the window; the tests fix
+that area, because the offscreen screen (800×800) is smaller than the windows.
+Nor does offscreen enforce a window's size limits, as a window manager does: a
+test of a child window's size also checks its minimum and maximum
+(`zoomtest::isFixedAt`), or a limit left behind only shows on a real desktop,
+as a window taller than its form.
+A popup does not inherit the scale of the item it belongs to: one shown by a
+child window (a dialog, a combo list, the calendar) takes `scale` from the
+window's `zoomFactor` with `transformOrigin: Popup.TopLeft`, and picks its side
+itself instead of trusting Qt's flip, which misplaces a scaled popup.
+A symbol is drawn with shapes (`Rectangle`), never with `Canvas`, whose bitmap
+a zoomed window would show blurred; an image in a child window multiplies its
+`sourceSize` by the zoom factor, rounded up, so it is rendered at the size it
+is seen.
+A character that font lacks fails `everyTextHasItsGlyphs`: draw the symbol
+instead. A QML test creates the `InterfaceSettings` singleton before loading a
+view, like `main.cpp`. A view
 that shows month or day names takes `InterfaceSettings.locale`, the interface
 language's locale (`pt_GW`, `es_ES` or `en_GB`, all starting the week on
 Monday), never `Qt.locale()`, which is the system's, nor `Qt.formatDate()` with

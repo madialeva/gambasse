@@ -6,8 +6,14 @@ import Gambasse
 // dialogs would ignore it and cannot be driven offscreen). One instance is
 // reused for every message: set titleText/messageText, choose the buttons
 // with yesNo, then open(). Result arrives through accepted()/rejected().
+// In a zoomed history or consultation window it is scaled like the window
+// (a popup does not inherit the scale of the item it belongs to), from its top
+// left corner so it stays centred.
 Popup {
     id: root
+    property real zoomFactor: 1
+    scale: root.zoomFactor
+    transformOrigin: Popup.TopLeft
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape

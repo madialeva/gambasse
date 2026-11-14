@@ -22,6 +22,12 @@ Item {
     // Month shown by the calendar popup (0-based month, like Date).
     property int shownYear: new Date().getFullYear()
     property int shownMonth: new Date().getMonth()
+    // Scale of the calendar: a popup does not inherit the scale of a zoomed
+    // history or consultation window, so it takes it from the window.
+    readonly property real zoomFactor: (root.Window.window as FormWindow)?.zoomFactor ?? 1
+    // An open calendar was placed for the previous size: a zoom closes it, as
+    // a click elsewhere would.
+    onZoomFactorChanged: calendarPopup.close()
 
     function fieldBackground() {
         if (field.activeFocus)
@@ -42,13 +48,16 @@ Item {
             shownMonth = today.getMonth();
         }
         calendarPopup.open();
-        // Under the field, or above it when the panel leaves no room below.
+        // Under the field, or above it when the panel leaves no room below,
+        // measured with the size it is drawn at.
         const overlay = calendarPopup.parent;
+        const width = calendarPopup.width * root.zoomFactor;
+        const height = calendarPopup.height * root.zoomFactor;
         const below = root.mapToItem(overlay, 0, root.height);
-        const left = root.mapToItem(overlay, 0, 0).x;
-        const fitsBelow = below.y + calendarPopup.height + 4 <= overlay.height;
-        calendarPopup.x = Math.max(4, Math.min(left, overlay.width - calendarPopup.width - 4));
-        calendarPopup.y = fitsBelow ? below.y : Math.max(4, below.y - root.height - calendarPopup.height);
+        const above = root.mapToItem(overlay, 0, 0);
+        const fitsBelow = below.y + height + 4 <= overlay.height;
+        calendarPopup.x = Math.max(4, Math.min(above.x, overlay.width - width - 4));
+        calendarPopup.y = fitsBelow ? below.y : Math.max(4, above.y - height);
     }
 
     function shiftMonth(delta) {
@@ -75,8 +84,10 @@ Item {
         rows: root.labelPosition === "above" ? 2 : 1
         columns: root.labelPosition === "above" ? 1 : 2
         columnSpacing: 6
-        // QVBoxLayout spacing between a caption above and its field.
-        rowSpacing: 6
+        // QVBoxLayout spacing between a caption above and its field. A short
+        // input (38 px: the 18 px caption line and a 21 px field) gives it up
+        // first, so the field keeps the height of the form's other fields.
+        rowSpacing: root.labelPosition === "above" ? Math.max(0, Math.min(6, root.height - Theme.formFieldHeight - Math.ceil(caption.implicitHeight))) : 6
         Text {
             id: caption
             text: root.labelText
@@ -107,10 +118,12 @@ Item {
             Layout.fillHeight: true
             Layout.preferredHeight: Theme.fieldHeight
             // The Widgets field keeps its 22 px height inside a taller input,
-            // centred beside its label or under it when the label is above.
-            // Under a caption a short input squeezes the field, not the
-            // caption (38 px: 14 caption + 6 + 18 field).
-            Layout.maximumHeight: root.labelPosition === "above" ? Math.min(Theme.fieldHeight, root.height - 6 - Math.ceil(caption.implicitHeight)) : Theme.fieldHeight
+            // centred beside its label. Under a caption it keeps the height of
+            // the form's fields: the spacing above it gives way first, then
+            // the caption, whose line has room to spare above and below its
+            // letters.
+            Layout.maximumHeight: root.labelPosition === "above" ? Math.min(Theme.formFieldHeight, root.height) : Theme.fieldHeight
+            Layout.minimumHeight: root.labelPosition === "above" ? Math.min(Theme.formFieldHeight, root.height) : 0
             // Preferred at its minimum and grown by fillWidth, so a long label
             // cannot squeeze it away (QLineEdit::minimumSizeHint in Widgets).
             Layout.minimumWidth: Theme.fieldMinimumWidth + calendarButton.width
@@ -180,37 +193,53 @@ Item {
                     color: "transparent"
                 }
                 // Same 16 px glyph UxDateField paints: an outlined page with a
-                // solid header and two rings.
-                contentItem: Canvas {
-                    id: calendarIcon
-                    onPaint: {
-                        const ctx = getContext("2d");
-                        ctx.reset();
-                        ctx.strokeStyle = Theme.windowText;
-                        ctx.fillStyle = Theme.windowText;
-                        ctx.lineWidth = 1.2;
-                        ctx.beginPath();
-                        ctx.roundedRect(2, 3, 12, 11, 1.5, 1.5);
-                        ctx.stroke();
-                        ctx.fillRect(2, 3, 12, 3);
-                        ctx.strokeRect(2, 3, 12, 3);
-                        ctx.beginPath();
-                        ctx.moveTo(5, 1);
-                        ctx.lineTo(5, 4);
-                        ctx.moveTo(11, 1);
-                        ctx.lineTo(11, 4);
-                        ctx.stroke();
+                // solid header and two rings. Drawn with shapes (the 1.2 px
+                // strokes of the original) so it stays sharp in a zoomed
+                // window.
+                contentItem: Item {
+                    objectName: "calendarIcon"
+                    implicitWidth: 16
+                    implicitHeight: 16
+                    Rectangle {
+                        objectName: "calendarPage"
+                        x: 1.4
+                        y: 2.4
+                        width: 13.2
+                        height: 12.2
+                        radius: 2.1
+                        color: "transparent"
+                        border.color: Theme.windowText
+                        border.width: 1.2
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 1.4
+                        y: 2.4
+                        width: 13.2
+                        height: 4.2
+                        color: Theme.windowText
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 4.4
+                        y: 1
+                        width: 1.2
+                        height: 3
+                        color: Theme.windowText
+                        antialiasing: true
+                    }
+                    Rectangle {
+                        x: 10.4
+                        y: 1
+                        width: 1.2
+                        height: 3
+                        color: Theme.windowText
+                        antialiasing: true
                     }
                 }
                 onClicked: root.openCalendar()
             }
             onTextEdited: root.textEdited()
-            Connections {
-                target: Theme
-                function onDarkChanged() {
-                    calendarIcon.requestPaint();
-                }
-            }
         }
     }
 
@@ -220,6 +249,8 @@ Item {
         id: calendarPopup
         objectName: "calendarPopup"
         parent: Overlay.overlay
+        scale: root.zoomFactor
+        transformOrigin: Popup.TopLeft
         width: 260
         height: 280
         modal: false

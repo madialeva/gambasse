@@ -12,6 +12,9 @@ Item {
     id: root
 
     property ConsultationController controller: null
+    // Zoom of the window, so the body diagram is rendered at the size it is
+    // seen.
+    readonly property real zoomFactor: (Window.window as FormWindow)?.zoomFactor ?? 1
 
     // A letter of the patient's side over the body diagram. It changes with the
     // language, so it is a text and not part of the picture; it is placed in the
@@ -164,9 +167,9 @@ Item {
                 objectName: "bodyRegions"
                 anchors.fill: parent
                 source: "qrc:/img/body-regions.svg"
-                // Drawn at the size it shows: without this, Qt draws it at its
-                // own 366x450 and stretches that bitmap.
-                sourceSize: Qt.size(width, height)
+                // Drawn at the size it shows, zoom included: without this, Qt
+                // draws it at its own 366x450 and stretches that bitmap.
+                sourceSize: Qt.size(Math.ceil(width * root.zoomFactor), Math.ceil(height * root.zoomFactor))
                 fillMode: Image.PreserveAspectFit
                 smooth: true
             }

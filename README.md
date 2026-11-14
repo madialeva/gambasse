@@ -46,6 +46,14 @@
   themes, switched live and remembered between sessions. It fits small screens,
   carries its own font, so it looks the same on any system, and a Help menu
   shows the version and the licences.
+- **Zoom:** the history and consultation windows grow with the letter size,
+  from the 13 px of their base layout, which is also the smallest, up to twice
+  as large, with the magnifier buttons of their title bar or `Ctrl` + `+` and
+  `Ctrl` + `-` (`Ctrl` + `0` goes back to the base size). The whole window
+  scales, so every control keeps its place; it never grows past the work area
+  of the screen, and every change centres it again over the main window. The
+  size is one for all of them and is remembered in `config.ini`
+  (`letra/pixeles`).
 - **Local data:** no server or network is needed. The records live in a local
   SQLite database, created and updated automatically, legacy databases included,
   and the photos in a folder.

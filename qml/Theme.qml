@@ -22,6 +22,10 @@ QtObject {
     readonly property int titleBarHeight: titleBarButtonHeight + 1
     // Height of a line edit or combo box in the Widgets windows.
     readonly property int fieldHeight: 22
+    // Height the history and consultation forms give their fields (the
+    // coordinates of the original designers): a field with its caption above
+    // keeps it, so it looks like the others.
+    readonly property int formFieldHeight: 21
     // Narrowest a squeezed line edit gets beside a long label.
     readonly property int fieldMinimumWidth: 28
 
