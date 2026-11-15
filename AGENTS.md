@@ -127,7 +127,9 @@ values to `TEXT NOT NULL` fields with `nonNull()`.
 Use English for source, identifiers, comments, CMake, scripts, technical docs,
 commits, and pull requests. GitHub issues and milestones: titles and
 descriptions always in English. OpenSpec artifacts and user conversation remain in
-Spanish. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
+Spanish. The end-user README is maintained in both English (`README.md`) and
+Spanish (`README_es.md`); always keep both language versions in sync whenever
+either one is updated. UI text must use `qsTr()` in QML and `tr()` in C++; English is the
 source language. The Portuguese catalog is European Portuguese (the norm used in
 Guinea-Bissau, 1990 spelling agreement), with titles in sentence case and
 drop-down options in capitals as in the other languages; never carry over the
@@ -271,9 +273,10 @@ host's fonts to the application: to see only the embedded font, point
 - This file is versioned in the repository as durable context. `openspec/`,
   `.opencode/`, and `.claude/` stay private working material: they are
   git-ignored and NOT published. Do not reference them from published files
-  (README, docs/README-DEVELOPER.md, ...). The public project description is the
-  README (with build and architecture details in docs/README-DEVELOPER.md) —
-  update them when the plan changes visibly.
+  (README, README_es.md, docs/README-DEVELOPER.md, ...). The public project
+  description lives in `README.md` (English) and `README_es.md` (Spanish) —
+  keep both language versions synchronized whenever the plan changes visibly,
+  alongside the build and architecture details in `docs/README-DEVELOPER.md`.
 
 ## GitHub workflow (issues, branches, PRs)
 

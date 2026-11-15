@@ -1,8 +1,8 @@
 # Gambasse — Developer Documentation
 
 Technical documentation for building, testing, packaging, and maintaining
-Gambasse. For an end-user overview, see [README.md](../README.md); for project
-architecture rules and workflow conventions, see [AGENTS.md](../AGENTS.md). All
+Gambasse. For an end-user overview, see [README.md](../README.md)
+([Español](../README_es.md)); for project architecture rules and workflow conventions, see [AGENTS.md](../AGENTS.md). All
 paths and commands below are relative to the repository root.
 
 ---

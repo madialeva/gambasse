@@ -15,6 +15,10 @@
 </p>
 
 <p align="left">
+  <strong>English</strong> | <a href="README_es.md">Español</a>
+</p>
+
+<p align="left">
   Gambasse is a clinical-record and consultation application for NGOs or any health professional
   working with patients in remote, humble areas where there is no population census
   and people lack identity documents. Since there is no official ID to locate a
