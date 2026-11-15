@@ -21,7 +21,7 @@ void ZoomController::setSettings(InterfaceSettings* settings) {
     m_settings = settings;
     if (m_settings)
         m_settingsConnection = connect(m_settings, &InterfaceSettings::letterSizeChanged, this,
-                                       &ZoomController::recompute);
+                                       [this] { recompute(); });
     emit settingsChanged();
     recompute();
 }
@@ -30,12 +30,20 @@ void ZoomController::setWindow(QWindow* window) {
     if (window == m_window)
         return;
     disconnect(m_screenConnection);
+    disconnect(m_parentConnection);
+    disconnect(m_visibleConnection);
+    disconnect(m_parentScreenConnection);
     m_window = window;
-    if (m_window)
+    if (m_window) {
         m_screenConnection =
             connect(m_window, &QWindow::screenChanged, this, &ZoomController::followScreen);
+        m_parentConnection = connect(m_window, &QWindow::transientParentChanged, this,
+                                     &ZoomController::followParent);
+        m_visibleConnection =
+            connect(m_window, &QWindow::visibleChanged, this, &ZoomController::followScreen);
+    }
     emit windowChanged();
-    followScreen();
+    followParent();
 }
 
 void ZoomController::setBaseSize(QSize size) {
@@ -55,7 +63,7 @@ void ZoomController::setAvailableArea(QRect area) {
         return;
     m_fixedArea = area;
     emit availableAreaChanged();
-    recompute();
+    recompute(true);
 }
 
 void ZoomController::resetAvailableArea() {
@@ -90,17 +98,13 @@ void ZoomController::reset() {
 void ZoomController::placeForShow() {
     if (!m_window || m_window->isVisible())
         return;
-    const QSize size = windowSize();
-    // The first time, and after the size shown changed while it was hidden
-    // (a zoom made in the other window), it is centred; otherwise it opens
-    // where it was left.
-    const QRect wanted =
-        m_placedSize != m_shown ? centred(size) : QRect(m_window->position(), size);
-    m_placedSize = m_shown;
-    applyGeometry(inArea(wanted));
+    if (QScreen* screen = hostScreen(); screen && m_window->screen() != screen)
+        m_window->setScreen(screen);
+    followScreen();
+    applyGeometry(inArea(centred(windowSize())));
 }
 
-void ZoomController::recompute() {
+void ZoomController::recompute(bool areaChanged) {
     const int wanted = m_settings ? m_settings->letterSize() : zoom::baseLetterSize;
     const int shown = zoom::fittingLetterSize(m_baseSize, wanted, availableArea().size());
     const QSize size = zoom::windowSize(m_baseSize, shown);
@@ -111,8 +115,9 @@ void ZoomController::recompute() {
     // already changed when this runs: a form of another height changes the
     // window size at the same letter size, and a larger screen the room to
     // zoom in without changing either.
+    const int previousShown = m_shown;
     const bool sizeChanged = size != m_windowSize;
-    const bool changed = shown != m_shown || sizeChanged || canZoomIn != m_canZoomIn;
+    const bool changed = shown != previousShown || sizeChanged || canZoomIn != m_canZoomIn;
     m_shown = shown;
     m_windowSize = size;
     m_canZoomIn = canZoomIn;
@@ -122,18 +127,36 @@ void ZoomController::recompute() {
     // window is placed again at once, a hidden one when it is shown.
     if (!m_window || !m_window->isVisible())
         return;
-    if (m_shown != m_placedSize) {
-        m_placedSize = m_shown;
-        applyGeometry(inArea(centred(windowSize())));
-    } else if (sizeChanged) {
+    if (m_shown != previousShown)
+        applyGeometry(inArea(centred(m_windowSize)));
+    else if (sizeChanged || areaChanged)
         applyGeometry(inArea(QRect(m_window->position(), m_windowSize)));
+}
+
+void ZoomController::followParent() {
+    disconnect(m_parentScreenConnection);
+    if (m_window) {
+        if (QWindow* parent = m_window->transientParent())
+            m_parentScreenConnection = connect(parent, &QWindow::screenChanged, this,
+                                               &ZoomController::followScreen);
     }
+    followScreen();
+}
+
+QScreen* ZoomController::hostScreen() const {
+    if (!m_window)
+        return QGuiApplication::primaryScreen();
+    if (!m_window->isVisible()) {
+        if (const QWindow* parent = m_window->transientParent();
+            parent && parent->screen())
+            return parent->screen();
+    }
+    return m_window->screen() ? m_window->screen() : QGuiApplication::primaryScreen();
 }
 
 void ZoomController::followScreen() {
     disconnect(m_areaConnection);
-    QScreen* screen = m_window && m_window->screen() ? m_window->screen()
-                                                     : QGuiApplication::primaryScreen();
+    QScreen* screen = hostScreen();
     const auto update = [this, screen] {
         const QRect area = screen ? screen->availableGeometry() : QRect();
         if (area == m_screenArea)
@@ -141,7 +164,7 @@ void ZoomController::followScreen() {
         m_screenArea = area;
         if (!m_fixedArea.isValid()) {
             emit availableAreaChanged();
-            recompute();
+            recompute(true);
         }
     };
     if (screen)
@@ -150,10 +173,10 @@ void ZoomController::followScreen() {
 }
 
 QRect ZoomController::centred(QSize size) const {
-    const QWindow* parent = m_window ? m_window->transientParent() : nullptr;
-    const QPoint centre = parent ? parent->geometry().center() : availableArea().center();
+    const QRect area = availableArea();
     QRect rect(QPoint(0, 0), size);
-    rect.moveCenter(centre);
+    if (area.isValid())
+        rect.moveCenter(area.center());
     return rect;
 }
 
@@ -172,7 +195,9 @@ QRect ZoomController::inArea(QRect rect) const {
 }
 
 void ZoomController::applyGeometry(QRect rect) {
-    if (m_window && m_window->geometry() != rect)
+    if (!m_window)
+        return;
+    if (!m_window->isVisible() || m_window->geometry() != rect)
         m_window->setGeometry(rect);
 }
 

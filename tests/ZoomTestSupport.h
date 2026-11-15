@@ -67,9 +67,9 @@ inline QString describeLimits(const QWindow* window) {
         .arg(text(window->size()), text(window->minimumSize()), text(window->maximumSize()));
 }
 
-// The centre of `child` over the centre of `main`, to the pixel.
-inline bool centredOver(const QWindow* child, const QWindow* main) {
-    const QPoint delta = child->geometry().center() - main->geometry().center();
+// The centre of `window` over the centre of `area`, to the pixel.
+inline bool centredIn(const QWindow* window, const QRect& area) {
+    const QPoint delta = window->geometry().center() - area.center();
     return qAbs(delta.x()) <= 1 && qAbs(delta.y()) <= 1;
 }
 

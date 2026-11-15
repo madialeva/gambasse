@@ -126,6 +126,7 @@ private slots:
     void everyTextShowsWhole_data();
     void everyTextShowsWhole();
     void lowWindowOpensAtItsOwnSize();
+    void switchingHistoriesCentresEachOnScreen();
     void everyFieldHasAFormHeight();
     void lowWindowShowsALargerSize();
     void everyTextShowsWholeZoomed_data();
@@ -478,6 +479,40 @@ void TestQmlAdultHistory::lowWindowOpensAtItsOwnSize() {
     window->setProperty("screenId", QStringLiteral("adult"));
     QVERIFY2(zoomtest::isFixedAt(window, QSize(1020, 430)),
              qPrintable(zoomtest::describeLimits(window)));
+}
+
+// Reusing the shared history window across forms of different heights
+// (Adult 430 px <-> Pregnancy 608 px) centres every window in the screen's
+// available area, independent of where the main window sits.
+void TestQmlAdultHistory::switchingHistoriesCentresEachOnScreen() {
+    QVERIFY(createPatient());
+    openScreen();
+    const QRect screenArea(40, 30, 1880, 1010);
+    QVERIFY(zoomtest::dragTo(m_window, QPoint(10, 10)));
+    zoomtest::setArea({historyWindow()}, screenArea);
+
+    QVERIFY(openHistory() != nullptr);
+    auto* window = qobject_cast<QQuickWindow*>(historyWindow());
+    QVERIFY(window != nullptr);
+    QTRY_COMPARE(window->size(), QSize(1020, 430));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
+
+    // Switching from the low adult form to the tall pregnancy form re-centres.
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    HistoryController* previous = history();
+    m_controller->openPregnancyHistory();
+    QTRY_VERIFY(window->isVisible() && history() != previous);
+    QTRY_COMPARE(window->size(), QSize(1020, 608));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
+
+    // Dragging aside and switching back to the low adult form re-centres it too.
+    QVERIFY(zoomtest::dragTo(window, QPoint(80, 70)));
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    QVERIFY(openHistory() != nullptr);
+    QTRY_COMPARE(window->size(), QSize(1020, 430));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 }
 
 // The adult history is lower than the pediatric one, so the same screen holds
