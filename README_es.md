@@ -15,7 +15,7 @@
 </p>
 
 <p align="left">
-  <a href="README.md">English</a> | <strong>Español</strong>
+  <a href="README.md">Inglés</a> | <strong>Español</strong>
 </p>
 
 <p align="left">
