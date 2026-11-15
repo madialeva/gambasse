@@ -798,26 +798,56 @@ void TestQmlConsultations::zoomScalesTheWindow() {
 // A zoom made while the consultation window is closed (in a history window)
 // centres it over the main window when it opens again.
 void TestQmlConsultations::zoomElsewhereCentresTheWindowOnOpen() {
-    const ScreenData data = screenData().at(0);
-    open(data, 0, zoomtest::wideArea);
+    const QRect screenArea(40, 30, 1880, 1010);
     const auto restore = qScopeGuard([this] { settings()->setLetterSize(13); });
+
+    // An adult female patient with both adult and pregnancy histories lets the
+    // shared consultation window switch between 608 px and 388 px forms.
+    const ScreenData pregnancy = screenData().at(1);
+    const ScreenData adult = screenData().at(0);
+    open(pregnancy, 0, screenArea);
+    QSqlQuery history(Database::instance().connection());
+    history.prepare(QStringLiteral("INSERT INTO %1 (patient_id) VALUES (?)").arg(adult.historyTable));
+    history.addBindValue(m_patientId);
+    QVERIFY2(history.exec(), qPrintable(history.lastError().text()));
+    m_controller->refreshAvailability();
+
     QQuickWindow* window = consultationWindow();
-    QVERIFY(zoomtest::dragTo(m_window, QPoint(400, 200)));
+    QVERIFY(zoomtest::dragTo(m_window, QPoint(20, 10)));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
+    QCOMPARE(window->size(), QSize(1020, 388));
+
+    // Dragged, closed and opened again: centred anew rather than left at (10, 10).
     QVERIFY(zoomtest::dragTo(window, QPoint(10, 10)));
     window->close();
     QTRY_VERIFY(!window->isVisible());
+    openConsultation(pregnancy);
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 
-    // Opened again with the same size: where it was left.
-    openConsultation(data);
-    QCOMPARE(window->position(), QPoint(10, 10));
+    // Switching between tall (Adult 608 px) and low (Pregnancy 388 px) re-centres.
     window->close();
     QTRY_VERIFY(!window->isVisible());
+    openConsultation(adult);
+    QTRY_COMPARE(window->size(), QSize(1020, 608));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
     settings()->setLetterSize(16);
-    QCOMPARE(window->position(), QPoint(10, 10)); // hidden: not moved yet
-    openConsultation(data);
+    openConsultation(pregnancy);
     QTRY_COMPARE(window->size(), zoomtest::zoomOf(window)->windowSize());
-    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
+
+    // And Pediatric Consultation (with the main window elsewhere).
+    settings()->setLetterSize(13);
+    cleanup();
+    open(screenData().at(2), 0, screenArea);
+    window = consultationWindow();
+    window->close();
+    QTRY_VERIFY(!window->isVisible());
+    QVERIFY(zoomtest::dragTo(m_window, QPoint(20, 10)));
+    openConsultation(screenData().at(2));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 }
 
 void TestQmlConsultations::everyTextShowsWholeZoomed_data() {

@@ -30,8 +30,8 @@ Window {
     readonly property real zoomFactor: zoom.factor
     default property alias content: stage.data
 
-    // Places the window (centred the first time and after a zoom change) and
-    // shows it. Called on every open.
+    // Places the window (centred in its screen's available area) and shows it.
+    // Called on every open.
     function showPlaced() {
         zoom.placeForShow();
         root.show();

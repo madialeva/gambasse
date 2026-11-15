@@ -162,7 +162,7 @@ private slots:
     void screenHoldsTheSizeBack();
     void smallScreenKeepsTheBaseSize();
     void sizeIsRememberedAcrossWindowsAndRuns();
-    void windowIsPlacedOverTheMainOne();
+    void windowCentresInTheScreenArea();
     void everyTextShowsWholeZoomed_data();
     void everyTextShowsWholeZoomed();
     void popupsFollowTheZoom();
@@ -669,33 +669,33 @@ void TestQmlHistories::sizeIsRememberedAcrossWindowsAndRuns() {
     QCOMPARE(zoomtest::zoomOf(historyWindow())->shownLetterSize(), 15);
 }
 
-// Centred over the main window the first time and after every zoom change;
-// where the user left it otherwise.
-void TestQmlHistories::windowIsPlacedOverTheMainOne() {
+// Centred in the screen's available area regardless of main window placement,
+// every time it opens and after every zoom change.
+void TestQmlHistories::windowCentresInTheScreenArea() {
     const ScreenData data = screenData().at(0);
     removeAll();
     QVERIFY(createPatient(data));
     openScreen();
     const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
-    m_window->setPosition(400, 200);
-    QTRY_COMPARE(m_window->position(), QPoint(400, 200));
-    zoomtest::setArea(childWindows(), zoomtest::wideArea);
+    const QRect screenArea(40, 30, 1880, 1010);
+    QVERIFY(zoomtest::dragTo(m_window, QPoint(10, 10)));
+    zoomtest::setArea(childWindows(), screenArea);
     openHistoryOf(data);
     QQuickWindow* window = historyQuickWindow();
-    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 
-    // Dragged, closed and opened again: where it was left.
+    // Dragged, closed and opened again: centred anew rather than kept there.
     QVERIFY(zoomtest::dragTo(window, QPoint(30, 40)));
     window->close();
     QTRY_VERIFY(!window->isVisible());
     openHistoryOf(data);
-    QCOMPARE(window->position(), QPoint(30, 40));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 
     // A zoom centres it again, with its new size.
     QVERIFY(zoomtest::dragTo(window, QPoint(30, 40)));
     zoomtest::zoomOf(window)->zoomIn();
     QTRY_COMPARE(window->size(), QSize(1099, 655));
-    QTRY_VERIFY(zoomtest::centredOver(window, m_window));
+    QTRY_VERIFY(zoomtest::centredIn(window, screenArea));
 }
 
 void TestQmlHistories::everyTextShowsWholeZoomed_data() {

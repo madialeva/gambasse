@@ -20,10 +20,10 @@ namespace gambasse {
 // available area of its screen. The window is its base layout scaled by
 // `factor` and measures `windowSize`.
 //
-// It also places the window: centred over its transient parent (the main
-// window) the first time it is shown and whenever the size it shows changes,
-// where it was left otherwise, and always moved just enough to lie whole in
-// the available area.
+// It also places the window: centred in the available area of the screen
+// holding its transient parent (or its own screen while visible or without
+// one) every time it is shown and whenever the letter size shown changes while
+// it is visible, and always moved just enough to lie whole in that area.
 class ZoomController : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -77,10 +77,11 @@ signals:
     void zoomChanged();
 
 private:
-    void recompute();
+    void recompute(bool areaChanged = false);
+    void followParent();
     void followScreen();
-    // Centred over the transient parent, or over the available area without
-    // one.
+    QScreen* hostScreen() const;
+    // Centred in the available area.
     QRect centred(QSize size) const;
     // Moved just enough to lie in the available area; aligned with its top
     // left corner when larger.
@@ -98,10 +99,11 @@ private:
     // button to the second.
     QSize m_windowSize;
     bool m_canZoomIn = false;
-    // The size shown when the window was last placed, 0 before the first time.
-    int m_placedSize = 0;
     QMetaObject::Connection m_settingsConnection;
     QMetaObject::Connection m_screenConnection;
+    QMetaObject::Connection m_parentConnection;
+    QMetaObject::Connection m_visibleConnection;
+    QMetaObject::Connection m_parentScreenConnection;
     QMetaObject::Connection m_areaConnection;
 };
 

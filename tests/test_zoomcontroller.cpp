@@ -1,4 +1,5 @@
 #include <QGuiApplication>
+#include <QScreen>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QWindow>
@@ -30,12 +31,13 @@ private slots:
     void baseSizeChangeIsAnnounced();
     void roomToZoomInIsAnnounced();
     void firstShowIsCentred();
-    void showsAgainWhereItWasLeft();
+    void reopenCentresRegardlessOfMoveOrHeight();
     void zoomCentresAVisibleWindow();
     void zoomWhileHiddenCentresOnShow();
     void zoomWithoutEffectDoesNotMove();
-    void showMovesAWindowThatNoLongerFits();
+    void visibleAreaChangeClampsWindow();
     void windowLargerThanTheAreaAlignsTopLeft();
+    void screenAreaIsUsedWithoutOverride();
 
 private:
     QTemporaryDir m_dir;
@@ -73,8 +75,8 @@ struct Harness {
         child.show();
     }
 
-    bool centredOverMain() const {
-        const QPoint delta = child.geometry().center() - main.geometry().center();
+    bool centredInArea() const {
+        const QPoint delta = child.geometry().center() - zoom.availableArea().center();
         return qAbs(delta.x()) <= 1 && qAbs(delta.y()) <= 1;
     }
 };
@@ -236,22 +238,40 @@ void TestZoomController::roomToZoomInIsAnnounced() {
 
 void TestZoomController::firstShowIsCentred() {
     m_settings->setLetterSize(15);
-    Harness h(m_settings, tallWindow, wideArea);
+    const QRect offsetArea(80, 40, 1840, 1000);
+    Harness h(m_settings, tallWindow, offsetArea);
+    h.main.setPosition(20, 10);
     h.present();
     QTRY_COMPARE(h.child.size(), QSize(1177, 702));
-    QTRY_VERIFY(h.centredOverMain());
+    QTRY_VERIFY(h.centredInArea());
 }
 
-void TestZoomController::showsAgainWhereItWasLeft() {
+void TestZoomController::reopenCentresRegardlessOfMoveOrHeight() {
     Harness h(m_settings, tallWindow, wideArea);
     h.present();
-    QTRY_VERIFY(h.centredOverMain());
-    h.child.setPosition(40, 30); // dragged by the user
+    QTRY_VERIFY(h.centredInArea());
+
+    // Dragged, closed and opened again: centred anew rather than left behind.
+    h.child.setPosition(40, 30);
     QTRY_COMPARE(h.child.position(), QPoint(40, 30));
     h.child.hide();
+    h.main.setPosition(60, 40);
     h.present();
     QTRY_VERIFY(h.child.isVisible());
-    QCOMPARE(h.child.position(), QPoint(40, 30));
+    QTRY_VERIFY(h.centredInArea());
+
+    // Switching to a lower form (e.g. Adult History) and back re-centres each.
+    h.child.hide();
+    h.zoom.setBaseSize(lowWindow);
+    h.present();
+    QTRY_COMPARE(h.child.size(), lowWindow);
+    QTRY_VERIFY(h.centredInArea());
+
+    h.child.hide();
+    h.zoom.setBaseSize(tallWindow);
+    h.present();
+    QTRY_COMPARE(h.child.size(), tallWindow);
+    QTRY_VERIFY(h.centredInArea());
 }
 
 void TestZoomController::zoomCentresAVisibleWindow() {
@@ -261,12 +281,12 @@ void TestZoomController::zoomCentresAVisibleWindow() {
     QTRY_COMPARE(h.child.position(), QPoint(40, 30));
     h.zoom.zoomIn();
     QTRY_COMPARE(h.child.geometry().size(), QSize(1099, 655));
-    QTRY_VERIFY(h.centredOverMain());
+    QTRY_VERIFY(h.centredInArea());
     h.child.setPosition(60, 50); // dragged again afterwards
     QTRY_COMPARE(h.child.position(), QPoint(60, 50));
     h.zoom.zoomOut();
     QTRY_COMPARE(h.child.geometry().size(), tallWindow);
-    QTRY_VERIFY(h.centredOverMain());
+    QTRY_VERIFY(h.centredInArea());
 }
 
 void TestZoomController::zoomWhileHiddenCentresOnShow() {
@@ -279,7 +299,7 @@ void TestZoomController::zoomWhileHiddenCentresOnShow() {
     m_settings->setLetterSize(16); // zoom made in a history window
     QCOMPARE(consultation.child.position(), QPoint(10, 10)); // hidden: not yet
     consultation.present();
-    QTRY_VERIFY(consultation.centredOverMain());
+    QTRY_VERIFY(consultation.centredInArea());
     QCOMPARE(consultation.child.size(), consultation.zoom.windowSize());
 }
 
@@ -296,22 +316,29 @@ void TestZoomController::zoomWithoutEffectDoesNotMove() {
     QCOMPARE(h.child.size(), QSize(1177, 702));
 }
 
-void TestZoomController::showMovesAWindowThatNoLongerFits() {
-    Harness h(m_settings, lowWindow, wideArea);
+void TestZoomController::visibleAreaChangeClampsWindow() {
+    Harness h(m_settings, tallWindow, wideArea);
     h.present();
-    h.child.setPosition(200, 600); // the low window near the bottom edge
-    QTRY_COMPARE(h.child.position(), QPoint(200, 600));
-    h.child.hide();
-    // The same window now holds the taller history, same letter size.
-    h.zoom.setBaseSize(tallWindow);
-    h.present();
-    QTRY_COMPARE(h.child.position(), QPoint(200, 1040 - 608));
+    h.child.setPosition(200, 420); // fits inside wideArea (bottom 1028 <= 1040)
+    QTRY_COMPARE(h.child.position(), QPoint(200, 420));
+    // Taskbar grows while open: pushed up just enough to fit the new area.
+    h.zoom.setAvailableArea(QRect(0, 0, 1920, 900));
+    QTRY_COMPARE(h.child.position(), QPoint(200, 900 - 608));
 }
 
 void TestZoomController::windowLargerThanTheAreaAlignsTopLeft() {
     Harness h(m_settings, tallWindow, QRect(50, 30, 1000, 500));
     h.present();
     QTRY_COMPARE(h.child.geometry(), QRect(QPoint(50, 30), tallWindow));
+}
+
+void TestZoomController::screenAreaIsUsedWithoutOverride() {
+    Harness h(m_settings, QSize(200, 120), QRect());
+    QVERIFY(h.main.screen() != nullptr);
+    QCOMPARE(h.zoom.availableArea(), h.main.screen()->availableGeometry());
+    h.main.setPosition(20, 10);
+    h.present();
+    QTRY_VERIFY(h.centredInArea());
 }
 
 } // namespace gambasse
