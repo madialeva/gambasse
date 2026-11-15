@@ -26,8 +26,9 @@ from Linux, with the cross compiler. Moving to another toolchain-cpp version
 changes together `TOOLCHAIN_CPP_REF` in the CI, the prefixes of the presets if
 they change (a MAJOR version of toolchain-cpp), the CI image tag if it brings
 another GCC (the CI checks the image against toolchain-cpp's `versions.sh`),
-the README and this file. Do not introduce Qt Widgets, MSVC, PostgreSQL, or
-new production dependencies without an approved OpenSpec change.
+the developer documentation (`docs/README-DEVELOPER.md`) and this file. Do
+not introduce Qt Widgets, MSVC, PostgreSQL, or new production dependencies
+without an approved OpenSpec change.
 
 ## Source layout
 
@@ -270,8 +271,9 @@ host's fonts to the application: to see only the embedded font, point
 - This file is versioned in the repository as durable context. `openspec/`,
   `.opencode/`, and `.claude/` stay private working material: they are
   git-ignored and NOT published. Do not reference them from published files
-  (README, ...). The only public project description is the
-  README — update it when the plan changes visibly.
+  (README, docs/README-DEVELOPER.md, ...). The public project description is the
+  README (with build and architecture details in docs/README-DEVELOPER.md) —
+  update them when the plan changes visibly.
 
 ## GitHub workflow (issues, branches, PRs)
 
