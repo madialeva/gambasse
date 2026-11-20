@@ -986,19 +986,29 @@ void TestQmlFoundation::titleBarZoomButtons() {
     QVERIFY(QTest::qWaitForWindowExposed(window));
     QObject* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
     QVERIFY(bar != nullptr);
+    auto* themeButton = bar->findChild<QQuickItem*>(QStringLiteral("themeButton"));
+    auto* minimizeButton = bar->findChild<QQuickItem*>(QStringLiteral("minimizeButton"));
+    auto* maximizeButton = bar->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
     auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
     auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
     auto* closeButton = bar->findChild<QQuickItem*>(QStringLiteral("closeButton"));
-    QVERIFY(zoomIn != nullptr && zoomOut != nullptr && closeButton != nullptr);
-    // The main window's bar has none.
-    QVERIFY(!zoomIn->isVisible());
-    QVERIFY(!zoomOut->isVisible());
+    QVERIFY(themeButton != nullptr && minimizeButton != nullptr && maximizeButton != nullptr
+            && zoomIn != nullptr && zoomOut != nullptr && closeButton != nullptr);
 
-    bar->setProperty("closeOnly", true);
+    // Main-window order: Theme, Zoom out, Zoom in, Minimize, Maximize, Close.
+    const auto left = [](QQuickItem* item) { return item->mapToScene(QPointF()).x(); };
     bar->setProperty("showZoom", true);
     QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
-    const auto left = [](QQuickItem* item) { return item->mapToScene(QPointF()).x(); };
-    // The row lays the buttons out on its next polish.
+    QTRY_VERIFY(left(themeButton) < left(zoomOut));
+    QVERIFY(left(zoomOut) < left(zoomIn));
+    QVERIFY(left(zoomIn) < left(minimizeButton));
+    QVERIFY(left(minimizeButton) < left(maximizeButton));
+    QVERIFY(left(maximizeButton) < left(closeButton));
+
+    // Close-only mode (child windows): Zoom out, Zoom in, Close.
+    bar->setProperty("closeOnly", true);
+    QVERIFY(!minimizeButton->isVisible() && !maximizeButton->isVisible());
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
     QTRY_VERIFY(left(zoomOut) < left(zoomIn));
     QVERIFY(left(zoomIn) < left(closeButton));
     for (QQuickItem* button : {zoomIn, zoomOut}) {
