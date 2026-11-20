@@ -64,8 +64,8 @@ Once a patient has a clinical history, you can record **Pediatric**, **Adult**, 
 
 - **Three languages built in:** switch live from the title bar between **Portuguese** (Guinea-Bissau / European Portuguese norm), **Spanish**, and **English**. The calendar (weeks starting on Monday, `dd/MM/yyyy` dates) and patient sorting follow your chosen language automatically.
 - **Light and dark themes:** switch between light mode for bright consultation rooms and dark mode for low-light settings.
-- **Adjustable zoom in clinical forms:** enlarge history and consultation windows up to twice their size using the magnifying-glass buttons in the window title bar—or `Ctrl` + `+`, `Ctrl` + `-`, and `Ctrl` + `0` to reset—for easier reading without ever overflowing your screen.
-- **Consistent, clear text:** includes its own typeface so forms look crisp and readable on every computer, and remembers your preferred language, theme, and reading size between sessions.
+- **Adjustable zoom on every screen:** enlarge the main patient window as well as the history and consultation windows up to twice their size using the magnifying-glass buttons in the window title bar—or `Ctrl` + `+`, `Ctrl` + `-`, and `Ctrl` + `0` to reset—for easier reading without ever overflowing your screen.
+- **Consistent, clear text and remembered layout:** includes its own typeface so every screen looks crisp and readable on any computer, starts maximized on larger monitors by default, and remembers your preferred window size, language, theme, and reading size between sessions.
 
 ## Offline, portable, and easy to back up
 

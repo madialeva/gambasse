@@ -65,8 +65,8 @@ Una vez creada la historia clínica de un paciente, se pueden registrar consulta
 
 - **Tres idiomas incluidos:** cambia en directo desde la barra superior entre **portugués** (norma de Guinea-Bisáu / portugués europeo), **español** e **inglés**. Tanto el calendario (semanas empezando en lunes, fechas `dd/MM/yyyy`) como la ordenación de la lista de pacientes se adaptan automáticamente al idioma elegido.
 - **Temas claro y oscuro:** alterna entre el modo claro para consultas bien iluminadas y el modo oscuro para entornos con poca luz.
-- **Zoom ajustable en los formularios clínicos:** amplía las ventanas de historia y consulta hasta el doble de su tamaño con los botones de lupa de la barra de título —o con `Ctrl` + `+`, `Ctrl` + `-`, y `Ctrl` + `0` para restablecer— para leer con más comodidad sin salirse nunca de la pantalla.
-- **Tipografía clara y uniforme:** incluye su propia fuente para que todos los textos se vean nítidos en cualquier ordenador, y recuerda automáticamente el idioma, el tema y el tamaño de lectura entre sesiones.
+- **Zoom ajustable en todas las pantallas:** amplía tanto la pantalla principal de pacientes como las ventanas de historia y consulta hasta el doble de su tamaño con los botones de lupa de la barra de título —o con `Ctrl` + `+`, `Ctrl` + `-`, y `Ctrl` + `0` para restablecer— para leer con más comodidad sin salirse nunca de la pantalla.
+- **Tipografía clara y disposición recordada:** incluye su propia fuente para que todos los textos se vean nítidos en cualquier ordenador, arranca maximizada por defecto en pantallas grandes y recuerda automáticamente el tamaño de ventana, el idioma, el tema y el tamaño de lectura entre sesiones.
 
 ## Sin conexión, portátil y fácil de respaldar
 

@@ -23,9 +23,13 @@ with `--base <directory>`):
 
 - `idioma/codigo`: active interface language (`pt` by default; `pt`, `es`, `en`).
 - `tema/modo`: active UI theme (`claro` by default; `claro`, `oscuro`).
-- `letra/pixeles`: shared letter size in pixels for zoomed history and
+- `letra/pixeles`: shared letter size in pixels for the main, history, and
   consultation windows (`13` by default, clamped between `13` and `26`, i.e.
   up to 2× the 13 px base layout).
+- `ventana/maximizada`, `ventana/ancho`, `ventana/alto`: main window startup
+  state and preferred normal size (`true` and `1008×561` by default; normal
+  dimensions are clamped to at least `1008×561`, and taskbar minimization is
+  never persisted).
 - `database/path`: SQLite database path (`database.db` by default; relative paths
   resolve from the base path). `database/user` and `database/password` are
   fixed connection credentials for now; the stock SQLite driver ignores them,
@@ -90,11 +94,13 @@ overrides it. The database file is created and migrated on first run.
 The declarative UI lives in `qml/` as the `Gambasse` module (`qt_add_qml_module`):
 shell (`Root.qml`, `Theme.qml` singleton, `TitleBar.qml`, `ResizeHandles.qml`)
 plus the `qml/components/` custom control library, the `qml/dialogs/` dialogs
-and the screens under `qml/windows/`, started by `App.qml`. History and
+and the screens under `qml/windows/`, started by `App.qml`. `Root.qml` uses
+`ShellWindowController` to start maximized by default, persist its window state
+and preferred normal size, and scale its elastic `stage`; history and
 consultation windows derive from `qml/windows/FormWindow.qml`, which scales its
-13 px base `stage` as a whole (via `ZoomController`, magnifier buttons in the
-title bar, or `Ctrl` + `+`, `Ctrl` + `-`, `Ctrl` + `0`) so controls keep their
-positions without exceeding the screen work area.
+13 px base `stage` as a whole via `ZoomController`. All seven screens share the
+same letter size, magnifier buttons in the title bar, and `Ctrl` + `+`,
+`Ctrl` + `-`, `Ctrl` + `0` shortcuts without exceeding the screen work area.
 
 C++ only decides and persists: thin controllers in `src/ui/`, registered in the
 same module (`QML_ELEMENT`, `QML_SINGLETON`), expose the `logic/` services and
