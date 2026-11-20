@@ -2,17 +2,19 @@ import QtQuick
 import QtQuick.Controls
 import Gambasse
 
-// Main shell window: frameless, with the custom title bar (help, language and
-// theme controls) over the patient screen. It owns the patient controller,
-// loaded from the database already opened by main.cpp; the theme follows the
-// InterfaceSettings singleton through Theme.
+// Main shell window: frameless, with the custom title bar (help, language,
+// theme and zoom controls) over the patient screen. Everything shown lives in
+// an elastic `stage` scaled by the shared zoom factor; ShellWindowController
+// manages the startup state (maximized by default), persisted normal size and
+// zoom limits.
 Window {
     id: root
     flags: Qt.FramelessWindowHint
-    visible: true
-    // Opens at the base size, which is also the smallest it can shrink to.
-    minimumWidth: Theme.baseWidth
-    minimumHeight: Theme.baseHeight
+    // Shown once ShellWindowController applies the persisted geometry and
+    // maximized/normal state, avoiding a base-size flash on startup.
+    visible: false
+    minimumWidth: shellWindow.minimumSize.width
+    minimumHeight: shellWindow.minimumSize.height
     width: Theme.baseWidth
     height: Theme.baseHeight
     title: "Gambasse"
@@ -47,10 +49,21 @@ Window {
     }
 
     readonly property alias patientController: patients
+    // How much the stage is scaled. Popups, which do not inherit the scale of
+    // the item they belong to, read it from their window.
+    readonly property real zoomFactor: shellWindow.factor
 
     PatientController {
         id: patients
         objectName: "patientController"
+    }
+
+    ShellWindowController {
+        id: shellWindow
+        objectName: "shellWindowController"
+        settings: InterfaceSettings
+        window: root
+        baseSize: Qt.size(Theme.baseWidth, Theme.baseHeight)
     }
 
     // The catalog is already switched when the signal arrives, so the grid
@@ -62,34 +75,79 @@ Window {
         }
     }
 
-    Component.onCompleted: patients.load()
-
-    MainWindow {
-        id: mainView
-        objectName: "mainView"
-        anchors.top: titleBar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        controller: patients
+    Component.onCompleted: {
+        patients.load();
+        shellWindow.applyInitialGeometry();
     }
-    TitleBar {
-        id: titleBar
-        objectName: "titleBar"
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        showLanguageTheme: true
-        showHelp: true
-        onAboutRequested: aboutDialog.present()
+
+    Item {
+        id: stage
+        objectName: "stage"
+        width: Math.max(Theme.baseWidth, root.width / root.zoomFactor)
+        height: Math.max(Theme.baseHeight, root.height / root.zoomFactor)
+        scale: root.zoomFactor
+        transformOrigin: Item.TopLeft
+
+        MainWindow {
+            id: mainView
+            objectName: "mainView"
+            anchors.top: titleBar.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            controller: patients
+            zoomFactor: root.zoomFactor
+        }
+        TitleBar {
+            id: titleBar
+            objectName: "titleBar"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            showLanguageTheme: true
+            showHelp: true
+            showZoom: true
+            zoomFactor: root.zoomFactor
+            canZoomIn: shellWindow.canZoomIn
+            canZoomOut: shellWindow.canZoomOut
+            onAboutRequested: aboutDialog.present()
+            onZoomInRequested: shellWindow.zoomIn()
+            onZoomOutRequested: shellWindow.zoomOut()
+        }
+
+        // Keyboard zoom inside the stage so any open menu, combo list,
+        // calendar or modal dialog blocks the shortcuts automatically.
+        // Disabled while a child history/consultation window is open so its
+        // own shortcuts handle the key without ambiguity.
+        Shortcut {
+            enabled: !mainView.formWindowOpen
+            sequences: ["Ctrl++", "Ctrl+="]
+            onActivated: shellWindow.zoomIn()
+            onActivatedAmbiguously: shellWindow.zoomIn()
+        }
+        Shortcut {
+            enabled: !mainView.formWindowOpen
+            sequences: ["Ctrl+-"]
+            onActivated: shellWindow.zoomOut()
+            onActivatedAmbiguously: shellWindow.zoomOut()
+        }
+        Shortcut {
+            enabled: !mainView.formWindowOpen
+            sequences: ["Ctrl+0"]
+            onActivated: shellWindow.reset()
+            onActivatedAmbiguously: shellWindow.reset()
+        }
     }
     ResizeHandles {
         anchors.fill: parent
+        minWidth: root.minimumWidth
+        minHeight: root.minimumHeight
     }
     AboutDialog {
         id: aboutDialog
         objectName: "aboutDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
 
     // While a history or consultation window is open (modal, in front), the

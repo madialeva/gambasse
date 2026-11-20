@@ -87,19 +87,24 @@ Window {
 
         // Keyboard zoom. Inside the stage, not on the window: an open dialog,
         // combo list or calendar then blocks them, so a popup placed for one
-        // size never sees the window change under it. Written by hand rather
-        // than StandardKey, which depends on the platform theme.
+        // size never sees the window change under it. Only enabled while this
+        // window is visible so it never competes with the main window's or the
+        // other child window's shortcuts. Written by hand rather than
+        // StandardKey, which depends on the platform theme.
         Shortcut {
+            enabled: root.visible
             sequences: ["Ctrl++", "Ctrl+="]
             onActivated: zoom.zoomIn()
             onActivatedAmbiguously: zoom.zoomIn()
         }
         Shortcut {
+            enabled: root.visible
             sequences: ["Ctrl+-"]
             onActivated: zoom.zoomOut()
             onActivatedAmbiguously: zoom.zoomOut()
         }
         Shortcut {
+            enabled: root.visible
             sequences: ["Ctrl+0"]
             onActivated: zoom.reset()
             onActivatedAmbiguously: zoom.reset()

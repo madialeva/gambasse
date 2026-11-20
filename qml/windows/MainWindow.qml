@@ -13,6 +13,7 @@ Item {
     id: root
 
     property PatientController controller: null
+    property real zoomFactor: 1
     // A history or consultation window is open in front of this screen.
     readonly property bool formWindowOpen: historyWindow.visible || consultationWindow.visible
     // User-typed filter per column (survives language-driven rebuilds).
@@ -284,6 +285,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         clip: true
+                        onWidthChanged: gridTable.forceLayout()
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -815,6 +817,7 @@ Item {
         id: messageDialog
         objectName: "messageDialog"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
     }
     // Picture for the selected patient; PatientController stores it as the
     // photo. Created again on every language change: Qt names the chooser's
@@ -848,6 +851,7 @@ Item {
         id: photoDeleteConfirm
         objectName: "photoDeleteConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.removePhoto())
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the photo."));
@@ -859,6 +863,7 @@ Item {
         id: deleteConfirm
         objectName: "deleteConfirm"
         parent: Overlay.overlay
+        zoomFactor: root.zoomFactor
         onAccepted: {
             if (!root.controller.removeCurrent())
                 messageDialog.showInfo(qsTr("Error"), qsTr("Could not delete the patient."));

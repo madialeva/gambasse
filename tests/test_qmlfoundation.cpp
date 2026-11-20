@@ -17,9 +17,11 @@
 #include <tuple>
 
 #include <Paths.h>
+#include <ZoomTestSupport.h>
+#include <data/common/Database.h>
+#include <logic/AppSettings.h>
 #include <ui/AppIcon.h>
 #include <ui/AppInfo.h>
-#include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
 namespace gambasse {
@@ -123,6 +125,8 @@ private slots:
 QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
     cleanup();
     persistInterface(theme, QStringLiteral("en"));
+    InterfaceSettings(nullptr).setLetterSize(13);
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
     settingsOf(*m_engine);
@@ -244,6 +248,7 @@ void TestQmlFoundation::localeFollowsTheLanguage() {
 
 void TestQmlFoundation::qmlShellFollowsThemeInHot() {
     persistInterface(QStringLiteral("claro"), QStringLiteral("en"));
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     QQmlApplicationEngine engine;
     // Same loading as the application: the module (and its resources) comes
     // from the shared GambasseQml library in both binaries.
@@ -842,8 +847,9 @@ void TestQmlFoundation::titleBarChrome() {
         // 40 px of buttons plus the 1 px bottom line: every button of the bar
         // fits exactly above that line.
         QCOMPARE(bar->property("height").toInt(), 41);
-        for (const char* name : {"helpButton", "languageButton", "themeButton", "minimizeButton",
-                                 "maximizeButton", "closeButton"}) {
+        for (const char* name : {"helpButton", "languageButton", "themeButton", "zoomOutButton",
+                                 "zoomInButton", "minimizeButton", "maximizeButton",
+                                 "closeButton"}) {
             auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
             QVERIFY2(button != nullptr, name);
             const QPointF top = button->mapToItem(qobject_cast<QQuickItem*>(bar), QPointF(0, 0));
@@ -944,35 +950,54 @@ void TestQmlFoundation::windowEdgeResize() {
     QQuickWindow* window = openShell(QStringLiteral("claro"));
     QVERIFY(window != nullptr);
     QVERIFY(QTest::qWaitForWindowExposed(window));
-    window->setPosition(100, 100);
-    QCOMPARE(QSize(window->width(), window->height()), QSize(1008, 561));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    window->setGeometry(100, 100, 1100, 640);
+    QTRY_COMPARE(window->geometry(), QRect(100, 100, 1100, 640));
+    QTest::qWait(50);
 
-    // Bottom-right corner shrinks both ways (staying above the 960x540 minimum).
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1005, 558));
-    QTest::mouseMove(window, QPoint(995, 548));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(995, 548));
-    QCOMPARE(window->width(), 998);
-    QCOMPARE(window->height(), 551);
+    // Bottom-right corner shrinks both ways while staying above the 1008x561 base minimum.
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1097, 637));
+    QTest::mouseMove(window, QPoint(1077, 617));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1077, 617));
+    QCOMPARE(window->width(), 1080);
+    QCOMPARE(window->height(), 620);
 
     // Right edge shrinks; left edge stays.
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(995, 300));
-    QTest::mouseMove(window, QPoint(975, 300));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(975, 300));
-    QCOMPARE(window->width(), 978);
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1077, 300));
+    QTest::mouseMove(window, QPoint(1057, 300));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1057, 300));
+    QCOMPARE(window->width(), 1060);
     QCOMPARE(window->x(), 100);
 
-    // Bottom edge shrinks.
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 548));
-    QTest::mouseMove(window, QPoint(500, 538));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 538));
-    QCOMPARE(window->height(), 541);
+    // Bottom edge cannot shrink below the 561 minimum.
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 617));
+    QTest::mouseMove(window, QPoint(500, 500));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 500));
+    QCOMPARE(window->height(), 561);
 
-    // Left edge cannot shrink below the 960 minimum (x follows the clamp).
+    // Left edge cannot shrink below the 1008 minimum (x follows the clamp).
     QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(3, 300));
     QTest::mouseMove(window, QPoint(203, 300));
     QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(203, 300));
-    QCOMPARE(window->width(), 960);
-    QCOMPARE(window->x(), 100 + (978 - 960));
+    QCOMPARE(window->width(), 1008);
+    QCOMPARE(window->x(), 100 + (1060 - 1008));
+
+    // With zoom at 15 px (scaled minimum 1164x648), edge resizing honours the
+    // scaled minimum too.
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(15);
+    QTRY_COMPARE(window->minimumSize(), QSize(1164, 648));
+    window->resize(1300, 720);
+    QTRY_COMPARE(window->size(), QSize(1300, 720));
+    QTest::qWait(50);
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1297, 717));
+    QTest::mouseMove(window, QPoint(1000, 500));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1000, 500));
+    QCOMPARE(window->width(), 1164);
+    QCOMPARE(window->height(), 648);
 }
 
 
@@ -1034,6 +1059,8 @@ void TestQmlFoundation::titleBarZoomButtons() {
     settings->setLanguage(QStringLiteral("en"));
 
     // One request per click.
+    bar->setProperty("canZoomIn", true);
+    bar->setProperty("canZoomOut", true);
     QSignalSpy inSpy(bar, SIGNAL(zoomInRequested()));
     QSignalSpy outSpy(bar, SIGNAL(zoomOutRequested()));
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomIn));

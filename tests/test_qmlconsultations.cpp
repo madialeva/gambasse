@@ -16,6 +16,7 @@
 #include <ZoomTestSupport.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
+#include <logic/AppSettings.h>
 #include <logic/PatientService.h>
 #include <ui/InterfaceSettings.h>
 #include <ui/controller/ConsultationController.h>
@@ -262,6 +263,7 @@ void TestQmlConsultations::openScreen() {
         baseline.setTheme(QStringLiteral("claro"));
         baseline.setLanguage(QStringLiteral("en"));
         baseline.setLetterSize(13);
+        AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     }
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.

@@ -24,8 +24,8 @@ Item {
     signal valueSelected
 
     // Scale of the list: a popup does not inherit the scale of a zoomed
-    // history or consultation window, so it takes it from the window.
-    readonly property real zoomFactor: (Window.window as FormWindow)?.zoomFactor ?? 1
+    // window, so it takes it from its window (FormWindow or Root).
+    readonly property real zoomFactor: (Window.window as FormWindow)?.zoomFactor ?? (Window.window as Root)?.zoomFactor ?? 1
     // Height of the window, at its own scale.
     readonly property real windowHeight: Window.height
     // An open list was placed for the previous size: a zoom closes it, as a

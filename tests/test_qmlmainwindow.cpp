@@ -19,6 +19,7 @@
 #include <ZoomTestSupport.h>
 #include <data/common/Database.h>
 #include <data/model/Patient.h>
+#include <logic/AppSettings.h>
 #include <logic/PatientService.h>
 #include <ui/InterfaceSettings.h>
 #include <ui/controller/PatientController.h>
@@ -148,7 +149,6 @@ private:
     void seedPatients();
 
 private slots:
-    void mainWindowHasNoZoom();
     void initTestCase();
     void cleanupTestCase();
     void init();
@@ -218,11 +218,14 @@ void TestQmlMainWindow::cleanup() {
 void TestQmlMainWindow::openScreen() {
     cleanup();
     {
-        // English source texts and the light theme, read by the engine's
-        // settings singleton when the shell creates it.
+        // English source texts, light theme, base letter size and normal base
+        // window geometry so the base-layout checks measure at 1008x561 even
+        // on the 800x800 offscreen screen.
         InterfaceSettings baseline(nullptr);
         baseline.setTheme(QStringLiteral("claro"));
         baseline.setLanguage(QStringLiteral("en"));
+        baseline.setLetterSize(13);
+        AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     }
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
@@ -1136,63 +1139,6 @@ void TestQmlMainWindow::photoDialogIsRebuiltOnLanguageChange() {
     m_settings->setLanguage(QStringLiteral("en"));
 }
 
-
-// The zoom is for the history and consultation windows only: a saved letter
-// size leaves the main window as it is, its keyboard does not zoom, and the
-// tooltips of its window buttons keep their texts, now under their button.
-void TestQmlMainWindow::mainWindowHasNoZoom() {
-    const auto measures = [this] {
-        QQuickItem* bar = child(m_window, QStringLiteral("titleBar"));
-        QQuickItem* logo = bar->findChild<QQuickItem*>(QStringLiteral("logoImage"));
-        QQuickItem* help = bar->findChild<QQuickItem*>(QStringLiteral("helpButton"));
-        return QList<QVariant>{m_window->size(), logo->width(), help->width(),
-                               bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"))
-                                   ->isVisible()};
-    };
-    InterfaceSettings(nullptr).setLetterSize(13);
-    openScreen();
-    const QList<QVariant> base = measures();
-    QCOMPARE(base.last().toBool(), false);
-
-    InterfaceSettings(nullptr).setLetterSize(20);
-    const auto restore = qScopeGuard([] { InterfaceSettings(nullptr).setLetterSize(13); });
-    openScreen();
-    QCOMPARE(m_settings->letterSize(), 20);
-    QCOMPARE(measures(), base);
-
-    m_window->requestActivate();
-    QTRY_VERIFY(m_window->isActive());
-    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
-    QTest::keyClick(m_window, Qt::Key_0, Qt::ControlModifier);
-    const QSettings config(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")),
-                           QSettings::IniFormat);
-    QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 20);
-    QCOMPARE(m_settings->letterSize(), 20);
-
-    QQuickItem* bar = child(m_window, QStringLiteral("titleBar"));
-    const QList<std::pair<const char*, QString>> tips = {
-        {"minimizeButton", QStringLiteral("Minimize")},
-        {"maximizeButton", QStringLiteral("Maximize")},
-        {"closeButton", QStringLiteral("Close")},
-    };
-    for (const auto& [name, text] : tips) {
-        auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
-        auto* tip = button->findChild<QObject*>(QStringLiteral("windowButtonTip"));
-        QVERIFY(tip != nullptr);
-        // Controls follow the platform's hover effects, which offscreen has
-        // off.
-        button->setProperty("hoverEnabled", true);
-        QTest::mouseMove(m_window, centerOf(button));
-        QTRY_VERIFY(tip->property("opened").toBool());
-        QCOMPARE(tip->property("text").toString(), text);
-        QCOMPARE(tip->property("scale").toReal(), 1.0);
-        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(tip));
-        QVERIFY2(qAbs(drawn.top() - zoomtest::sceneRect(button).bottom()) < 0.6,
-                 qPrintable(zoomtest::describe(drawn)));
-        QTest::mouseMove(m_window, QPoint(500, 300));
-        QTRY_VERIFY(!tip->property("visible").toBool());
-    }
-}
 
 } // namespace gambasse
 

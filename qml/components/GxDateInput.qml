@@ -23,8 +23,8 @@ Item {
     property int shownYear: new Date().getFullYear()
     property int shownMonth: new Date().getMonth()
     // Scale of the calendar: a popup does not inherit the scale of a zoomed
-    // history or consultation window, so it takes it from the window.
-    readonly property real zoomFactor: (root.Window.window as FormWindow)?.zoomFactor ?? 1
+    // window, so it takes it from its window (FormWindow or Root).
+    readonly property real zoomFactor: (root.Window.window as FormWindow)?.zoomFactor ?? (root.Window.window as Root)?.zoomFactor ?? 1
     // An open calendar was placed for the previous size: a zoom closes it, as
     // a click elsewhere would.
     onZoomFactorChanged: calendarPopup.close()

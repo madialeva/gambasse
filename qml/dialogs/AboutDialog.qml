@@ -37,6 +37,7 @@ GxDialog {
         id: fontLicenseDialog
         objectName: "fontLicenseDialog"
         parent: root.parent
+        zoomFactor: root.zoomFactor
         width: 640
         contentItem: Column {
             spacing: 12
@@ -77,8 +78,10 @@ GxDialog {
             objectName: "aboutLogo"
             anchors.horizontalCenter: parent.horizontalCenter
             source: "qrc:/img/logo.svg"
-            sourceSize.width: 96
-            sourceSize.height: 96
+            width: 96
+            height: 96
+            sourceSize.width: Math.ceil(96 * root.zoomFactor)
+            sourceSize.height: Math.ceil(96 * root.zoomFactor)
         }
         Column {
             width: parent.width

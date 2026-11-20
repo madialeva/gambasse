@@ -2,7 +2,8 @@ import QtQuick
 import Gambasse
 
 // Application entry point loaded by main.cpp: shows the splash and, once it
-// finishes, creates the main shell. Both are centred on their screen.
+// finishes, creates the main shell. The splash is centred on its screen; the
+// shell applies its own persisted geometry and state.
 QtObject {
     id: app
 
@@ -10,13 +11,7 @@ QtObject {
     property Root shell: null
 
     property Component shellComponent: Component {
-        Root {
-            id: shellWindow
-            Component.onCompleted: {
-                shellWindow.x = Screen.virtualX + Math.round((Screen.width - shellWindow.width) / 2);
-                shellWindow.y = Screen.virtualY + Math.round((Screen.height - shellWindow.height) / 2);
-            }
-        }
+        Root {}
     }
 
     property SplashWindow splash: SplashWindow {
