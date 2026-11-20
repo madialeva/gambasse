@@ -112,6 +112,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/ConsultationService.h
     src/logic/InterfaceLocale.cpp
     src/logic/InterfaceLocale.h
+    src/logic/MainWindowGeometry.cpp
+    src/logic/MainWindowGeometry.h
     src/logic/PatientService.cpp
     src/logic/PatientService.h
     src/logic/PediatricConsultationLabels.cpp

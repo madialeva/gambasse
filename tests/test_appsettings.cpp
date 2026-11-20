@@ -23,6 +23,11 @@ private slots:
     void letterSizeInvalid_data();
     void letterSizeInvalid();
     void letterSizeKeepsTheOtherKeys();
+    void mainWindowGeometryDefault();
+    void mainWindowGeometryRoundTrip();
+    void mainWindowGeometryInvalid_data();
+    void mainWindowGeometryInvalid();
+    void mainWindowGeometryKeepsTheOtherKeys();
 };
 
 namespace {
@@ -108,6 +113,92 @@ void TestAppSettings::letterSizeKeepsTheOtherKeys() {
     QCOMPARE(settings.letterSize(), 17);
     QCOMPARE(settings.language(), QStringLiteral("es"));
     QCOMPARE(settings.theme(), QStringLiteral("oscuro"));
+    const QSettings raw(QDir(dir.path()).filePath(QStringLiteral("config.ini")),
+                        QSettings::IniFormat);
+    QCOMPARE(raw.value(QStringLiteral("database/path")).toString(), QStringLiteral("database.db"));
+    QCOMPARE(raw.value(QStringLiteral("database/user")).toString(), QStringLiteral("gambasse"));
+    QCOMPARE(raw.value(QStringLiteral("database/password")).toString(),
+             QStringLiteral("gambasse"));
+}
+
+void TestAppSettings::mainWindowGeometryDefault() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    setBasePath(dir.path());
+
+    const MainWindowGeometry geometry = AppSettings().mainWindowGeometry();
+    QCOMPARE(geometry.maximized, true);
+    QCOMPARE(geometry.normalSize, QSize(1008, 561));
+}
+
+void TestAppSettings::mainWindowGeometryRoundTrip() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    setBasePath(dir.path());
+
+    AppSettings().setMainWindowGeometry({false, QSize(1280, 720)});
+    const MainWindowGeometry normal = AppSettings().mainWindowGeometry();
+    QCOMPARE(normal.maximized, false);
+    QCOMPARE(normal.normalSize, QSize(1280, 720));
+
+    const QSettings raw(QDir(dir.path()).filePath(QStringLiteral("config.ini")),
+                        QSettings::IniFormat);
+    QCOMPARE(raw.value(QStringLiteral("ventana/maximizada")).toString(), QStringLiteral("false"));
+    QCOMPARE(raw.value(QStringLiteral("ventana/ancho")).toString(), QStringLiteral("1280"));
+    QCOMPARE(raw.value(QStringLiteral("ventana/alto")).toString(), QStringLiteral("720"));
+
+    // Below-minimum sizes are clamped up when stored.
+    AppSettings().setMainWindowGeometry({true, QSize(800, 400)});
+    const MainWindowGeometry maximized = AppSettings().mainWindowGeometry();
+    QCOMPARE(maximized.maximized, true);
+    QCOMPARE(maximized.normalSize, QSize(1008, 561));
+}
+
+void TestAppSettings::mainWindowGeometryInvalid_data() {
+    QTest::addColumn<QByteArray>("ini");
+    QTest::addColumn<bool>("maximized");
+    QTest::addColumn<QSize>("normalSize");
+
+    QTest::newRow("invalid maximized and strings")
+        << QByteArray("[ventana]\nmaximizada=quizas\nancho=pequeno\nalto=100\n") << true
+        << QSize(1008, 561);
+    QTest::newRow("empty values")
+        << QByteArray("[ventana]\nmaximizada=\nancho=\nalto=\n") << true << QSize(1008, 561);
+    QTest::newRow("below minimum clamped")
+        << QByteArray("[ventana]\nmaximizada=false\nancho=500\nalto=300\n") << false
+        << QSize(1008, 561);
+    QTest::newRow("mixed case boolean and valid size")
+        << QByteArray("[ventana]\nmaximizada= FALSE \nancho= 1400 \nalto= 800 \n") << false
+        << QSize(1400, 800);
+}
+
+void TestAppSettings::mainWindowGeometryInvalid() {
+    QFETCH(QByteArray, ini);
+    QFETCH(bool, maximized);
+    QFETCH(QSize, normalSize);
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QVERIFY(writeConfig(dir, ini));
+
+    const MainWindowGeometry geometry = AppSettings().mainWindowGeometry();
+    QCOMPARE(geometry.maximized, maximized);
+    QCOMPARE(geometry.normalSize, normalSize);
+}
+
+void TestAppSettings::mainWindowGeometryKeepsTheOtherKeys() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QVERIFY(writeConfig(dir, "[database]\npath=database.db\nuser=gambasse\npassword=gambasse\n\n"
+                             "[idioma]\ncodigo=es\n\n[tema]\nmodo=oscuro\n\n"
+                             "[letra]\npixeles=17\n"));
+
+    AppSettings().setMainWindowGeometry({false, QSize(1280, 720)});
+
+    const AppSettings settings;
+    QCOMPARE(settings.mainWindowGeometry(), (MainWindowGeometry{false, QSize(1280, 720)}));
+    QCOMPARE(settings.language(), QStringLiteral("es"));
+    QCOMPARE(settings.theme(), QStringLiteral("oscuro"));
+    QCOMPARE(settings.letterSize(), 17);
     const QSettings raw(QDir(dir.path()).filePath(QStringLiteral("config.ini")),
                         QSettings::IniFormat);
     QCOMPARE(raw.value(QStringLiteral("database/path")).toString(), QStringLiteral("database.db"));
