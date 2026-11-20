@@ -155,6 +155,15 @@ void ShellWindowController::recompute(bool areaChanged) {
     const int previousShown = m_shown;
     const bool changed =
         shown != m_shown || minSize != m_minimumSize || canZoomIn != m_canZoomIn;
+    const QSize previousSize = m_window ? m_window->size() : QSize();
+    const QPoint previousPos = m_window ? m_window->position() : QPoint();
+    // Guard before emitting zoomChanged(): QML bindings on minimumWidth and
+    // minimumHeight can resize the window synchronously while zoomChanged() is
+    // delivered, and those programmatic resizes must not overwrite
+    // m_preferredNormalSize.
+    const auto guard = qScopeGuard([this] { m_applyingGeometry = false; });
+    m_applyingGeometry = true;
+
     m_shown = shown;
     m_minimumSize = minSize;
     m_canZoomIn = canZoomIn;
@@ -164,10 +173,6 @@ void ShellWindowController::recompute(bool areaChanged) {
     if (!m_initialApplied || !m_window)
         return;
 
-    const auto guard = qScopeGuard([this] { m_applyingGeometry = false; });
-    m_applyingGeometry = true;
-    const QSize previousSize = m_window->size();
-    const QPoint previousPos = m_window->position();
     m_window->setMinimumSize(m_minimumSize);
     if (!m_window->isVisible() || m_window->visibility() != QWindow::Windowed)
         return;
@@ -177,10 +182,9 @@ void ShellWindowController::recompute(bool areaChanged) {
     QRect next(previousPos, target);
     if (areaChanged || m_shown != previousShown || target != previousSize)
         next = mainwindow::clampToArea(next, area);
-    if (next != m_window->geometry()) {
-        m_lastAppliedSize = next.size();
+    m_lastAppliedSize = next.size();
+    if (next != m_window->geometry())
         m_window->setGeometry(next);
-    }
 }
 
 QScreen* ShellWindowController::hostScreen() const {

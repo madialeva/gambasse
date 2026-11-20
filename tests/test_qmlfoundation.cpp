@@ -120,6 +120,9 @@ private slots:
     void titleBarZoomButtons();
     void titleBarDrag();
     void windowEdgeResize();
+    void defaultStartupIsMaximizedAndSplashUnzoomed();
+    void titleBarMenusAndTooltipsScaleWithZoom();
+    void aboutDialogAndBarIconsScaleWithZoom();
 };
 
 QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
@@ -1096,6 +1099,183 @@ void TestQmlFoundation::titleBarZoomButtons() {
     QTest::qWait(50);
     QCOMPARE(inSpy.count(), 1);
     QCOMPARE(outSpy.count(), 1);
+}
+
+void TestQmlFoundation::defaultStartupIsMaximizedAndSplashUnzoomed() {
+    cleanup();
+    QFile::remove(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")));
+    // Splash stays at its base 560x470 size even with a saved zoom of 20 px,
+    // and with no [ventana] section the shell opens maximized.
+    InterfaceSettings(nullptr).setLetterSize(20);
+    const auto restore = qScopeGuard([] { InterfaceSettings(nullptr).setLetterSize(13); });
+    {
+        QQmlApplicationEngine engine;
+        settingsOf(engine);
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+        QVERIFY(!engine.rootObjects().isEmpty());
+        QObject* app = engine.rootObjects().first();
+        auto* splash = qvariant_cast<QQuickWindow*>(app->property("splash"));
+        QVERIFY(splash != nullptr);
+        QVERIFY(QTest::qWaitForWindowExposed(splash));
+        QCOMPARE(splash->size(), QSize(560, 470));
+
+        QTRY_VERIFY_WITH_TIMEOUT(app->property("shell").value<QObject*>() != nullptr, 5000);
+        auto* shell = qvariant_cast<QQuickWindow*>(app->property("shell"));
+        QVERIFY(shell != nullptr);
+        QTRY_COMPARE(shell->visibility(), QWindow::Maximized);
+        QCOMPARE(zoomtest::shellWindowOf(shell)->maximized(), true);
+    }
+
+    // With normal mode persisted, App opens the shell windowed.
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
+    {
+        QQmlApplicationEngine engine;
+        settingsOf(engine);
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+        QVERIFY(!engine.rootObjects().isEmpty());
+        QObject* app = engine.rootObjects().first();
+        QTRY_VERIFY_WITH_TIMEOUT(app->property("shell").value<QObject*>() != nullptr, 5000);
+        auto* shell = qvariant_cast<QQuickWindow*>(app->property("shell"));
+        QVERIFY(shell != nullptr);
+        QTRY_COMPARE(shell->visibility(), QWindow::Windowed);
+        QCOMPARE(zoomtest::shellWindowOf(shell)->maximized(), false);
+    }
+}
+
+void TestQmlFoundation::titleBarMenusAndTooltipsScaleWithZoom() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), shell->minimumSize());
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    const QList<std::pair<const char*, const char*>> menus = {{"helpButton", "helpMenu"},
+                                                              {"languageButton", "languageMenu"},
+                                                              {"themeButton", "themeMenu"}};
+    for (const auto& [buttonName, menuName] : menus) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        auto* menu = bar->findChild<QObject*>(QLatin1String(menuName));
+        QVERIFY2(button != nullptr && menu != nullptr, menuName);
+
+        QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(button));
+        QTRY_VERIFY2(menu->property("opened").toBool(), menuName);
+        QVERIFY2(qAbs(menu->property("scale").toReal() - factor) < 0.001, menuName);
+
+        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(menu));
+        const QRectF buttonRect = zoomtest::sceneRect(button);
+        QVERIFY2(qAbs(drawn.left() - buttonRect.left()) < 1.0,
+                 qPrintable(QStringLiteral("%1 left=%2 button=%3")
+                                .arg(QLatin1String(menuName))
+                                .arg(drawn.left())
+                                .arg(buttonRect.left())));
+        QVERIFY2(drawn.top() >= buttonRect.bottom() - 1.0, menuName);
+        QVERIFY2(drawn.right() <= window->width() + 1.0 && drawn.bottom() <= window->height() + 1.0,
+                 menuName);
+
+        QTest::keyClick(window, Qt::Key_Escape);
+        QTRY_VERIFY2(!menu->property("visible").toBool(), menuName);
+    }
+
+    // Tooltips of language, theme, zoom and window buttons scale and appear under their button.
+    const QList<std::pair<const char*, const char*>> tips = {
+        {"languageButton", "languageButtonTip"},
+        {"themeButton", "themeButtonTip"},
+        {"zoomOutButton", "windowButtonTip"},
+        {"zoomInButton", "windowButtonTip"},
+        {"minimizeButton", "windowButtonTip"},
+        {"maximizeButton", "windowButtonTip"},
+        {"closeButton", "windowButtonTip"},
+    };
+    for (const auto& [buttonName, tipName] : tips) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        QVERIFY2(button != nullptr, buttonName);
+        auto* tip = button->findChild<QObject*>(QLatin1String(tipName));
+        QVERIFY2(tip != nullptr, buttonName);
+        button->setProperty("hoverEnabled", true);
+        QTest::mouseMove(window, itemCenter(button));
+        QTRY_VERIFY2(tip->property("opened").toBool(), buttonName);
+        QVERIFY2(qAbs(tip->property("scale").toReal() - factor) < 0.001, buttonName);
+        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(tip));
+        QVERIFY2(qAbs(drawn.top() - zoomtest::sceneRect(button).bottom()) < 1.0,
+                 qPrintable(QStringLiteral("%1: %2").arg(QLatin1String(buttonName),
+                                                         zoomtest::describe(drawn))));
+        QTest::mouseMove(window, QPoint(500, 300));
+        QTRY_VERIFY2(!tip->property("visible").toBool(), buttonName);
+    }
+}
+
+void TestQmlFoundation::aboutDialogAndBarIconsScaleWithZoom() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), shell->minimumSize());
+
+    // AboutDialog and fontLicenseDialog are centred, scaled and fit inside the window.
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    QVERIFY(qAbs(dialog->property("scale").toReal() - factor) < 0.001);
+    const QRectF aboutRect = zoomtest::sceneRect(zoomtest::drawnItemOf(dialog));
+    QVERIFY(qAbs(aboutRect.center().x() - window->width() / 2.0) <= 1.5);
+    QVERIFY(qAbs(aboutRect.center().y() - window->height() / 2.0) <= 1.5);
+    QVERIFY(aboutRect.top() >= 0 && aboutRect.left() >= 0 && aboutRect.right() <= window->width()
+            && aboutRect.bottom() <= window->height());
+
+    auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutFont"));
+    auto* licenseDialog = dialog->findChild<QObject*>(QStringLiteral("fontLicenseDialog"));
+    QVERIFY(link != nullptr && licenseDialog != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(link, "linkActivated", Q_ARG(QString, QStringLiteral("license"))));
+    QTRY_VERIFY(licenseDialog->property("opened").toBool());
+    QVERIFY(qAbs(licenseDialog->property("scale").toReal() - factor) < 0.001);
+    const QRectF licenseRect = zoomtest::sceneRect(zoomtest::drawnItemOf(licenseDialog));
+    QVERIFY(licenseRect.top() >= 0 && licenseRect.left() >= 0
+            && licenseRect.right() <= window->width() && licenseRect.bottom() <= window->height());
+    QVERIFY(QMetaObject::invokeMethod(licenseDialog, "close"));
+    QTRY_VERIFY(!licenseDialog->property("visible").toBool());
+
+    // At 20 px, vector and high-res icons render at their scaled pixel sizes.
+    settings->setLetterSize(20);
+    QTRY_COMPARE(shell->shownLetterSize(), 20);
+    auto* aboutLogo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(aboutLogo != nullptr);
+    QCOMPARE(aboutLogo->property("sourceSize").toSize(),
+             QSize(qCeil(96 * 20 / 13.0), qCeil(96 * 20 / 13.0)));
+    QCOMPARE(QSizeF(aboutLogo->width(), aboutLogo->height()), QSizeF(96, 96));
+
+    auto* bar = window->findChild<QQuickItem*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* barLogo = bar->findChild<QQuickItem*>(QStringLiteral("logoImage"));
+    auto* flag = bar->findChild<QQuickItem*>(QStringLiteral("languageFlag"));
+    auto* themeIcon = bar->findChild<QQuickItem*>(QStringLiteral("themeIcon"));
+    QVERIFY(barLogo != nullptr && flag != nullptr && themeIcon != nullptr);
+    QCOMPARE(barLogo->property("sourceSize").toSize().height(), qCeil(24 * 20 / 13.0));
+    QCOMPARE(barLogo->height(), 24.0);
+    QCOMPARE(flag->property("sourceSize").toSize().width(), qCeil(24 * 20 / 13.0));
+    QCOMPARE(QSizeF(flag->width(), flag->height()), QSizeF(24, 16));
+    QCOMPARE(themeIcon->property("sourceSize").toSize(),
+             QSize(qCeil(16 * 20 / 13.0), qCeil(16 * 20 / 13.0)));
+    QCOMPARE(QSizeF(themeIcon->width(), themeIcon->height()), QSizeF(16, 16));
+
+    QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
 }
 
 } // namespace gambasse

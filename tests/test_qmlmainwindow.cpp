@@ -182,6 +182,12 @@ private slots:
     void deletePhotoAsksForConfirmation();
     void photoButtonsFollowTheLanguage();
     void photoDialogIsRebuiltOnLanguageChange();
+    void defaultStartupMaximizedAndPersistedGeometry();
+    void zoomButtonsShortcutsAndElasticResponse();
+    void zoomSharesSettingWithChildWindow();
+    void zoomedPopupsAndGridInteraction();
+    void everyTextShowsWholeZoomed_data();
+    void everyTextShowsWholeZoomed();
 };
 
 void TestQmlMainWindow::initTestCase() {
@@ -1139,6 +1145,320 @@ void TestQmlMainWindow::photoDialogIsRebuiltOnLanguageChange() {
     m_settings->setLanguage(QStringLiteral("en"));
 }
 
+void TestQmlMainWindow::defaultStartupMaximizedAndPersistedGeometry() {
+    seedPatients();
+    cleanup();
+    QFile::remove(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")));
+    m_engine = new QQmlApplicationEngine();
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
+    QVERIFY(!m_engine->rootObjects().isEmpty());
+    m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+    QVERIFY(m_window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(m_window));
+    ShellWindowController* shell = zoomtest::shellWindowOf(m_window);
+    QVERIFY(shell != nullptr);
+    QCOMPARE(m_window->visibility(), QWindow::Maximized);
+
+    // Restoring, resizing and reopening recovers the normal size.
+    shell->setAvailableArea(zoomtest::wideArea);
+    m_window->showNormal();
+    QTRY_COMPARE(m_window->visibility(), QWindow::Windowed);
+    m_window->resize(1280, 720);
+    QTRY_COMPARE(m_window->size(), QSize(1280, 720));
+    shell->flushPendingSave();
+    QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{false, QSize(1280, 720)}));
+
+    // Minimizing and closing keeps normal 1280x720 (never persists minimized).
+    m_window->showMinimized();
+    QTRY_COMPARE(m_window->visibility(), QWindow::Minimized);
+    cleanup();
+    QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{false, QSize(1280, 720)}));
+
+    // Reopening starts windowed and takes 1280x720 once on a screen that fits it.
+    m_engine = new QQmlApplicationEngine();
+    m_settings = m_engine->singletonInstance<InterfaceSettings*>(
+        QStringLiteral("Gambasse"), QStringLiteral("InterfaceSettings"));
+    m_engine->loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("Root"));
+    m_window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+    QVERIFY(m_window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(m_window));
+    QCOMPARE(m_window->visibility(), QWindow::Windowed);
+    shell = zoomtest::shellWindowOf(m_window);
+    shell->setAvailableArea(zoomtest::wideArea);
+    QTRY_COMPARE(m_window->size(), QSize(1280, 720));
+}
+
+void TestQmlMainWindow::zoomButtonsShortcutsAndElasticResponse() {
+    seedPatients();
+    openScreen();
+    ShellWindowController* shell = zoomtest::shellWindowOf(m_window);
+    QQuickItem* stage = zoomtest::stageOf(m_window);
+    QQuickItem* bar = child(m_window, QStringLiteral("titleBar"));
+    QVERIFY(shell != nullptr && stage != nullptr && bar != nullptr);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    shell->setAvailableArea(zoomtest::wideArea);
+    m_window->requestActivate();
+    QTRY_VERIFY(m_window->isActive());
+
+    auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
+    auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
+    QVERIFY(zoomIn != nullptr && zoomOut != nullptr);
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
+    QVERIFY(zoomIn->isEnabled() && !zoomOut->isEnabled());
+
+    // Clicking Zoom in grows from 1008x561 to the 14 px minimum without
+    // overwriting the preferred 1008x561 in config.ini.
+    clickIn(m_window, zoomIn);
+    QTRY_COMPARE(shell->shownLetterSize(), 14);
+    QVERIFY(qAbs(stage->scale() - 14.0 / 13.0) < 0.001);
+    QCOMPARE(m_window->minimumSize(), shell->minimumSize());
+    QCOMPARE(m_window->size(), shell->minimumSize());
+    QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{false, QSize(1008, 561)}));
+
+    // Focus and text in an edited field are kept across button and keyboard zoom.
+    clickIn(m_window, item(QStringLiteral("editButton")));
+    QVERIFY(m_controller->editing());
+    auto* nameField = item(QStringLiteral("nameInput"))->findChild<QQuickItem*>(QStringLiteral("field"));
+    QVERIFY(nameField != nullptr);
+    QTRY_VERIFY(nameField->hasActiveFocus());
+    nameField->setProperty("text", QStringLiteral("MARIA"));
+    clickIn(m_window, zoomIn);
+    QTRY_COMPARE(shell->shownLetterSize(), 15);
+    QCOMPARE(nameField->property("text").toString(), QStringLiteral("MARIA"));
+    QVERIFY(nameField->hasActiveFocus());
+
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 16);
+    QTest::keyClick(m_window, Qt::Key_Equal, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 17);
+    QTest::keyClick(m_window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 16);
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier | Qt::KeypadModifier);
+    QCOMPARE(shell->shownLetterSize(), 17);
+    QCOMPARE(nameField->property("text").toString(), QStringLiteral("MARIA"));
+    QVERIFY(nameField->hasActiveFocus());
+
+    // Open combo popup blocks shortcuts, whereas clicking Zoom out closes it and zooms.
+    auto* sexCombo = item(QStringLiteral("sexInput"))->findChild<QQuickItem*>(QStringLiteral("comboBox"));
+    QVERIFY(sexCombo != nullptr);
+    auto* sexPopup = sexCombo->findChild<QObject*>(QStringLiteral("comboPopup"));
+    QVERIFY(sexPopup != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(sexPopup, "open"));
+    QTRY_VERIFY(sexPopup->property("opened").toBool());
+    QTest::keyClick(m_window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 17);
+    clickIn(m_window, zoomOut);
+    QTRY_COMPARE(shell->shownLetterSize(), 16);
+    QTRY_VERIFY(!sexPopup->property("visible").toBool());
+
+    // Open calendar popup blocks shortcuts, whereas clicking Zoom out closes it and zooms.
+    auto* dateInput = item(QStringLiteral("dateInput"));
+    auto* calPopup = dateInput->findChild<QObject*>(QStringLiteral("calendarPopup"));
+    QVERIFY(calPopup != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(dateInput, "openCalendar"));
+    QTRY_VERIFY(calPopup->property("opened").toBool());
+    QTest::keyClick(m_window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 16);
+    clickIn(m_window, zoomOut);
+    QTRY_COMPARE(shell->shownLetterSize(), 15);
+    QTRY_VERIFY(!calPopup->property("visible").toBool());
+
+    clickIn(m_window, item(QStringLiteral("cancelButton")));
+    QTRY_VERIFY(!m_controller->editing());
+
+    // Open modal dialog blocks shortcuts; open title-bar menu blocks shortcuts.
+    clickIn(m_window, item(QStringLiteral("deleteButton")));
+    auto* confirm = m_screen->findChild<QObject*>(QStringLiteral("deleteConfirm"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 15);
+    QVERIFY(confirm->property("visible").toBool());
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+    QTRY_VERIFY(!confirm->property("visible").toBool());
+
+    auto* langButton = bar->findChild<QQuickItem*>(QStringLiteral("languageButton"));
+    auto* langMenu = bar->findChild<QObject*>(QStringLiteral("languageMenu"));
+    clickIn(m_window, langButton);
+    QTRY_VERIFY(langMenu->property("opened").toBool());
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 15);
+    QTest::keyClick(m_window, Qt::Key_Escape);
+    QTRY_VERIFY(!langMenu->property("visible").toBool());
+
+    // Ctrl+0 returns to 13 px and restores the preferred 1008x561 window size.
+    QTest::keyClick(m_window, Qt::Key_0, Qt::ControlModifier);
+    QTRY_COMPARE(shell->shownLetterSize(), 13);
+    QTRY_COMPARE(m_window->size(), QSize(1008, 561));
+
+    // Focus on a filter box: Ctrl++ zooms without typing into the filter.
+    auto* filterBox = visualItems(m_screen, QStringLiteral("filterBox")).at(1);
+    auto* filterField = filterBox->findChild<QQuickItem*>(QStringLiteral("field"));
+    QVERIFY(filterField != nullptr);
+    clickIn(m_window, filterField);
+    filterField->setProperty("text", QStringLiteral("QMLW"));
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 14);
+    QCOMPARE(filterField->property("text").toString(), QStringLiteral("QMLW"));
+    QTest::keyClick(m_window, Qt::Key_0, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 13);
+
+    // Elastic normal size: resized to 1400x800, zooming to 15 px keeps 1400x800.
+    m_window->resize(1400, 800);
+    QTRY_COMPARE(m_window->size(), QSize(1400, 800));
+    shell->flushPendingSave();
+    m_settings->setLetterSize(15);
+    QTRY_COMPARE(shell->shownLetterSize(), 15);
+    QCOMPARE(m_window->size(), QSize(1400, 800));
+
+    // Elastic maximized: zooming keeps the window maximized.
+    m_window->showMaximized();
+    QTRY_COMPARE(m_window->visibility(), QWindow::Maximized);
+    m_settings->setLetterSize(18);
+    QTRY_COMPARE(shell->shownLetterSize(), 18);
+    QCOMPARE(m_window->visibility(), QWindow::Maximized);
+    m_window->showNormal();
+    QTRY_COMPARE(m_window->visibility(), QWindow::Windowed);
+
+    // Laptop screen 1366x728 caps at 16 px; Ctrl+- drops chosen size to 15 px.
+    shell->setAvailableArea(zoomtest::laptopArea);
+    m_settings->setLetterSize(20);
+    QTRY_COMPARE(shell->shownLetterSize(), 16);
+    QVERIFY(!zoomIn->isEnabled());
+    QTest::keyClick(m_window, Qt::Key_Plus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 16);
+    QTest::keyClick(m_window, Qt::Key_Minus, Qt::ControlModifier);
+    QCOMPARE(shell->shownLetterSize(), 15);
+    QCOMPARE(m_settings->letterSize(), 15);
+    const QSettings config(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")),
+                           QSettings::IniFormat);
+    QCOMPARE(config.value(QStringLiteral("letra/pixeles")).toInt(), 15);
+}
+
+void TestQmlMainWindow::zoomSharesSettingWithChildWindow() {
+    seedPatients();
+    openScreen();
+    ShellWindowController* shell = zoomtest::shellWindowOf(m_window);
+    QObject* historyWin = m_screen->findChild<QObject*>(QStringLiteral("historyWindow"));
+    QVERIFY(shell != nullptr && historyWin != nullptr);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    shell->setAvailableArea(zoomtest::wideArea);
+    zoomtest::setArea({historyWin}, zoomtest::wideArea);
+
+    // Zoom raised on the main window applies immediately to a child history window.
+    shell->zoomIn();
+    shell->zoomIn();
+    QCOMPARE(shell->shownLetterSize(), 15);
+
+    clickIn(m_window, item(QStringLiteral("createAdultButton")));
+    auto* historyQuick = qobject_cast<QQuickWindow*>(historyWin);
+    QVERIFY(historyQuick != nullptr);
+    QTRY_VERIFY(historyQuick->isVisible());
+    ZoomController* childZoom = zoomtest::zoomOf(historyWin);
+    QVERIFY(childZoom != nullptr);
+    QCOMPARE(childZoom->shownLetterSize(), 15);
+
+    // Zoom raised inside the child window updates the main window too.
+    childZoom->zoomIn();
+    childZoom->zoomIn();
+    QCOMPARE(childZoom->shownLetterSize(), 17);
+    QCOMPARE(shell->shownLetterSize(), 17);
+
+    historyQuick->close();
+    QTRY_VERIFY(!historyQuick->isVisible());
+    QCOMPARE(shell->shownLetterSize(), 17);
+    QCOMPARE(m_window->size(), shell->minimumSize());
+}
+
+void TestQmlMainWindow::zoomedPopupsAndGridInteraction() {
+    seedPatients();
+    openScreen();
+    ShellWindowController* shell = zoomtest::shellWindowOf(m_window);
+    QVERIFY(shell != nullptr);
+    const auto restore = qScopeGuard([this] { m_settings->setLetterSize(13); });
+    shell->setAvailableArea(zoomtest::wideArea);
+    m_settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTRY_COMPARE(m_window->size(), shell->minimumSize());
+    QTest::qWait(50);
+
+    // TableView click selection and header sorting work inside the scaled stage.
+    auto* table = item(QStringLiteral("gridTable"));
+    QVERIFY(table != nullptr);
+    clickIn(m_window, table, QPointF(20, 2 * 24 + 12));
+    QTRY_COMPARE(m_controller->currentRow(), 2);
+    QCOMPARE(m_controller->patientName(), QStringLiteral("QMLW_GAMA"));
+
+    QQuickItem* nameHeader = nullptr;
+    for (QQuickItem* header : visualItems(m_screen, QStringLiteral("headerCell"))) {
+        if (header->property("index").toInt() == PatientsModel::ColumnName)
+            nameHeader = header;
+    }
+    QVERIFY(nameHeader != nullptr);
+    clickIn(m_window, nameHeader);
+    QTRY_COMPARE(m_controller->sortOrder(), static_cast<int>(Qt::DescendingOrder));
+    QCOMPARE(m_controller->patientName(), QStringLiteral("QMLW_GAMA"));
+
+    // Scaled combo list and calendar in edit mode.
+    clickIn(m_window, item(QStringLiteral("editButton")));
+    QVERIFY(m_controller->editing());
+    auto* sexCombo = item(QStringLiteral("sexInput"))->findChild<QQuickItem*>(QStringLiteral("comboBox"));
+    auto* sexPopup = sexCombo->findChild<QObject*>(QStringLiteral("comboPopup"));
+    QVERIFY(QMetaObject::invokeMethod(sexPopup, "open"));
+    QTRY_VERIFY(sexPopup->property("opened").toBool());
+    const QString comboIssues =
+        zoomtest::popupProblems(sexPopup, sexCombo, sexCombo->width(), factor);
+    QVERIFY2(comboIssues.isEmpty(), qPrintable(comboIssues));
+    QVERIFY(QMetaObject::invokeMethod(sexPopup, "close"));
+
+    auto* dateInput = item(QStringLiteral("dateInput"));
+    auto* calPopup = dateInput->findChild<QObject*>(QStringLiteral("calendarPopup"));
+    QVERIFY(QMetaObject::invokeMethod(dateInput, "openCalendar"));
+    QTRY_VERIFY(calPopup->property("opened").toBool());
+    const QString calIssues = zoomtest::popupProblems(calPopup, dateInput, 260.0, factor);
+    QVERIFY2(calIssues.isEmpty(), qPrintable(calIssues));
+    QVERIFY(QMetaObject::invokeMethod(calPopup, "close"));
+    clickIn(m_window, item(QStringLiteral("cancelButton")));
+    QTRY_VERIFY(!m_controller->editing());
+
+    // Delete confirmation dialog is centred, scaled and inside the window.
+    clickIn(m_window, item(QStringLiteral("deleteButton")));
+    auto* confirm = m_screen->findChild<QObject*>(QStringLiteral("deleteConfirm"));
+    QTRY_VERIFY(confirm->property("opened").toBool());
+    QVERIFY(qAbs(confirm->property("scale").toReal() - factor) < 0.001);
+    const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(confirm));
+    QVERIFY(qAbs(drawn.center().x() - m_window->width() / 2.0) <= 1.5);
+    QVERIFY(qAbs(drawn.center().y() - m_window->height() / 2.0) <= 1.5);
+    QVERIFY(drawn.top() >= 0 && drawn.left() >= 0 && drawn.right() <= m_window->width()
+            && drawn.bottom() <= m_window->height());
+    QVERIFY(QMetaObject::invokeMethod(confirm, "close"));
+}
+
+void TestQmlMainWindow::everyTextShowsWholeZoomed_data() {
+    everyTextShowsWhole_data();
+}
+
+void TestQmlMainWindow::everyTextShowsWholeZoomed() {
+    QFETCH(QString, language);
+    seedPatients();
+    openScreen();
+    ShellWindowController* shell = zoomtest::shellWindowOf(m_window);
+    QQuickItem* stage = zoomtest::stageOf(m_window);
+    QVERIFY(shell != nullptr && stage != nullptr);
+    const auto restore = qScopeGuard([this] {
+        m_settings->setLetterSize(13);
+        m_settings->setLanguage(QStringLiteral("en"));
+    });
+    shell->setAvailableArea(zoomtest::wideArea);
+    m_settings->setLetterSize(17);
+    m_settings->setLanguage(language);
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTest::qWait(100);
+    const QStringList cut = cutTextsOnEveryTab(stage);
+    QVERIFY2(cut.isEmpty(), qPrintable(cut.join(QStringLiteral(" | "))));
+}
 
 } // namespace gambasse
 
