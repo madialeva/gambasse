@@ -19,6 +19,10 @@ Item {
     // the window that shows the bar owns the dialog.
     property bool showHelp: false
     signal aboutRequested
+    // Optional custom minimize handler (Root uses ShellWindowController.minimize()
+    // so Qt::WindowMaximized is preserved across iconify/de-iconify).
+    property bool customMinimize: false
+    signal minimizeRequested
     // Optional zoom buttons (history and consultation windows). Like the Help
     // menu, the bar only announces the click: FormWindow zooms, and tells the
     // bar which way it still can.
@@ -27,10 +31,16 @@ Item {
     property bool canZoomOut: true
     signal zoomInRequested
     signal zoomOutRequested
-    // Scale of the window the bar is drawn in (the zoom of a history or
-    // consultation window): the logo is rendered at the size it is seen and
-    // the tooltips, popups that do not inherit it, are scaled by it.
+    // Scale of the window the bar is drawn in (the zoom of the main, history
+    // or consultation window): the icons are rendered at the size they are seen
+    // and the menus and tooltips, popups that do not inherit it, are scaled by
+    // it.
     property real zoomFactor: 1
+    onZoomFactorChanged: {
+        helpMenu.close();
+        languageMenu.close();
+        themeMenu.close();
+    }
     // config.ini is free text, so the code is checked before building any URL
     // (a wrong one used to point at a non-existing flag image).
     // Window.window is an attached property and only resolves on Items, so the
@@ -223,6 +233,8 @@ Item {
                 id: helpMenu
                 objectName: "helpMenu"
                 y: helpButton.height
+                scale: root.zoomFactor
+                transformOrigin: Popup.TopLeft
                 MenuItem {
                     objectName: "aboutMenuItem"
                     text: qsTr("About")
@@ -247,8 +259,9 @@ Item {
                 Image {
                     objectName: "languageFlag"
                     source: root.flagSource
-                    sourceSize.width: 24
+                    sourceSize.width: Math.ceil(24 * root.zoomFactor)
                     fillMode: Image.PreserveAspectFit
+                    width: 24
                     height: 16
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -259,13 +272,22 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
-            ToolTip.text: qsTr("Language")
-            ToolTip.visible: hovered
+            ToolTip {
+                objectName: "languageButtonTip"
+                text: qsTr("Language")
+                visible: languageButton.hovered
+                x: (languageButton.width - width) / 2
+                y: languageButton.height
+                scale: root.zoomFactor
+                transformOrigin: Popup.TopLeft
+            }
             onClicked: languageMenu.open()
             Menu {
                 id: languageMenu
                 objectName: "languageMenu"
                 y: languageButton.height
+                scale: root.zoomFactor
+                transformOrigin: Popup.TopLeft
                 MenuItem {
                     text: qsTr("Spanish")
                     icon.source: "qrc:/img/flag-es.png"
@@ -297,15 +319,42 @@ Item {
             objectName: "themeButton"
             height: Theme.titleBarButtonHeight
             visible: root.showLanguageTheme
-            icon.source: InterfaceSettings.theme === "oscuro" ? "qrc:/img/moon.svg" : "qrc:/img/sun.svg"
             text: InterfaceSettings.theme === "oscuro" ? qsTr("Dark") : qsTr("Light")
-            ToolTip.text: qsTr("Theme")
-            ToolTip.visible: hovered
+            contentItem: Row {
+                spacing: 4
+                Image {
+                    objectName: "themeIcon"
+                    source: InterfaceSettings.theme === "oscuro" ? "qrc:/img/moon.svg" : "qrc:/img/sun.svg"
+                    sourceSize.width: Math.ceil(16 * root.zoomFactor)
+                    sourceSize.height: Math.ceil(16 * root.zoomFactor)
+                    width: 16
+                    height: 16
+                    fillMode: Image.PreserveAspectFit
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text: themeButton.text
+                    color: Theme.windowText
+                    font: themeButton.font
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+            ToolTip {
+                objectName: "themeButtonTip"
+                text: qsTr("Theme")
+                visible: themeButton.hovered
+                x: (themeButton.width - width) / 2
+                y: themeButton.height
+                scale: root.zoomFactor
+                transformOrigin: Popup.TopLeft
+            }
             onClicked: themeMenu.open()
             Menu {
                 id: themeMenu
                 objectName: "themeMenu"
                 y: themeButton.height
+                scale: root.zoomFactor
+                transformOrigin: Popup.TopLeft
                 MenuItem {
                     text: qsTr("Light")
                     icon.source: "qrc:/img/sun.svg"
@@ -323,11 +372,40 @@ Item {
             }
         }
         WindowButton {
+            id: zoomOutButton
+            objectName: "zoomOutButton"
+            tip: qsTr("Zoom out")
+            visible: root.showZoom
+            enabled: root.canZoomOut
+            onClicked: root.zoomOutRequested()
+            contentItem: Magnifier {
+                plus: false
+                colour: zoomOutButton.enabled ? Theme.windowText : Theme.mutedText
+            }
+        }
+        WindowButton {
+            id: zoomInButton
+            objectName: "zoomInButton"
+            tip: qsTr("Zoom in")
+            visible: root.showZoom
+            enabled: root.canZoomIn
+            onClicked: root.zoomInRequested()
+            contentItem: Magnifier {
+                plus: true
+                colour: zoomInButton.enabled ? Theme.windowText : Theme.mutedText
+            }
+        }
+        WindowButton {
             objectName: "minimizeButton"
             glyph: "\u2014"
             tip: qsTr("Minimize")
             visible: !root.closeOnly
-            onClicked: Window.window.showMinimized()
+            onClicked: {
+                if (root.customMinimize)
+                    root.minimizeRequested();
+                else
+                    Window.window.showMinimized();
+            }
         }
         WindowButton {
             id: maximizeButton
@@ -363,30 +441,6 @@ Item {
                     border.color: Theme.windowText
                     border.width: 2
                 }
-            }
-        }
-        WindowButton {
-            id: zoomOutButton
-            objectName: "zoomOutButton"
-            tip: qsTr("Zoom out")
-            visible: root.showZoom
-            enabled: root.canZoomOut
-            onClicked: root.zoomOutRequested()
-            contentItem: Magnifier {
-                plus: false
-                colour: zoomOutButton.enabled ? Theme.windowText : Theme.mutedText
-            }
-        }
-        WindowButton {
-            id: zoomInButton
-            objectName: "zoomInButton"
-            tip: qsTr("Zoom in")
-            visible: root.showZoom
-            enabled: root.canZoomIn
-            onClicked: root.zoomInRequested()
-            contentItem: Magnifier {
-                plus: true
-                colour: zoomInButton.enabled ? Theme.windowText : Theme.mutedText
             }
         }
         WindowButton {

@@ -9,6 +9,7 @@
 #include <QtTest>
 
 #include <ui/InterfaceSettings.h>
+#include <ui/controller/ShellWindowController.h>
 #include <ui/controller/ZoomController.h>
 
 namespace gambasse::zoomtest {
@@ -21,6 +22,12 @@ inline const QRect laptopArea(0, 0, 1366, 728);
 inline ZoomController* zoomOf(QObject* window) {
     return window != nullptr
                ? window->findChild<ZoomController*>(QStringLiteral("zoomController"))
+               : nullptr;
+}
+
+inline ShellWindowController* shellWindowOf(QObject* window) {
+    return window != nullptr
+               ? window->findChild<ShellWindowController*>(QStringLiteral("shellWindowController"))
                : nullptr;
 }
 

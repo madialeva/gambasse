@@ -112,6 +112,8 @@ qt_add_library(GambasseCore STATIC
     src/logic/ConsultationService.h
     src/logic/InterfaceLocale.cpp
     src/logic/InterfaceLocale.h
+    src/logic/MainWindowGeometry.cpp
+    src/logic/MainWindowGeometry.h
     src/logic/PatientService.cpp
     src/logic/PatientService.h
     src/logic/PediatricConsultationLabels.cpp
@@ -178,6 +180,8 @@ qt_add_qml_module(GambasseQml
         src/ui/controller/PregnancyConsultationController.h
         src/ui/controller/PregnancyHistoryController.cpp
         src/ui/controller/PregnancyHistoryController.h
+        src/ui/controller/ShellWindowController.cpp
+        src/ui/controller/ShellWindowController.h
         src/ui/controller/ZoomController.cpp
         src/ui/controller/ZoomController.h
         src/ui/filter/ColumnFilterProxy.cpp

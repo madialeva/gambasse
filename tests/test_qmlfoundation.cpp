@@ -17,9 +17,11 @@
 #include <tuple>
 
 #include <Paths.h>
+#include <ZoomTestSupport.h>
+#include <data/common/Database.h>
+#include <logic/AppSettings.h>
 #include <ui/AppIcon.h>
 #include <ui/AppInfo.h>
-#include <data/common/Database.h>
 #include <ui/InterfaceSettings.h>
 
 namespace gambasse {
@@ -118,11 +120,16 @@ private slots:
     void titleBarZoomButtons();
     void titleBarDrag();
     void windowEdgeResize();
+    void defaultStartupIsMaximizedAndSplashUnzoomed();
+    void titleBarMenusAndTooltipsScaleWithZoom();
+    void aboutDialogAndBarIconsScaleWithZoom();
 };
 
 QQuickWindow* TestQmlFoundation::openShell(const QString& theme) {
     cleanup();
     persistInterface(theme, QStringLiteral("en"));
+    InterfaceSettings(nullptr).setLetterSize(13);
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     m_engine = new QQmlApplicationEngine();
     // Up front, like the application: it installs the interface font.
     settingsOf(*m_engine);
@@ -244,6 +251,7 @@ void TestQmlFoundation::localeFollowsTheLanguage() {
 
 void TestQmlFoundation::qmlShellFollowsThemeInHot() {
     persistInterface(QStringLiteral("claro"), QStringLiteral("en"));
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
     QQmlApplicationEngine engine;
     // Same loading as the application: the module (and its resources) comes
     // from the shared GambasseQml library in both binaries.
@@ -842,8 +850,9 @@ void TestQmlFoundation::titleBarChrome() {
         // 40 px of buttons plus the 1 px bottom line: every button of the bar
         // fits exactly above that line.
         QCOMPARE(bar->property("height").toInt(), 41);
-        for (const char* name : {"helpButton", "languageButton", "themeButton", "minimizeButton",
-                                 "maximizeButton", "closeButton"}) {
+        for (const char* name : {"helpButton", "languageButton", "themeButton", "zoomOutButton",
+                                 "zoomInButton", "minimizeButton", "maximizeButton",
+                                 "closeButton"}) {
             auto* button = bar->findChild<QQuickItem*>(QLatin1String(name));
             QVERIFY2(button != nullptr, name);
             const QPointF top = button->mapToItem(qobject_cast<QQuickItem*>(bar), QPointF(0, 0));
@@ -944,35 +953,54 @@ void TestQmlFoundation::windowEdgeResize() {
     QQuickWindow* window = openShell(QStringLiteral("claro"));
     QVERIFY(window != nullptr);
     QVERIFY(QTest::qWaitForWindowExposed(window));
-    window->setPosition(100, 100);
-    QCOMPARE(QSize(window->width(), window->height()), QSize(1008, 561));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    window->setGeometry(100, 100, 1100, 640);
+    QTRY_COMPARE(window->geometry(), QRect(100, 100, 1100, 640));
+    QTest::qWait(50);
 
-    // Bottom-right corner shrinks both ways (staying above the 960x540 minimum).
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1005, 558));
-    QTest::mouseMove(window, QPoint(995, 548));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(995, 548));
-    QCOMPARE(window->width(), 998);
-    QCOMPARE(window->height(), 551);
+    // Bottom-right corner shrinks both ways while staying above the 1008x561 base minimum.
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1097, 637));
+    QTest::mouseMove(window, QPoint(1077, 617));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1077, 617));
+    QCOMPARE(window->width(), 1080);
+    QCOMPARE(window->height(), 620);
 
     // Right edge shrinks; left edge stays.
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(995, 300));
-    QTest::mouseMove(window, QPoint(975, 300));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(975, 300));
-    QCOMPARE(window->width(), 978);
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1077, 300));
+    QTest::mouseMove(window, QPoint(1057, 300));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1057, 300));
+    QCOMPARE(window->width(), 1060);
     QCOMPARE(window->x(), 100);
 
-    // Bottom edge shrinks.
-    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 548));
-    QTest::mouseMove(window, QPoint(500, 538));
-    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 538));
-    QCOMPARE(window->height(), 541);
+    // Bottom edge cannot shrink below the 561 minimum.
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 617));
+    QTest::mouseMove(window, QPoint(500, 500));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(500, 500));
+    QCOMPARE(window->height(), 561);
 
-    // Left edge cannot shrink below the 960 minimum (x follows the clamp).
+    // Left edge cannot shrink below the 1008 minimum (x follows the clamp).
     QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(3, 300));
     QTest::mouseMove(window, QPoint(203, 300));
     QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(203, 300));
-    QCOMPARE(window->width(), 960);
-    QCOMPARE(window->x(), 100 + (978 - 960));
+    QCOMPARE(window->width(), 1008);
+    QCOMPARE(window->x(), 100 + (1060 - 1008));
+
+    // With zoom at 15 px (scaled minimum 1164x648), edge resizing honours the
+    // scaled minimum too.
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(15);
+    QTRY_COMPARE(window->minimumSize(), QSize(1164, 648));
+    window->resize(1300, 720);
+    QTRY_COMPARE(window->size(), QSize(1300, 720));
+    QTest::qWait(50);
+    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1297, 717));
+    QTest::mouseMove(window, QPoint(1000, 500));
+    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1000, 500));
+    QCOMPARE(window->width(), 1164);
+    QCOMPARE(window->height(), 648);
 }
 
 
@@ -986,19 +1014,29 @@ void TestQmlFoundation::titleBarZoomButtons() {
     QVERIFY(QTest::qWaitForWindowExposed(window));
     QObject* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
     QVERIFY(bar != nullptr);
+    auto* themeButton = bar->findChild<QQuickItem*>(QStringLiteral("themeButton"));
+    auto* minimizeButton = bar->findChild<QQuickItem*>(QStringLiteral("minimizeButton"));
+    auto* maximizeButton = bar->findChild<QQuickItem*>(QStringLiteral("maximizeButton"));
     auto* zoomIn = bar->findChild<QQuickItem*>(QStringLiteral("zoomInButton"));
     auto* zoomOut = bar->findChild<QQuickItem*>(QStringLiteral("zoomOutButton"));
     auto* closeButton = bar->findChild<QQuickItem*>(QStringLiteral("closeButton"));
-    QVERIFY(zoomIn != nullptr && zoomOut != nullptr && closeButton != nullptr);
-    // The main window's bar has none.
-    QVERIFY(!zoomIn->isVisible());
-    QVERIFY(!zoomOut->isVisible());
+    QVERIFY(themeButton != nullptr && minimizeButton != nullptr && maximizeButton != nullptr
+            && zoomIn != nullptr && zoomOut != nullptr && closeButton != nullptr);
 
-    bar->setProperty("closeOnly", true);
+    // Main-window order: Theme, Zoom out, Zoom in, Minimize, Maximize, Close.
+    const auto left = [](QQuickItem* item) { return item->mapToScene(QPointF()).x(); };
     bar->setProperty("showZoom", true);
     QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
-    const auto left = [](QQuickItem* item) { return item->mapToScene(QPointF()).x(); };
-    // The row lays the buttons out on its next polish.
+    QTRY_VERIFY(left(themeButton) < left(zoomOut));
+    QVERIFY(left(zoomOut) < left(zoomIn));
+    QVERIFY(left(zoomIn) < left(minimizeButton));
+    QVERIFY(left(minimizeButton) < left(maximizeButton));
+    QVERIFY(left(maximizeButton) < left(closeButton));
+
+    // Close-only mode (child windows): Zoom out, Zoom in, Close.
+    bar->setProperty("closeOnly", true);
+    QVERIFY(!minimizeButton->isVisible() && !maximizeButton->isVisible());
+    QVERIFY(zoomIn->isVisible() && zoomOut->isVisible());
     QTRY_VERIFY(left(zoomOut) < left(zoomIn));
     QVERIFY(left(zoomIn) < left(closeButton));
     for (QQuickItem* button : {zoomIn, zoomOut}) {
@@ -1024,6 +1062,8 @@ void TestQmlFoundation::titleBarZoomButtons() {
     settings->setLanguage(QStringLiteral("en"));
 
     // One request per click.
+    bar->setProperty("canZoomIn", true);
+    bar->setProperty("canZoomOut", true);
     QSignalSpy inSpy(bar, SIGNAL(zoomInRequested()));
     QSignalSpy outSpy(bar, SIGNAL(zoomOutRequested()));
     QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(zoomIn));
@@ -1059,6 +1099,183 @@ void TestQmlFoundation::titleBarZoomButtons() {
     QTest::qWait(50);
     QCOMPARE(inSpy.count(), 1);
     QCOMPARE(outSpy.count(), 1);
+}
+
+void TestQmlFoundation::defaultStartupIsMaximizedAndSplashUnzoomed() {
+    cleanup();
+    QFile::remove(QDir(m_dir.path()).filePath(QStringLiteral("config.ini")));
+    // Splash stays at its base 560x470 size even with a saved zoom of 20 px,
+    // and with no [ventana] section the shell opens maximized.
+    InterfaceSettings(nullptr).setLetterSize(20);
+    const auto restore = qScopeGuard([] { InterfaceSettings(nullptr).setLetterSize(13); });
+    {
+        QQmlApplicationEngine engine;
+        settingsOf(engine);
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+        QVERIFY(!engine.rootObjects().isEmpty());
+        QObject* app = engine.rootObjects().first();
+        auto* splash = qvariant_cast<QQuickWindow*>(app->property("splash"));
+        QVERIFY(splash != nullptr);
+        QVERIFY(QTest::qWaitForWindowExposed(splash));
+        QCOMPARE(splash->size(), QSize(560, 470));
+
+        QTRY_VERIFY_WITH_TIMEOUT(app->property("shell").value<QObject*>() != nullptr, 5000);
+        auto* shell = qvariant_cast<QQuickWindow*>(app->property("shell"));
+        QVERIFY(shell != nullptr);
+        QTRY_COMPARE(shell->visibility(), QWindow::Maximized);
+        QCOMPARE(zoomtest::shellWindowOf(shell)->maximized(), true);
+    }
+
+    // With normal mode persisted, App opens the shell windowed.
+    AppSettings().setMainWindowGeometry({false, QSize(1008, 561)});
+    {
+        QQmlApplicationEngine engine;
+        settingsOf(engine);
+        engine.loadFromModule(QStringLiteral("Gambasse"), QStringLiteral("App"));
+        QVERIFY(!engine.rootObjects().isEmpty());
+        QObject* app = engine.rootObjects().first();
+        QTRY_VERIFY_WITH_TIMEOUT(app->property("shell").value<QObject*>() != nullptr, 5000);
+        auto* shell = qvariant_cast<QQuickWindow*>(app->property("shell"));
+        QVERIFY(shell != nullptr);
+        QTRY_COMPARE(shell->visibility(), QWindow::Windowed);
+        QCOMPARE(zoomtest::shellWindowOf(shell)->maximized(), false);
+    }
+}
+
+void TestQmlFoundation::titleBarMenusAndTooltipsScaleWithZoom() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), shell->minimumSize());
+    window->requestActivate();
+    QVERIFY(QTest::qWaitForWindowActive(window));
+
+    auto* bar = window->findChild<QObject*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    const QList<std::pair<const char*, const char*>> menus = {{"helpButton", "helpMenu"},
+                                                              {"languageButton", "languageMenu"},
+                                                              {"themeButton", "themeMenu"}};
+    for (const auto& [buttonName, menuName] : menus) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        auto* menu = bar->findChild<QObject*>(QLatin1String(menuName));
+        QVERIFY2(button != nullptr && menu != nullptr, menuName);
+
+        QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, itemCenter(button));
+        QTRY_VERIFY2(menu->property("opened").toBool(), menuName);
+        QVERIFY2(qAbs(menu->property("scale").toReal() - factor) < 0.001, menuName);
+
+        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(menu));
+        const QRectF buttonRect = zoomtest::sceneRect(button);
+        QVERIFY2(qAbs(drawn.left() - buttonRect.left()) < 1.0,
+                 qPrintable(QStringLiteral("%1 left=%2 button=%3")
+                                .arg(QLatin1String(menuName))
+                                .arg(drawn.left())
+                                .arg(buttonRect.left())));
+        QVERIFY2(drawn.top() >= buttonRect.bottom() - 1.0, menuName);
+        QVERIFY2(drawn.right() <= window->width() + 1.0 && drawn.bottom() <= window->height() + 1.0,
+                 menuName);
+
+        QTest::keyClick(window, Qt::Key_Escape);
+        QTRY_VERIFY2(!menu->property("visible").toBool(), menuName);
+    }
+
+    // Tooltips of language, theme, zoom and window buttons scale and appear under their button.
+    const QList<std::pair<const char*, const char*>> tips = {
+        {"languageButton", "languageButtonTip"},
+        {"themeButton", "themeButtonTip"},
+        {"zoomOutButton", "windowButtonTip"},
+        {"zoomInButton", "windowButtonTip"},
+        {"minimizeButton", "windowButtonTip"},
+        {"maximizeButton", "windowButtonTip"},
+        {"closeButton", "windowButtonTip"},
+    };
+    for (const auto& [buttonName, tipName] : tips) {
+        auto* button = bar->findChild<QQuickItem*>(QLatin1String(buttonName));
+        QVERIFY2(button != nullptr, buttonName);
+        auto* tip = button->findChild<QObject*>(QLatin1String(tipName));
+        QVERIFY2(tip != nullptr, buttonName);
+        button->setProperty("hoverEnabled", true);
+        QTest::mouseMove(window, itemCenter(button));
+        QTRY_VERIFY2(tip->property("opened").toBool(), buttonName);
+        QVERIFY2(qAbs(tip->property("scale").toReal() - factor) < 0.001, buttonName);
+        const QRectF drawn = zoomtest::sceneRect(zoomtest::drawnItemOf(tip));
+        QVERIFY2(qAbs(drawn.top() - zoomtest::sceneRect(button).bottom()) < 1.0,
+                 qPrintable(QStringLiteral("%1: %2").arg(QLatin1String(buttonName),
+                                                         zoomtest::describe(drawn))));
+        QTest::mouseMove(window, QPoint(500, 300));
+        QTRY_VERIFY2(!tip->property("visible").toBool(), buttonName);
+    }
+}
+
+void TestQmlFoundation::aboutDialogAndBarIconsScaleWithZoom() {
+    QQuickWindow* window = openShell(QStringLiteral("claro"));
+    QVERIFY(window != nullptr);
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    ShellWindowController* shell = zoomtest::shellWindowOf(window);
+    QVERIFY(shell != nullptr);
+    shell->setAvailableArea(zoomtest::wideArea);
+    InterfaceSettings* settings = settingsOf(*m_engine);
+    const auto restore = qScopeGuard([settings] { settings->setLetterSize(13); });
+    settings->setLetterSize(17);
+    const qreal factor = 17.0 / 13.0;
+    QTRY_COMPARE(shell->shownLetterSize(), 17);
+    QTRY_COMPARE(window->size(), shell->minimumSize());
+
+    // AboutDialog and fontLicenseDialog are centred, scaled and fit inside the window.
+    QObject* dialog = openAboutDialog(window);
+    QVERIFY(dialog != nullptr);
+    QVERIFY(qAbs(dialog->property("scale").toReal() - factor) < 0.001);
+    const QRectF aboutRect = zoomtest::sceneRect(zoomtest::drawnItemOf(dialog));
+    QVERIFY(qAbs(aboutRect.center().x() - window->width() / 2.0) <= 1.5);
+    QVERIFY(qAbs(aboutRect.center().y() - window->height() / 2.0) <= 1.5);
+    QVERIFY(aboutRect.top() >= 0 && aboutRect.left() >= 0 && aboutRect.right() <= window->width()
+            && aboutRect.bottom() <= window->height());
+
+    auto* link = dialog->findChild<QQuickItem*>(QStringLiteral("aboutFont"));
+    auto* licenseDialog = dialog->findChild<QObject*>(QStringLiteral("fontLicenseDialog"));
+    QVERIFY(link != nullptr && licenseDialog != nullptr);
+    QVERIFY(QMetaObject::invokeMethod(link, "linkActivated", Q_ARG(QString, QStringLiteral("license"))));
+    QTRY_VERIFY(licenseDialog->property("opened").toBool());
+    QVERIFY(qAbs(licenseDialog->property("scale").toReal() - factor) < 0.001);
+    const QRectF licenseRect = zoomtest::sceneRect(zoomtest::drawnItemOf(licenseDialog));
+    QVERIFY(licenseRect.top() >= 0 && licenseRect.left() >= 0
+            && licenseRect.right() <= window->width() && licenseRect.bottom() <= window->height());
+    QVERIFY(QMetaObject::invokeMethod(licenseDialog, "close"));
+    QTRY_VERIFY(!licenseDialog->property("visible").toBool());
+
+    // At 20 px, vector and high-res icons render at their scaled pixel sizes.
+    settings->setLetterSize(20);
+    QTRY_COMPARE(shell->shownLetterSize(), 20);
+    auto* aboutLogo = dialog->findChild<QQuickItem*>(QStringLiteral("aboutLogo"));
+    QVERIFY(aboutLogo != nullptr);
+    QCOMPARE(aboutLogo->property("sourceSize").toSize(),
+             QSize(qCeil(96 * 20 / 13.0), qCeil(96 * 20 / 13.0)));
+    QCOMPARE(QSizeF(aboutLogo->width(), aboutLogo->height()), QSizeF(96, 96));
+
+    auto* bar = window->findChild<QQuickItem*>(QStringLiteral("titleBar"));
+    QVERIFY(bar != nullptr);
+    auto* barLogo = bar->findChild<QQuickItem*>(QStringLiteral("logoImage"));
+    auto* flag = bar->findChild<QQuickItem*>(QStringLiteral("languageFlag"));
+    auto* themeIcon = bar->findChild<QQuickItem*>(QStringLiteral("themeIcon"));
+    QVERIFY(barLogo != nullptr && flag != nullptr && themeIcon != nullptr);
+    QCOMPARE(barLogo->property("sourceSize").toSize().height(), qCeil(24 * 20 / 13.0));
+    QCOMPARE(barLogo->height(), 24.0);
+    QCOMPARE(flag->property("sourceSize").toSize().width(), qCeil(24 * 20 / 13.0));
+    QCOMPARE(QSizeF(flag->width(), flag->height()), QSizeF(24, 16));
+    QCOMPARE(themeIcon->property("sourceSize").toSize(),
+             QSize(qCeil(16 * 20 / 13.0), qCeil(16 * 20 / 13.0)));
+    QCOMPARE(QSizeF(themeIcon->width(), themeIcon->height()), QSizeF(16, 16));
+
+    QVERIFY(QMetaObject::invokeMethod(dialog, "close"));
+    QTRY_VERIFY(!dialog->property("visible").toBool());
 }
 
 } // namespace gambasse

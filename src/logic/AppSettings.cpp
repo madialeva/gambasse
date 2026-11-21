@@ -47,4 +47,34 @@ void AppSettings::setLetterSize(int pixels) const {
     config.setValue(QStringLiteral("letra/pixeles"), zoom::clampLetterSize(pixels));
 }
 
+MainWindowGeometry AppSettings::mainWindowGeometry() const {
+    QSettings config(configFilePath(), QSettings::IniFormat);
+    MainWindowGeometry geometry;
+    const QString rawMaximized =
+        config.value(QStringLiteral("ventana/maximizada")).toString().trimmed().toLower();
+    if (rawMaximized == QLatin1String("false"))
+        geometry.maximized = false;
+    else if (rawMaximized == QLatin1String("true"))
+        geometry.maximized = true;
+
+    bool widthOk = false;
+    const int rawWidth =
+        config.value(QStringLiteral("ventana/ancho")).toString().trimmed().toInt(&widthOk);
+    bool heightOk = false;
+    const int rawHeight =
+        config.value(QStringLiteral("ventana/alto")).toString().trimmed().toInt(&heightOk);
+    const QSize base = mainwindow::baseSize();
+    geometry.normalSize = mainwindow::clampNormalSize(
+        {widthOk ? rawWidth : base.width(), heightOk ? rawHeight : base.height()});
+    return geometry;
+}
+
+void AppSettings::setMainWindowGeometry(const MainWindowGeometry& geometry) const {
+    QSettings config(configFilePath(), QSettings::IniFormat);
+    const QSize clamped = mainwindow::clampNormalSize(geometry.normalSize);
+    config.setValue(QStringLiteral("ventana/maximizada"), geometry.maximized);
+    config.setValue(QStringLiteral("ventana/ancho"), clamped.width());
+    config.setValue(QStringLiteral("ventana/alto"), clamped.height());
+}
+
 } // namespace gambasse
