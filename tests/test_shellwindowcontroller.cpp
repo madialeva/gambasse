@@ -143,14 +143,20 @@ void TestShellWindowController::restoreResizeMaximizeAndMinimizePersistence() {
     QTRY_COMPARE(h.window.visibility(), QWindow::Maximized);
     QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{true, QSize(1280, 720)}));
 
-    // Minimizing while maximized keeps maximized persisted.
-    h.window.showMinimized();
+    // Minimizing while maximized keeps maximized persisted; when the WM
+    // reports Windowed on de-iconify, the controller restores Maximized
+    // without touching config.ini or shrinking the window.
+    h.controller.minimize();
     QTRY_COMPARE(h.window.visibility(), QWindow::Minimized);
     QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{true, QSize(1280, 720)}));
 
-    // Restoring from maximized returns to 1280x720.
-    h.window.showMaximized();
+    // Simulate a WM dropping maximize when de-iconifying from the taskbar.
+    h.window.showNormal();
     QTRY_COMPARE(h.window.visibility(), QWindow::Maximized);
+    QCOMPARE(h.controller.maximized(), true);
+    QCOMPARE(AppSettings().mainWindowGeometry(), (MainWindowGeometry{true, QSize(1280, 720)}));
+
+    // Explicit user Restore from maximized returns to 1280x720.
     h.window.showNormal();
     QTRY_COMPARE(h.window.visibility(), QWindow::Windowed);
     QTRY_COMPARE(h.window.size(), QSize(1280, 720));

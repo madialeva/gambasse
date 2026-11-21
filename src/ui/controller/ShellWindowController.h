@@ -68,6 +68,10 @@ public:
     // Writes any debounced normal-size resize to config.ini immediately.
     Q_INVOKABLE void flushPendingSave();
 
+    // Minimizes the window to the taskbar while preserving Qt::WindowMaximized
+    // in its window states, so un-minimizing returns to the prior state.
+    Q_INVOKABLE void minimize();
+
 signals:
     void settingsChanged();
     void windowChanged();
@@ -94,6 +98,8 @@ private:
     bool m_canZoomIn = false;
 
     bool m_maximized = true;
+    bool m_minimized = false;
+    bool m_restoringMaximized = false;
     QSize m_preferredNormalSize = mainwindow::baseSize();
     bool m_initialApplied = false;
     bool m_hadNormalPlacement = false;

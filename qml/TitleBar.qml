@@ -19,6 +19,10 @@ Item {
     // the window that shows the bar owns the dialog.
     property bool showHelp: false
     signal aboutRequested
+    // Optional custom minimize handler (Root uses ShellWindowController.minimize()
+    // so Qt::WindowMaximized is preserved across iconify/de-iconify).
+    property bool customMinimize: false
+    signal minimizeRequested
     // Optional zoom buttons (history and consultation windows). Like the Help
     // menu, the bar only announces the click: FormWindow zooms, and tells the
     // bar which way it still can.
@@ -396,7 +400,12 @@ Item {
             glyph: "\u2014"
             tip: qsTr("Minimize")
             visible: !root.closeOnly
-            onClicked: Window.window.showMinimized()
+            onClicked: {
+                if (root.customMinimize)
+                    root.minimizeRequested();
+                else
+                    Window.window.showMinimized();
+            }
         }
         WindowButton {
             id: maximizeButton

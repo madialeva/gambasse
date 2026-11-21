@@ -107,10 +107,12 @@ Window {
             showLanguageTheme: true
             showHelp: true
             showZoom: true
+            customMinimize: true
             zoomFactor: root.zoomFactor
             canZoomIn: shellWindow.canZoomIn
             canZoomOut: shellWindow.canZoomOut
             onAboutRequested: aboutDialog.present()
+            onMinimizeRequested: shellWindow.minimize()
             onZoomInRequested: shellWindow.zoomIn()
             onZoomOutRequested: shellWindow.zoomOut()
         }

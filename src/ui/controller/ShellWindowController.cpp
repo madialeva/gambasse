@@ -144,6 +144,20 @@ void ShellWindowController::flushPendingSave() {
     }
 }
 
+void ShellWindowController::minimize() {
+    if (!m_window)
+        return;
+    // QWindow::showMinimized() is required on X11 (QXcbWindow ignores
+    // setWindowStates(Maximized | Minimized)), but clears Qt::WindowMaximized.
+    // Recording m_minimized lets onVisibilityChanged() restore the prior
+    // maximized state when the user de-iconifies from the taskbar.
+    const auto guard = qScopeGuard([this] { m_applyingGeometry = false; });
+    m_applyingGeometry = true;
+    m_minimized = true;
+    m_restoringMaximized = false;
+    m_window->showMinimized();
+}
+
 void ShellWindowController::recompute(bool areaChanged) {
     const int wanted = m_settings ? m_settings->letterSize() : zoom::baseLetterSize;
     const QRect area = availableArea();
@@ -212,15 +226,26 @@ void ShellWindowController::followScreen() {
 }
 
 void ShellWindowController::onVisibilityChanged(QWindow::Visibility visibility) {
-    if (!m_initialApplied || m_applyingGeometry || !m_window)
+    if (!m_initialApplied || !m_window)
+        return;
+    if (visibility == QWindow::Maximized)
+        m_restoringMaximized = false;
+    if (m_applyingGeometry)
         return;
     if (visibility == QWindow::Hidden) {
         flushPendingSave();
         return;
     }
-    // Minimizing to the taskbar must never alter the persisted startup state.
-    if (visibility == QWindow::Minimized)
+    // Minimizing to the taskbar must never alter the persisted startup state
+    // or the dimensions the window had before iconifying.
+    if (visibility == QWindow::Minimized) {
+        m_minimized = true;
+        m_restoringMaximized = false;
         return;
+    }
+
+    const bool wasMinimized = m_minimized;
+    m_minimized = false;
 
     if (visibility == QWindow::Maximized) {
         m_saveTimer.stop();
@@ -228,11 +253,26 @@ void ShellWindowController::onVisibilityChanged(QWindow::Visibility visibility) 
             m_maximized = true;
             emit windowStateChanged();
         }
-        persistGeometry();
+        if (!wasMinimized)
+            persistGeometry();
         return;
     }
 
     if (visibility == QWindow::Windowed) {
+        // Coming back from the taskbar (or receiving a stale Windowed event
+        // while recovering maximize after un-iconifying): keep the state the
+        // window had before minimizing without touching config.ini.
+        if ((wasMinimized || m_restoringMaximized) && m_maximized) {
+            m_restoringMaximized = true;
+            const auto guard = qScopeGuard([this] { m_applyingGeometry = false; });
+            m_applyingGeometry = true;
+            m_window->showMaximized();
+            return;
+        }
+        if (wasMinimized)
+            return;
+
+        m_restoringMaximized = false;
         const bool wasMaximized = m_maximized;
         if (m_maximized) {
             m_maximized = false;
