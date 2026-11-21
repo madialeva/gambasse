@@ -1,13 +1,116 @@
 #include <ui/controller/ShellWindowController.h>
 
 #include <QGuiApplication>
+#include <QLibrary>
 #include <QScopeGuard>
 #include <QScreen>
+#include <cstdint>
+#include <cstdlib>
 
 #include <logic/AppSettings.h>
 #include <logic/ZoomLevels.h>
 
 namespace gambasse {
+namespace {
+
+#if defined(Q_OS_LINUX) && QT_CONFIG(xcb)
+// Sends ICCCM 4.1.4 WM_CHANGE_STATE (IconicState) directly on Qt's XCB
+// connection without clearing _NET_WM_STATE_MAXIMIZED_{HORZ,VERT}.
+// QWindow::showMinimized() strips Qt::WindowMaximized first, which makes X11
+// window managers (such as KWin) un-maximize the window and play a
+// small-to-maximized flash on de-iconify. Resolved dynamically from the
+// already-loaded libxcb.so.1 so no compile-time XCB headers or link flags are
+// introduced.
+bool iconifyOnX11(QWindow* window) {
+    auto* x11 = qGuiApp ? qGuiApp->nativeInterface<QNativeInterface::QX11Application>() : nullptr;
+    if (!x11 || !x11->connection())
+        return false;
+
+    struct AtomCookie {
+        uint32_t sequence;
+    };
+    struct AtomReply {
+        uint8_t responseType;
+        uint8_t pad0;
+        uint16_t sequence;
+        uint32_t length;
+        uint32_t atom;
+    };
+    struct Screen {
+        uint32_t root;
+    };
+    struct ScreenIterator {
+        Screen* data;
+        int rem;
+        int index;
+    };
+    struct ClientMessage {
+        uint8_t responseType;
+        uint8_t format;
+        uint16_t sequence;
+        uint32_t window;
+        uint32_t type;
+        uint32_t data32[5];
+    };
+    static_assert(sizeof(ClientMessage) == 32);
+
+    using GetSetupFn = const void* (*)(xcb_connection_t*);
+    using RootsIterFn = ScreenIterator (*)(const void*);
+    using InternAtomFn = AtomCookie (*)(xcb_connection_t*, uint8_t, uint16_t, const char*);
+    using InternAtomReplyFn = AtomReply* (*)(xcb_connection_t*, AtomCookie, void**);
+    using SendEventFn = uint32_t (*)(xcb_connection_t*, uint8_t, uint32_t, uint32_t, const char*);
+    using FlushFn = int (*)(xcb_connection_t*);
+
+    static auto* lib = [] {
+        auto* l = new QLibrary(QStringLiteral("xcb"), 1);
+        l->load();
+        return l;
+    }();
+    static const auto getSetup = reinterpret_cast<GetSetupFn>(lib->resolve("xcb_get_setup"));
+    static const auto rootsIter =
+        reinterpret_cast<RootsIterFn>(lib->resolve("xcb_setup_roots_iterator"));
+    static const auto internAtom = reinterpret_cast<InternAtomFn>(lib->resolve("xcb_intern_atom"));
+    static const auto internAtomReply =
+        reinterpret_cast<InternAtomReplyFn>(lib->resolve("xcb_intern_atom_reply"));
+    static const auto sendEvent = reinterpret_cast<SendEventFn>(lib->resolve("xcb_send_event"));
+    static const auto flush = reinterpret_cast<FlushFn>(lib->resolve("xcb_flush"));
+    if (!getSetup || !rootsIter || !internAtom || !internAtomReply || !sendEvent || !flush)
+        return false;
+
+    const uint32_t winId = static_cast<uint32_t>(window->winId());
+    if (winId == 0)
+        return false;
+
+    xcb_connection_t* conn = x11->connection();
+    const ScreenIterator iter = rootsIter(getSetup(conn));
+    if (!iter.data || iter.rem <= 0)
+        return false;
+    const uint32_t rootWindow = iter.data->root;
+
+    static constexpr char atomName[] = "WM_CHANGE_STATE";
+    AtomReply* reply =
+        internAtomReply(conn, internAtom(conn, 0, sizeof(atomName) - 1, atomName), nullptr);
+    if (!reply || reply->atom == 0) {
+        std::free(reply);
+        return false;
+    }
+    const uint32_t wmChangeState = reply->atom;
+    std::free(reply);
+
+    ClientMessage ev{};
+    ev.responseType = 33; // XCB_CLIENT_MESSAGE
+    ev.format = 32;
+    ev.window = winId;
+    ev.type = wmChangeState;
+    ev.data32[0] = 3; // IconicState (ICCCM 4.1.4)
+    // SubstructureRedirectMask (0x100000) | SubstructureNotifyMask (0x080000)
+    sendEvent(conn, 0, rootWindow, 0x00180000u, reinterpret_cast<const char*>(&ev));
+    flush(conn);
+    return true;
+}
+#endif
+
+} // namespace
 
 ShellWindowController::ShellWindowController(QObject* parent)
     : QObject(parent), m_shown(zoom::baseLetterSize),
@@ -147,14 +250,14 @@ void ShellWindowController::flushPendingSave() {
 void ShellWindowController::minimize() {
     if (!m_window)
         return;
-    // QWindow::showMinimized() is required on X11 (QXcbWindow ignores
-    // setWindowStates(Maximized | Minimized)), but clears Qt::WindowMaximized.
-    // Recording m_minimized lets onVisibilityChanged() restore the prior
-    // maximized state when the user de-iconifies from the taskbar.
     const auto guard = qScopeGuard([this] { m_applyingGeometry = false; });
     m_applyingGeometry = true;
     m_minimized = true;
     m_restoringMaximized = false;
+#if defined(Q_OS_LINUX) && QT_CONFIG(xcb)
+    if (iconifyOnX11(m_window))
+        return;
+#endif
     m_window->showMinimized();
 }
 
@@ -249,11 +352,12 @@ void ShellWindowController::onVisibilityChanged(QWindow::Visibility visibility) 
 
     if (visibility == QWindow::Maximized) {
         m_saveTimer.stop();
-        if (!m_maximized) {
+        const bool stateChanged = !m_maximized;
+        if (stateChanged) {
             m_maximized = true;
             emit windowStateChanged();
         }
-        if (!wasMinimized)
+        if (stateChanged && !wasMinimized)
             persistGeometry();
         return;
     }
