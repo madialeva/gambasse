@@ -39,6 +39,7 @@ CMakeLists.txt.user.*
 *.sln
 
 # ---- AI's folders and files ----
+.agents/
 .claude/
 .opencode/
 openspec/
